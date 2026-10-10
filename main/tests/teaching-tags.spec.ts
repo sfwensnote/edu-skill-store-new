@@ -1,7 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 import { mockQuestions } from '../shared/teaching-method';
 import { teachingCategories } from '../shared/teaching-tags';
 import { marketSkills } from '../src/data/marketplace';
+import { addMarketSkill } from '../shared/marketplace';
 
 test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和预览不产生学生任务', async ({ page }) => {
   await page.goto('/#/create/tag-metadata');
@@ -12,9 +13,10 @@ test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和�
   await expect(idea).toHaveValue('');
   await idea.fill('学生求解一元一次方程时，希望他先独立检查自己的步骤。');
   await page.getByLabel('教学分类').selectOption('');
-  await page.getByRole('button', { name: '继续', exact: true }).click();
+  await expect(page.getByRole('button', { name: '继续', exact: true })).toBeDisabled();
   await expect(page.getByRole('heading', { name: '说说你的教学想法' })).toBeVisible();
   expect(await page.getByLabel('教学分类').locator('option').allTextContents()).toEqual(['请选择教学分类', ...teachingCategories]);
+  await expect(page.getByRole('group', { name: '常用标签' })).not.toContainText(/PBL|情境|任务链/);
   await page.getByLabel('教学分类').selectOption('智能练习');
   await page.getByLabel('自定义标签').fill('一元一次方程');
   await page.getByLabel('自定义标签').press('Enter');
@@ -40,24 +42,71 @@ test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和�
   expect(tasks).toHaveLength(0);
 });
 
+test('旧 PBL 标签不出现在我的 SKILL 和试用详情，来源资料与有效标签保留', async ({ page }) => {
+  const oldEntry = {
+    ...marketSkills[4], area: 'inquiry' as const, scene: 'PBL 项目反思',
+    skill: { ...marketSkills[4].skill, category: '项目式学习' as const, tags: ['PBL 项目反思', '任务链设计', '证据追问'] },
+  };
+  const workspace = JSON.stringify({ version: 1, addedSkills: addMarketSkill([], oldEntry, '2026-10-10T08:00:00Z') });
+  await page.addInitScript((raw) => {
+    const key = 'teaching-method.market-workspace.v1';
+    if (!localStorage.getItem(key)) localStorage.setItem(key, raw);
+    if (!sessionStorage.getItem('teaching-method.market-filters')) sessionStorage.setItem('teaching-method.market-filters', JSON.stringify({ category: '项目式学习', tag: 'PBL 项目反思', area: 'inquiry' }));
+    if (!sessionStorage.getItem('teaching-method.workshop-filters.v1')) sessionStorage.setItem('teaching-method.workshop-filters.v1', JSON.stringify({ panels: { added: { area: 'daily' } } }));
+  }, workspace);
+  await page.goto('/#/market');
+  await expect(page.locator('.market-resource-card')).toHaveCount(5);
+  await expect(page.locator('main')).not.toContainText(/PBL|情境探究|任务链设计|项目式学习/);
+  await page.goto('/#/workshop?tab=added');
+  const card = page.locator('.workshop-item');
+  await expect(page.getByLabel('作品板块')).toHaveCount(0);
+  await expect(page.locator('main')).not.toContainText(/PBL|情境探究|任务链设计|项目式学习/);
+  await expect(card).toContainText('证据追问');
+  await expect(card).not.toContainText(/PBL|任务链设计|项目式学习/);
+  await card.getByRole('button', { name: '查看', exact: true }).click();
+  await expect(page.locator('main')).not.toContainText(/PBL|情境探究|任务链设计|项目式学习/);
+  await expect(page.locator('.detail-heading')).toContainText('未分类');
+  await expect(page.locator('.detail-heading')).not.toContainText(/PBL|任务链设计|项目式学习/);
+  await page.getByLabel('学生输入', { exact: true }).fill('我不知道怎么说明依据');
+  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(page.getByRole('log')).toContainText('模型回复');
+  expect(await page.evaluate(() => localStorage.getItem('teaching-method.market-workspace.v1'))).toBe(workspace);
+});
+
+test('创建页不再接受 PBL 类自定义标签，普通知识点仍可添加和恢复', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/create/no-pbl-tags');
+  await page.getByLabel('自定义标签').fill('pbl 项目');
+  await page.getByLabel('自定义标签').press('Enter');
+  await expect(page.getByRole('alert')).toContainText('不再使用');
+  await expect(page.getByRole('button', { name: '移除标签 pbl 项目' })).toHaveCount(0);
+  await page.getByLabel('自定义标签').fill('阅读理解');
+  await page.getByLabel('自定义标签').press('Enter');
+  await expect(page.getByRole('button', { name: '移除标签 阅读理解' })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('button', { name: '移除标签 阅读理解' })).toBeVisible();
+  await expect(page.getByRole('group', { name: '常用标签' })).not.toContainText(/PBL|情境|任务链/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 test('情境探究的分类和标签可恢复，手机表单不横向溢出', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/inquiry');
-  await page.getByRole('button', { name: '填入数学租赁示例' }).click();
+  await page.getByRole('button', { name: '填入数学租赁案例' }).click();
   await page.getByLabel('教学分类').selectOption('');
   await page.getByRole('button', { name: '开始设计' }).click();
   await expect(page.getByRole('alert')).toContainText('教学分类');
-  await page.getByLabel('教学分类').selectOption('情境任务');
+  await page.getByLabel('教学分类').selectOption('知识讲解');
   await page.getByLabel('自定义标签').fill('一次函数应用');
   await page.getByLabel('自定义标签').press('Enter');
   await page.reload();
-  await expect(page.getByLabel('教学分类')).toHaveValue('情境任务');
+  await expect(page.getByLabel('教学分类')).toHaveValue('知识讲解');
   await expect(page.getByRole('button', { name: '移除标签 一次函数应用' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: '开始设计' }).click();
   await page.reload();
   await page.getByText('教学背景', { exact: true }).click();
-  await expect(page.getByLabel('教学分类')).toHaveValue('情境任务');
+  await expect(page.getByLabel('教学分类')).toHaveValue('知识讲解');
   await expect(page.getByRole('button', { name: '移除标签 一次函数应用' })).toBeVisible();
 });
 

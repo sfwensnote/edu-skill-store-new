@@ -52,7 +52,7 @@ export function ActivityWorkbench({
   const steps =
     draft.path === 'learning'
       ? ['选择作品', '任务要求', '教学支持', '预览保存']
-      : ['选择 SKILL', '选择任务', '模拟检查', '保存配置'];
+      : ['选择 SKILL', '选择任务', '计划检查', '保存配置'];
   const [mobileTab, setMobileTab] = useState<'configure' | 'preview'>('configure');
   const [error, setError] = useState('');
   const [detailOpen, setDetailOpen] = useState(false);
@@ -202,7 +202,7 @@ export function ActivityWorkbench({
             <strong>
               {draft.step} / 4 · {steps[draft.step - 1]}
             </strong>
-            <span role="status">{message || (dirty ? '有未保存修改' : saved ? '已保存到本机' : '尚未填写')}</span>
+            <span role="status">{message || (dirty ? '有未保存修改' : saved ? '已保存' : '尚未填写')}</span>
           </div>
           <div className="activity-bottom-actions">
             <Button

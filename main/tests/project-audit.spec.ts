@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './demo-workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { buildContextualProblem, rentalSampleDesign } from '../shared/contextual-design';
 import { assistantSkillEntries } from '../shared/marketplace';
@@ -45,7 +45,7 @@ async function seed(page: Page) {
             sharedSkillIds: [],
           }),
         );
-      if (!localStorage.getItem('teaching-assistant.frontend-demo.v2'))
+      if (!JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]').some((item: { id: string }) => item.id === assistant.id))
         localStorage.setItem('teaching-assistant.frontend-demo.v2', JSON.stringify([assistant]));
     },
     { design, assistant, draft, task },
@@ -99,11 +99,10 @@ test('从学习活动查看方法再应用，建立独立 SKILL 配置，不恢�
     .getByRole('button', { name: '查看方法', exact: true })
     .first()
     .click();
-  await expect(page.getByRole('button', { name: '教学任务', exact: true })).toHaveAttribute(
-    'aria-current',
-    'page',
-  );
-  await page.getByRole('button', { name: '应用 SKILL', exact: true }).click();
+  await expect(page.getByRole('button', { name: '教学任务', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '继续配置', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '更多方法操作', exact: true }).click();
+  await page.getByRole('menuitem', { name: '应用 SKILL', exact: true }).click();
   await expect(page.getByRole('heading', { name: '选择教学 SKILL', exact: true }).first()).toBeVisible();
   expect(await page.evaluate(() => new URLSearchParams(location.hash.split('?')[1]).has('draft'))).toBe(
     false,
@@ -124,7 +123,7 @@ test('报告沿用当前方法并移除虚构统计，分享不会激活助手�
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/assistant/audit-teacher/logs');
-  await expect(page.getByText('暂无真实运行记录', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '教学方法', exact: true })).toBeVisible();
   await expect(page.getByText('128 次', { exact: true })).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -141,14 +140,14 @@ test('报告沿用当前方法并移除虚构统计，分享不会激活助手�
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'docs/assets/项目审查-方法报告手机.png', fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole('button', { name: '加入分享展示', exact: true }).click();
-  await expect(page).toHaveURL(/workshop\?tab=showcase$/);
-  await expect(page.locator('.workshop-item')).toHaveCount(assistant.skills.length);
+  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await expect(page).toHaveURL(/#\/market$/);
+  await expect(page.locator('.market-resource-card').filter({ hasText: '我的证据追问方法' })).toHaveCount(1);
   const saved = await page.evaluate(
     () => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2')!)[0],
   );
   expect(saved.status).toBe('TRIAL');
-  expect(saved.isPublic).toBe(true);
+  expect(saved.isPublic).toBe(false);
   expect(errors).toEqual([]);
 });
 

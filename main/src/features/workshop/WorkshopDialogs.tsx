@@ -60,7 +60,7 @@ export function WorkshopDialogs({
               variant="destructive"
               onClick={() => {
                 if (!pending?.action()) {
-                  setError('删除未保存，作品仍保留。请释放本机存储空间后重试。');
+                  setError('删除未保存，作品仍保留。请释放存储空间后重试。');
                   return;
                 }
                 const removalOnly = pending.removalOnly;
@@ -116,7 +116,7 @@ export function WorkshopDialogs({
                 setError('');
                 onMessage('已加入助手配置，请重新核对。');
                 onMountEntry(null);
-              } else setError('配置未保存，请释放本机存储空间后重试。');
+              } else setError('配置未保存，请释放存储空间后重试。');
             }}
           >
             确认加入

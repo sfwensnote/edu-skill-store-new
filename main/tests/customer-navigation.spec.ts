@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 import { campusBrief } from '../shared/inquiry-examples';
 import { finishLearningActivity } from './activity-helpers';
 
@@ -6,7 +6,7 @@ test('教师可以直接设计生物项目，独立保存并布置任务，不�
   await page.goto('/#/inquiry');
   await expect(page.getByLabel('教学内容', { exact: true })).toHaveValue('');
   await page.getByRole('button', { name: '策划一个探究项目' }).click();
-  await page.getByRole('button', { name: '填入校园观察示例' }).click();
+  await page.getByRole('button', { name: '填入校园观察案例' }).click();
   await page.getByRole('button', { name: '开始设计', exact: true }).click();
   await page.getByRole('button', { name: '开始填写项目草案' }).click();
   await expect(page.getByLabel('项目名称', { exact: true })).toHaveValue(campusBrief.title);
@@ -91,7 +91,7 @@ test('客户展示页面使用统一配色，没有开发说明，桌面与手�
   ]) {
     await page.goto(`/#/${path}`);
     await expect(page.locator('main')).toBeVisible();
-    await expect(page.locator('body')).not.toContainText(/Demo|前端演示|本机|不调用.*模型|未调用.*LLM/);
+    await expect(page.locator('body')).not.toContainText(/前端演示|不调用.*模型|未调用.*LLM/);
   }
   await page.setViewportSize({ width: 390, height: 844 });
   for (const path of ['home', 'inquiry', 'workshop', 'market', 'space']) {

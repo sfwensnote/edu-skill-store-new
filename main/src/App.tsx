@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { LibraryPage } from '@/features/library/LibraryPage';
 import { LibraryDetailPage } from '@/features/library/LibraryDetailPage';
@@ -12,6 +12,7 @@ import { StudentPreviewPage } from '@/features/usage/StudentPreviewPage';
 import { MethodTrialRecord } from '@/features/usage/MethodTrialRecord';
 import { libraryAssistants } from '@/data/platform';
 import { useDemoPlatform } from '@/hooks/useDemoPlatform';
+import { methodPreviewCases } from '../shared/method-preview';
 import { useAppRoute } from '@/hooks/useAppRoute';
 import { usePageFocus } from '@/hooks/usePageFocus';
 import {
@@ -27,7 +28,6 @@ import {
 import { HomePage, DailyPage } from '@/features/marketplace/LandingPages';
 import { MarketPage } from '@/features/marketplace/MarketPage';
 import { SkillDetailPage } from '@/features/marketplace/MarketPages';
-import { AdaptSkillDialog } from '@/features/marketplace/AdaptSkillDialog';
 import { WorkshopPage } from '@/features/workshop/WorkshopPage';
 import { InquiryStartPage } from '@/features/inquiry/InquiryStartPage';
 import { outcomeTab, isOutcomeReady } from '../shared/inquiry-workflow';
@@ -45,7 +45,6 @@ export default function App() {
   usePageFocus(route);
   const platform = useDemoPlatform();
   const market = useMarketWorkspace();
-  const [adaptingSkill, setAdaptingSkill] = useState<SkillEntry | null>(null);
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
@@ -157,6 +156,10 @@ export default function App() {
   const current = routeAssistantId ? platform.getAssistant(routeAssistantId) : undefined;
   const previewSkillId = route.page === 'trial-preview' && route.caseId
     ? route.caseId.slice(0, route.caseId.lastIndexOf(':')) : undefined;
+  const missingPreviewCase = route.page === 'trial-preview' && current && route.caseId &&
+    !methodPreviewCases(current.skills).some((item) => item.id === route.caseId);
+  const missingEditingSkill = route.page === 'create' && current && route.skillId &&
+    !current.skills.some((skill) => skill.id === route.skillId);
   const publicAssistant = routeAssistantId
     ? publicLibrary.find((item) => item.id === routeAssistantId)
     : undefined;
@@ -204,7 +207,6 @@ export default function App() {
           onBack={() => back({ page: 'market' })}
           onUse={() => applySkill(selectedSkill)}
           onFavorite={() => market.toggleFavorite(selectedSkill.id)}
-          onAdapt={() => setAdaptingSkill(selectedSkill)}
           onCopy={() => copySkill(selectedSkill)}
           onAdd={() => market.addSkill(selectedSkill)}
           added={Boolean(selectedSkill.addedFrom) || addedIds.includes(selectedSkill.id)}
@@ -276,7 +278,6 @@ export default function App() {
           onEditSkill={editSkill}
           onOpenSkill={(skillId) => navigate({ page: 'skill-detail', skillId })}
           onCopySkill={copySkill}
-          onAdaptSkill={setAdaptingSkill}
           onDeleteSkill={(e) => e.addedFrom ? market.removeAddedSkill(e.id) : Boolean(e.assistantId && platform.removeSkill(e.assistantId, e.skill.id))}
           onMount={platform.mountSkill}
           onFavorite={market.toggleFavorite}
@@ -287,15 +288,6 @@ export default function App() {
           onDeleteAssistant={platform.removeAssistant}
         />
       )}
-      {adaptingSkill && <AdaptSkillDialog key={`adapt:${adaptingSkill.id}`} entry={adaptingSkill}
-        onClose={() => setAdaptingSkill(null)}
-        onAdapt={(requirements) => {
-          const copy = platform.copySkill(adaptingSkill, requirements);
-          if (!copy) return false;
-          setAdaptingSkill(null);
-          navigate({ page: 'create', ...copy });
-          return true;
-        }} />}
       {route.page === 'space' && (
         <UsageSpace
           key={route.draftId || route.selection || 'teaching-activities'}
@@ -347,7 +339,7 @@ export default function App() {
       )}
       {((route.page === 'skill-detail' && !selectedSkill) ||
         (route.page === 'task-preview' && !task) ||
-        (route.page === 'inquiry-editor' && !design)) && (
+        (route.page === 'inquiry-editor' && !design) || missingEditingSkill) && (
         <main className="page-frame not-found">
           <h1>没有找到这项内容</h1>
           <button onClick={() => navigate({ page: 'workshop' })}>返回我的 SKILL</button>
@@ -367,7 +359,7 @@ export default function App() {
           onUse={() => navigate({ page: 'use', assistantId: publicAssistant.id })}
         />
       )}
-      {route.page === 'create' && current && (
+      {route.page === 'create' && current && !missingEditingSkill && (
         <DesignerPage
           key={current.id + (route.skillId || '')}
           assistant={current}
@@ -460,7 +452,7 @@ export default function App() {
           onPublish={isMethodReviewed(current) ? () => shareReviewedMethod(current.id) : undefined}
         />
       )}
-      {route.page === 'trial-preview' && current && (!previewSkillId || current.skills.some((skill) => skill.id === previewSkillId)) && (
+      {route.page === 'trial-preview' && current && !missingPreviewCase && (
         <StudentPreviewPage
           key={current.id + (route.caseId || '')}
           assistant={{ ...current, skills: current.skills.filter((skill) => previewSkillId ? skill.id === previewSkillId : platform.isSkillIncluded(current.id, skill.id)) }}
@@ -475,7 +467,7 @@ export default function App() {
             ...(previewSkillId ? { skillId: previewSkillId } : {}), returnTo: routeHash(route) })}
         />
       )}
-      {route.page === 'trial-preview' && current && previewSkillId && !current.skills.some((skill) => skill.id === previewSkillId) &&
+      {route.page === 'trial-preview' && current && missingPreviewCase &&
         <main className="page-frame not-found"><h1>没有找到这项方法</h1><button onClick={() => goTo({ page: 'workshop', tab: 'skills' })}>返回我的 SKILL</button></main>}
       {route.page === 'use' && (current || publicAssistant) && (
         <UsePage

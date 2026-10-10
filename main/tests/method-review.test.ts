@@ -3,8 +3,15 @@ import assert from 'node:assert/strict';
 import { initialMine } from '../src/data/platform';
 import { methodFromSkill, defaultCreationDraft, prepareMethod, demoIdea, mockQuestions, recordAnswer } from '../shared/teaching-method';
 import { reviseReviewedMethod, isMethodReviewed } from '../shared/method-review';
-import { methodPreviewCases, methodPreviewReply } from '../shared/method-preview';
+import { methodPreviewCases } from '../shared/method-preview';
 import { readRoute, routeHash } from '../src/lib/routes';
+
+test('空或不完整的方法不能以旧状态冒充已核对', () => {
+  const reviewed = { ...initialMine[0], revision: 2, status: 'TESTED' as const };
+  assert.equal(isMethodReviewed(reviewed), true);
+  assert.equal(isMethodReviewed({ ...reviewed, skills: [] }), false);
+  assert.equal(isMethodReviewed({ ...reviewed, skills: [{ ...reviewed.skills[0], behaviorSteps: [] }] }), false);
+});
 
 test('核对中修改方法只替换目标 SKILL，升级版本并撤销旧确认', () => {
   const assistant = { ...structuredClone(initialMine[0]), revision: 4, isPublic: true };
@@ -31,8 +38,8 @@ test('第二次介入的示例进入独立预览情况，不被第一步替代',
   const cases = methodPreviewCases(updated.skills);
   assert.equal(cases.length, 2);
   assert.equal(cases[1].condition, mockQuestions[3].example);
-  assert.ok(methodPreviewReply(cases[1]).includes(mockQuestions[4].example));
-  assert.ok(!methodPreviewReply(cases[1]).includes(mockQuestions[2].example));
+  assert.equal(cases[1].action, mockQuestions[4].example);
+  assert.notEqual(cases[1].action, mockQuestions[2].example);
 });
 
 test('预览保留核对或方法步骤来源及指定步骤，刷新后仍可返回', () => {

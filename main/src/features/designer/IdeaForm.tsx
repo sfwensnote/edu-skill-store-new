@@ -40,7 +40,7 @@ export function IdeaForm({
             })
           }
         >
-          填入数学示例
+          填入数学案例
         </Button>
       )}
       <label className="idea-input">
@@ -103,7 +103,7 @@ export function IdeaForm({
       <TeachingTagsField value={draft.method.tags}
         onChange={(tags) => onChange({ ...draft, method: { ...draft.method, tags } })} />
       <footer className="creation-footer">
-        <Button size="lg" type="submit" disabled={!draft.originalIdea.trim()}>
+        <Button size="lg" type="submit" disabled={!draft.originalIdea.trim() || !draft.method.category}>
           继续
           <ArrowRight data-icon="inline-end" />
         </Button>

@@ -21,7 +21,7 @@ test('教师从试用记录和报告打开学生视角 Demo，可发送示例并
   await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
   await expect(page).toHaveURL(/student-preview\?from=logs&return=/);
   await expect(page.getByText('学生视角预览')).toBeVisible();
-  await expect(page.getByText(/固定对话示例/)).toBeVisible();
+  await expect(page.locator('main')).not.toContainText(/Demo|演示|预置|示例/);
   await page.getByRole('button', { name: '我把左边的 6 移到右边，算成了 12 + 6。' }).click();
   await expect(page.getByLabel('以学生身份输入')).toHaveValue('我把左边的 6 移到右边，算成了 12 + 6。');
   await page.getByRole('button', { name: '发送学生问题' }).click();

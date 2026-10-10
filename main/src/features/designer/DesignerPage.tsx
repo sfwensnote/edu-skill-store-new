@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { SaveFailureExitGuard } from '@/components/SaveFailureExitGuard';
 import { IdeaForm } from './IdeaForm';
 import { GuidedMethodPage } from './GuidedMethodPage';
-import { normalizeTeachingTags, teachingCategoryOf, teachingTagsOf, type TeachingCategory } from '../../../shared/teaching-tags';
+import { visibleTeachingTags, isTeachingCategory, teachingCategoryOf, teachingTagsOf, type TeachingCategory } from '../../../shared/teaching-tags';
 import './creation-flow.css';
 
 const draftKey = (id: string, skillId?: string) =>
@@ -28,12 +28,16 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
     ) as CreationDraft | null;
     if (
       saved &&
+      (assistant.status === 'DRAFT' || saved.sourceRevision === assistant.revision) &&
       typeof saved.originalIdea === 'string' &&
       saved.method &&
       ['problem', 'expectedOutcome'].every(
         (key) => typeof saved.method[key as keyof TeachingMethod] === 'string',
       ) &&
       (saved.method.trigger === undefined || typeof saved.method.trigger === 'string') &&
+      ['name', 'description'].every((key) => saved.method[key as keyof TeachingMethod] === undefined ||
+        typeof saved.method[key as keyof TeachingMethod] === 'string') &&
+      (saved.method.tags === undefined || (Array.isArray(saved.method.tags) && saved.method.tags.every((tag) => typeof tag === 'string'))) &&
       ['grade', 'subject', 'teachingScene'].every(
         (key) => typeof saved[key as keyof CreationDraft] === 'string',
       ) &&
@@ -52,7 +56,7 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
       const descriptor = { ...method, name: method.name || '', summary: method.description || '' };
       const category = teachingCategoryOf(descriptor, saved.teachingScene, assistant.area);
       method.category = category === '未分类' ? null : category;
-      method.tags = normalizeTeachingTags(method.tags ?? sourceTags ?? teachingTagsOf(descriptor, saved.teachingScene, assistant.area));
+      method.tags = visibleTeachingTags(method.tags ?? sourceTags ?? teachingTagsOf(descriptor, saved.teachingScene, assistant.area));
       return {
         ...saved,
         method,
@@ -91,10 +95,10 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
   }
   if (!assistant.goal && !assistant.skills.length) return defaultCreationDraft();
   const selected = assistant.skills.find((s) => s.id === skillId) || assistant.skills[0];
-  const category = selected ? teachingCategoryOf(selected, assistant.activity, assistant.area) : sourceCategory || (assistant.area === 'inquiry' ? '项目式学习' : '未分类');
+  const category = selected ? teachingCategoryOf(selected, assistant.activity, assistant.area) : isTeachingCategory(sourceCategory) ? sourceCategory : '未分类';
   const method = selected ? methodFromSkill(selected) : emptyMethod();
   method.category = category === '未分类' ? null : category;
-  method.tags = selected ? teachingTagsOf(selected, assistant.activity, assistant.area) : normalizeTeachingTags(sourceTags);
+  method.tags = selected ? teachingTagsOf(selected, assistant.activity, assistant.area) : visibleTeachingTags(sourceTags);
   return {
     ...defaultCreationDraft(),
     originalIdea: assistant.goal,
@@ -102,9 +106,9 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
     grade: assistant.grade,
     subject: assistant.subject,
     teachingScene: method.category || '',
-    stage: selected && !assistant.adaptation ? 'method' : 'idea',
+    stage: selected ? 'method' : 'idea',
     method,
-    questionIndex: selected && !assistant.adaptation ? 6 : 0,
+    questionIndex: selected ? 6 : 0,
     editingSkillId: selected?.id,
   };
 }
@@ -144,12 +148,12 @@ export function DesignerPage({
   function save(next: CreationDraft) {
     setDraft(next);
     try {
-      localStorage.setItem(draftKey(assistant.id, selectedSkillId), JSON.stringify(next));
+      localStorage.setItem(draftKey(assistant.id, selectedSkillId), JSON.stringify({ ...next, sourceRevision: assistant.revision }));
       setStorageError('');
       setSavedAt(new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }));
       return true;
     } catch {
-      setStorageError('本地存储空间不足，请保持此页面打开，避免丢失草稿。');
+      setStorageError('存储空间不足，请保持此页面打开，避免丢失草稿。');
       return false;
     }
   }
@@ -158,28 +162,24 @@ export function DesignerPage({
     const saved = onUpdate({
       status: 'DRAFT',
       isPublic: false,
-      name: assistant.name || `${next.grade}${next.subject}教学助手`,
+      name: assistant.name || `${next.grade}${next.subject}教学方法`,
       goal: next.stage === 'idea' ? next.originalIdea : next.method.expectedOutcome || next.originalIdea,
       grade: next.grade,
       subject: next.subject,
       activity: next.teachingScene || '教学实践',
     });
-    if (!saved) setStorageError('教学方法保存失败，当前修改仍在页面中，请释放本机存储空间后重试。');
+    if (!saved) setStorageError('教学方法保存失败，当前修改仍在页面中，请释放存储空间后重试。');
   }
   function retrySave() {
     if (!save(draft)) return false;
-    const saved = onUpdate(
-      assistant.goal
-        ? {}
-        : {
-            goal: draft.method.expectedOutcome || draft.originalIdea,
-            grade: draft.grade,
-            subject: draft.subject,
-            activity: draft.teachingScene || '教学实践',
-            name: assistant.name || `${draft.grade}${draft.subject}教学助手`,
-          },
-    );
-    if (!saved) setStorageError('教学方法保存失败，当前修改仍在页面中，请释放本机存储空间后重试。');
+    const saved = onUpdate({
+      goal: draft.stage === 'idea' ? draft.originalIdea : draft.method.expectedOutcome || draft.originalIdea,
+      grade: draft.grade,
+      subject: draft.subject,
+      activity: draft.teachingScene || '教学实践',
+      name: assistant.name || `${draft.grade}${draft.subject}教学方法`,
+    });
+    if (!saved) setStorageError('教学方法保存失败，当前修改仍在页面中，请释放存储空间后重试。');
     return saved;
   }
   function confirmMethod() {
@@ -192,7 +192,7 @@ export function DesignerPage({
     const saved = onUpdate({
       skills: upsertMethodSkill(assistant.skills, skill),
       revision: (assistant.revision || 1) + 1,
-      name: assistant.name || `${draft.grade}${draft.subject}教学助手`,
+      name: (assistant.skills.length <= 1 ? draft.method.name : '') || assistant.name || `${draft.grade}${draft.subject}教学方法`,
       goal: draft.method.expectedOutcome,
       grade: draft.grade,
       subject: draft.subject,

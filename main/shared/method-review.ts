@@ -1,4 +1,4 @@
-import type { TeachingAssistant } from './assistant';
+import { skillSchema, type TeachingAssistant } from './assistant';
 import { methodError, packageTeachingMethod, upsertMethodSkill, type TeachingMethod } from './teaching-method';
 
 export function reviseReviewedMethod(
@@ -22,6 +22,7 @@ export function reviseReviewedMethod(
 }
 
 export function isMethodReviewed(assistant: TeachingAssistant) {
-  return ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status) &&
+  return assistant.skills.length > 0 && assistant.skills.every((skill) => skillSchema.safeParse(skill).success) &&
+    ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status) &&
     !(assistant.id.startsWith('assistant-demo-') && !assistant.revision);
 }

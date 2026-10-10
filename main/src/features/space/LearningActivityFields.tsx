@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { EmptyState } from '@/components/Workbench';
 import type { SkillEntry } from '../../../shared/marketplace';
+import { skillValidationLabel } from '../../../shared/skill-display';
 import {
   compatibilityIssue,
   skillPermissionIssue,
@@ -41,7 +42,7 @@ export function SkillMethodSummary({ entry }: { entry: SkillEntry }) {
         </div>
         <div>
           <dt>方法状态</dt>
-          <dd>{entry.validation}</dd>
+          <dd>{skillValidationLabel(entry)}</dd>
         </div>
         <div>
           <dt>执行验证</dt>

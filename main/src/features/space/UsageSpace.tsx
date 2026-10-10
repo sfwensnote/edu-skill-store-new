@@ -121,7 +121,7 @@ export function UsageSpace({
     setDraft(saved);
     setDirty(false);
     dirtyRef.current = false;
-    setMessage(saved.path === 'learning' ? '任务草稿已保存到本机' : 'SKILL 应用配置已保存，尚未启用');
+    setMessage(saved.path === 'learning' ? '任务草稿已保存' : 'SKILL 应用配置已保存，尚未启用');
     return true;
   }
   saveRef.current = save;

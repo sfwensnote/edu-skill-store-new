@@ -201,7 +201,7 @@ export function activityStepIssue(
     draft.step >= 3 &&
     (!draft.simulation || draft.simulation.fingerprint !== simulationFingerprint(draft, entry, target))
   )
-    return '请先生成当前配置的规则模拟，再检查方法与教学原则。';
+    return '请先生成当前配置的执行计划，再检查方法与教学原则。';
   return '';
 }
 

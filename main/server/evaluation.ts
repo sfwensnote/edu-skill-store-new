@@ -37,7 +37,7 @@ export async function evaluate(agent: Agent): Promise<Evaluation> {
         name: '教学模型执行与材料引用',
         kind: 'technical',
         status: 'pending',
-        reason: '尚未连接真实教学模型。当前固定回复不能证明执行或引用正确。',
+        reason: '尚未连接教学模型，暂无法完成执行检测。',
       },
       {
         name: '目标对齐与教学引导',

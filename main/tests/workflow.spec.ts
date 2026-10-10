@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 
 test('助手库支持搜索、筛选和详情跳转', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -18,24 +18,18 @@ test('助手库支持搜索、筛选和详情跳转', async ({ page }) => {
   await page.screenshot({ path: 'test-results/library-1440.png', fullPage: true });
 });
 
-test('我的助手支持确认删除', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
+test('旧我的助手地址进入我的 SKILL；删除单项须确认并保留其他方法', async ({ page }) => {
   await page.goto('/#/mine');
-  await expect(page.getByText('2 个助手')).toBeVisible();
-
-  const moreButton = page.getByRole('button', { name: '更多操作：课堂提问设计助手' });
-  const deleteButton = page.getByRole('menuitem', { name: '删除课堂提问设计助手' });
-  await moreButton.click();
-  await deleteButton.click();
-  await expect(page.getByRole('heading', { name: '删除这项内容？' })).toBeVisible();
-  await page.getByRole('button', { name: '取消' }).click();
-  await expect(page.getByText('课堂提问设计助手')).toBeVisible();
-  await expect(page).toHaveURL(/#\/mine$/);
-
-  await moreButton.click();
-  await deleteButton.click();
-  await page.getByRole('button', { name: '确认删除' }).click();
-  await expect(page.getByText('课堂提问设计助手')).toHaveCount(0);
-  await expect(page.getByText('1 个助手')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
+  const first = page.locator('.workshop-item').first();
+  const title = await first.locator('h3').innerText();
+  await first.getByRole('button', { name: /更多操作/ }).click();
+  await page.getByRole('menuitem', { name: `删除${title}`, exact: true }).click();
+  await page.getByRole('button', { name: '取消', exact: true }).click();
+  await expect(page.locator('.workshop-item')).toHaveCount(6);
+  await first.getByRole('button', { name: /更多操作/ }).click();
+  await page.getByRole('menuitem', { name: `删除${title}`, exact: true }).click();
+  await page.getByRole('button', { name: '确认删除', exact: true }).click();
+  await expect(page.locator('.workshop-item')).toHaveCount(5);
   await expect(page).toHaveURL(/#\/mine$/);
 });

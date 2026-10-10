@@ -4,7 +4,9 @@ import { packageTeachingMethod, methodFromSkill } from '../shared/teaching-metho
 import { parseInquiryStartDraft } from '../shared/inquiry-workflow';
 import { copyContextualDesign, contextualMarkdown } from '../shared/contextual-design';
 import { parseMarketWorkspace } from '../shared/marketplace';
-import { categoryOf, tagsOf, catalogBase, defaultCatalogFilters } from '../src/features/marketplace/market-catalog';
+import { categoryOf, tagsOf, catalogBase, defaultCatalogFilters, restoreCatalogFilters } from '../src/features/marketplace/market-catalog';
+import { teachingCategories, suggestedTags, isPblTag, teachingTagsOf } from '../shared/teaching-tags';
+import { skillSchema } from '../shared/assistant';
 import { marketSkills } from '../src/data/marketplace';
 
 test('教师选择的场景和自定义标签在 SKILL 封装与重新编辑时保留', () => {
@@ -60,4 +62,27 @@ test('没有新字段的旧集市方法仍可按原有分类发现', () => {
   delete entry.skill.tags;
   assert.equal(categoryOf(entry), '错因辅导');
   assert.ok(tagsOf(entry).includes('错因辅导'));
+});
+
+test('PBL 分类与标签退出展示，旧来源快照仍完整恢复', () => {
+  const skill = { ...marketSkills[4].skill, category: '项目式学习' as const, tags: ['pbl 项目', '任务链设计', '证据追问'] };
+  assert.equal(skillSchema.safeParse(skill).success, true);
+  const entry = { ...marketSkills[4], skill, area: 'inquiry' as const, scene: 'PBL 项目反思' };
+  const added = { ...entry, id: `added:${entry.id}`, addedFrom: { id: entry.id, addedAt: '2026-10-10T08:00:00Z' } };
+  const restored = parseMarketWorkspace(JSON.stringify({ version: 1, addedSkills: [added] }));
+  assert.deepEqual(restored.addedSkills[0], added);
+  assert.equal(parseInquiryStartDraft(JSON.stringify({ category: '项目式学习' })).category, '项目式学习');
+  assert.equal(categoryOf(added), '未分类');
+  assert.deepEqual(tagsOf(added), ['证据追问']);
+  assert.equal(catalogBase([added], { ...defaultCatalogFilters, query: 'PBL' }).length, 0);
+  assert.equal(catalogBase([added], { ...defaultCatalogFilters, tag: '证据追问' }).length, 1);
+  assert.equal(teachingTagsOf({ ...entry.skill, tags: undefined }, entry.scene, entry.area).some(isPblTag), false);
+});
+
+test('已取消的分类、标签和板块缓存不继续遮挡集市内容', () => {
+  const restored = restoreCatalogFilters(JSON.stringify({ area: 'inquiry', category: '项目式学习', tag: 'PBL 项目反思', subject: '数学' }));
+  assert.deepEqual(restored, { ...defaultCatalogFilters, subject: '数学' });
+  assert.deepEqual(teachingCategories, ['课堂提问', '错因辅导', '智能练习', '知识讲解']);
+  assert.equal(suggestedTags.some(isPblTag), false);
+  assert.equal(marketSkills.flatMap(tagsOf).some(isPblTag), false);
 });

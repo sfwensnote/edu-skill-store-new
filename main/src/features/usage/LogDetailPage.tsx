@@ -33,7 +33,6 @@ export function LogDetailPage({
         <div>
           <p>{assistant.name} · v{assistant.revision || 1}.0</p>
           <h1>{skill.name}</h1>
-          <p className="section-help">教师设定的方法，实际执行待验证。</p>
         </div>
         <Button onClick={() => onPreview(0)}>学生视角预览</Button>
       </div>

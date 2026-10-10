@@ -73,7 +73,7 @@ export function TaskPreview({
     try {
       localStorage.setItem(key, JSON.stringify(next));
     } catch {
-      setMessage('本机存储不足，输入仍在当前页面，请保持页面打开。');
+      setMessage('存储空间不足，输入仍在当前页面，请保持页面打开。');
     }
   }
   return (
@@ -82,7 +82,6 @@ export function TaskPreview({
         <ArrowLeft />
         返回教学任务
       </button>
-      <div className="demo-banner">学生视角预览 · 提交仅保存到本机</div>
       <header className="page-title-block">
         <h1>{task.title}</h1>
         <p>{task.instructions}</p>
@@ -123,7 +122,7 @@ export function TaskPreview({
           <p>【教师预设提示】{task.feedback}</p>
           {task.kind === 'skill' && (
             <p>
-              【引导示例】
+              方法提示
               {task.skill?.skill.steps?.[0]?.action || task.skill?.skill.behaviorSteps[0]}
             </p>
           )}

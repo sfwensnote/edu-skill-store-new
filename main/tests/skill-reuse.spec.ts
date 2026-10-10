@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './demo-workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { assistantSkillEntries, addMarketSkill } from '../shared/marketplace';
 
@@ -46,15 +46,15 @@ test('集市添加不创建可编辑副本；分类、刷新、试用与移除�
   await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
   await expect(page.getByText('方法示例', { exact: true })).toHaveCount(0);
-  await page.getByLabel('学生的回应').fill('我不知道下一步怎么做');
-  await page.getByRole('button', { name: '查看引导示例', exact: true }).click();
-  await expect(page.locator('.experience-turn')).toHaveCount(1);
+  await page.getByLabel('学生输入', { exact: true }).fill('我不知道下一步怎么做');
+  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(page.locator('.experience-turn')).toHaveCount(2);
   expect((await stored(page)).owners).toEqual(before);
   await page.reload();
   await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
   await expect(page.getByRole('heading', { name: '从集市添加', exact: true })).toBeVisible();
   await card.getByRole('button', { name: /更多操作/ }).click();
-  await expect(page.getByRole('menuitem', { name: '改编 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: '改编 SKILL', exact: true })).toHaveCount(0);
   await expect(page.getByRole('menuitem', { name: /编辑|分享展示|加入助手配置/ })).toHaveCount(0);
   await page.getByRole('menuitem', { name: '从我的 SKILL 移除', exact: true }).click();
   await page.getByRole('button', { name: '确认移除', exact: true }).click();
@@ -77,50 +77,20 @@ test('添加保存失败时不假报成功，恢复存储后只添加一次', as
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
 
-test('改编先填写新需求；取消及保存失败不建副本，成功后独立梳理并重新检测', async ({ page }) => {
+test('集市及添加项没有改编或创建副本入口，试用不改变源方法', async ({ page }) => {
   await page.goto('/#/market');
-  await firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
-  const before = (await stored(page)).owners;
-  const original = (await stored(page)).workspace.addedSkills[0];
+  const before = await stored(page);
   await firstRow(page).getByRole('button', { name: '查看与试用', exact: true }).click();
-  await page.getByRole('button', { name: '改编 SKILL', exact: true }).click();
-  await expect(page.getByRole('button', { name: '开始改编', exact: true })).toBeDisabled();
-  await page.getByRole('button', { name: '取消', exact: true }).click();
-  await expect(page.locator('main')).toHaveCount(1);
-  expect((await stored(page)).owners).toEqual(before);
-  await page.getByRole('button', { name: '改编 SKILL', exact: true }).click();
-  const requirements = '用于高中物理，先要求学生解释依据，再给出检查提示。';
-  await page.getByLabel('新需求', { exact: true }).fill(requirements);
-  await blockStorage(page, ownersKey);
-  await page.getByRole('button', { name: '开始改编', exact: true }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByRole('dialog').getByRole('alert')).toContainText('草稿未保存');
-  await expect(page.getByLabel('新需求', { exact: true })).toHaveValue(requirements);
-  expect((await stored(page)).owners).toEqual(before);
-  await page.evaluate(() => (window as any).restoreSkillStorage());
-  await page.getByRole('button', { name: '开始改编', exact: true }).click();
-  await expect(page).toHaveURL(/#\/create\//);
-  await expect(page.getByRole('heading', { name: '说说你的教学想法', exact: true })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: '教学想法', exact: true })).toHaveValue(requirements);
-  let data = await stored(page);
-  expect(data.owners).toHaveLength(3);
-  const draft = data.owners[0];
-  expect(draft.status).toBe('DRAFT');
-  expect(draft.isPublic).toBe(false);
-  expect(draft.revision).toBe(1);
-  expect(draft.skills[0].id).not.toBe(original.skill.id);
-  expect(draft.adaptation.requirements).toBe(requirements);
-  expect(data.workspace.addedSkills[0]).toEqual(original);
-  expect(data.workspace.sharedSkillIds).toEqual([]);
-  await page.reload();
-  await expect(page.getByRole('textbox', { name: '教学想法', exact: true })).toHaveValue(requirements);
-  await page.getByRole('button', { name: '继续', exact: true }).click();
-  await expect(page.locator('.question-top small')).toHaveText('1 / 6');
-  await expect(page.getByRole('button', { name: '形成 SKILL', exact: true })).toBeDisabled();
-  await page.goto('/#/workshop?tab=created');
-  await expect(page.locator('.workshop-item')).toHaveCount(7);
-  await page.getByRole('button', { name: '从集市添加', exact: true }).click();
-  await expect(page.locator('.workshop-item')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: /改编|创建方法副本|编辑我的方法/ })).toHaveCount(0);
+  await page.getByLabel('学生输入', { exact: true }).fill('我不知道哪里出错了');
+  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(page.getByRole('log')).toContainText('模型回复');
+  expect((await stored(page)).owners).toEqual(before.owners);
+  await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await page.goto('/#/workshop?tab=added');
+  await page.locator('.workshop-item').getByRole('button', { name: /更多操作/ }).click();
+  await expect(page.getByRole('menuitem', { name: /改编|创建方法副本|编辑/ })).toHaveCount(0);
+  expect((await stored(page)).owners).toEqual(before.owners);
 });
 
 test('从已发布个人来源添加也不会取得所有权，来源移除后保留固定版本', async ({ page }) => {

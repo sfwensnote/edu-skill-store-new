@@ -8,7 +8,6 @@ export function MethodTrialRecord({ task, onBack }: { task: LocalTeachingTask; o
     <header className="method-detail-heading"><div>
       <p>历史方法试用 · {task.skill?.version}</p>
       <h1>{task.skill?.skill.name || task.title}</h1>
-      <p className="section-help">保留旧版的本机试用记录，不作为学生任务或执行证据。</p>
     </div></header>
     {task.skill && <MethodSteps skill={task.skill.skill} />}
     <section className="method-boundaries">

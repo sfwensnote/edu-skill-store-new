@@ -1,10 +1,9 @@
 import type { SkillEntry } from '../../../shared/marketplace';
-import { teachingCategories, popularTags, teachingCategoryOf, teachingTagsOf, maxTagLength, type CatalogCategory } from '../../../shared/teaching-tags';
+import { teachingCategories, popularTags, teachingCategoryOf, teachingTagsOf, isPblTag, maxTagLength, type CatalogCategory } from '../../../shared/teaching-tags';
 export { teachingCategories, popularTags };
 
 export type CatalogFilters = {
   query: string;
-  area: string;
   grade: string;
   subject: string;
   category: string;
@@ -13,7 +12,6 @@ export type CatalogFilters = {
 };
 export const defaultCatalogFilters: CatalogFilters = {
   query: '',
-  area: '全部',
   grade: '全部',
   subject: '全部',
   category: '全部方法',
@@ -39,13 +37,12 @@ export function catalogBase(entries: SkillEntry[], filters: CatalogFilters): Ski
       entry.skill.summary,
       entry.example,
       entry.creator,
-      entry.scene,
+      ...(isPblTag(entry.scene) ? [] : [entry.scene]),
       ...tagsOf(entry),
     ]
       .join(' ')
       .toLocaleLowerCase();
     return (
-      (filters.area === '全部' || entry.area === filters.area) &&
       (filters.grade === '全部' || entry.grade === filters.grade) &&
       (filters.subject === '全部' || entry.subject === filters.subject) &&
       (!filters.tag || tagsOf(entry).includes(filters.tag)) &&
@@ -71,9 +68,8 @@ export function restoreCatalogFilters(raw: string | null): CatalogFilters {
     const next = { ...defaultCatalogFilters };
     for (const key of Object.keys(next) as (keyof CatalogFilters)[])
       if (typeof parsed?.[key] === 'string') next[key] = parsed[key];
-    if (!['全部', 'daily', 'inquiry'].includes(next.area)) next.area = '全部';
     if (!['全部方法', '我收藏的', '未分类', ...teachingCategories].includes(next.category)) next.category = '全部方法';
-    if (next.tag.length > maxTagLength) next.tag = '';
+    if (next.tag.length > maxTagLength || isPblTag(next.tag)) next.tag = '';
     if (!['default', 'name'].includes(next.sort)) next.sort = 'default';
     return next;
   } catch {

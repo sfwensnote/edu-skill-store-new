@@ -116,7 +116,7 @@
   .editor-heading {
     gap: 10px;
   }
-  .editor-heading > .demo-label {
+  .editor-heading > .content-label {
     flex-basis: 100%;
   }
   .editor-heading .back-link {
@@ -153,7 +153,7 @@
   .workshop-tabs button {
     padding-inline: 12px;
   }
-  .demo-banner,
+  .status-banner,
   .review-banner {
     font-size: 13px;
   }

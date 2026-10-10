@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 
 test('首页只保留 SKILL 入口，创建直接进入方法编辑，导航保持统一', async ({ page }) => {
   const errors: string[] = [];

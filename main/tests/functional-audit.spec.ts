@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './demo-workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { buildContextualProblem, rentalSampleDesign } from '../shared/contextual-design';
 import { defaultCreationDraft, mockQuestions, prepareMethod, recordAnswer } from '../shared/teaching-method';
@@ -254,7 +254,7 @@ test('删除和展示保存失败保留作品与确认弹窗，恢复后可以�
 
 test('核对状态保存失败不能进入完成页或试用流程，恢复后最后一步可重新确认', async ({ page }) => {
   await page.addInitScript((assistant) => {
-    if (!localStorage.getItem('teaching-assistant.frontend-demo.v2'))
+    if (!JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]').some((item: { id: string }) => item.id === 'functional-check'))
       localStorage.setItem(
         'teaching-assistant.frontend-demo.v2',
         JSON.stringify([

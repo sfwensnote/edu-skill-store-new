@@ -28,7 +28,7 @@ export function TestMethodEditor({ skill, onClose, onSave }: {
     if (issue) { setError(issue); return; }
     if (!dirty) { onClose(); return; }
     if (onSave(method)) onClose();
-    else setError('修改未保存，请释放本机存储空间后重试。');
+    else setError('修改未保存，请释放存储空间后重试。');
   }
   return (
     <Dialog open onOpenChange={(open) => { if (!open) close(); }}>

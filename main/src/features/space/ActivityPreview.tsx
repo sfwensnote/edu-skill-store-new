@@ -163,7 +163,6 @@ export function ActivityPreview({
         <ClipboardCheck aria-hidden="true" />
         <div>
           <h2>{draft.step < 3 ? '方法应用预览' : '执行计划预览'}</h2>
-          {draft.step >= 3 && <p>规则模拟 · 未真实执行</p>}
         </div>
       </header>
       {!entry ? (
@@ -194,7 +193,7 @@ export function ActivityPreview({
                 <small>{entry.version}</small>
               </h3>
               {!simulation ? (
-                <p className="activity-notice">请查看模拟步骤。配置或版本变化后需重新模拟。</p>
+                <p className="activity-notice">请检查执行计划。配置或版本变化后需重新检查。</p>
               ) : (
                 <div className="activity-evidence-list">
                   <section>
@@ -229,18 +228,18 @@ export function ActivityPreview({
                     )}
                   </section>
                   <section>
-                    <h4>教学原则 · 待执行验证</h4>
+                    <h4>教学原则</h4>
                     {entry.skill.constraints.map((constraint, i) => (
                       <p key={i}>{constraint}</p>
                     ))}
                     {!entry.skill.constraints.length && <p>未填写教学原则，请回到方法流程补充。</p>}
                   </section>
                   <section>
-                    <h4>退出结果</h4>
+                    <h4>退出条件</h4>
                     <p>
                       {simulation.assessment === 'trigger'
-                        ? `${entry.skill.constraints.find((item) => item.startsWith('结束条件：')) || '退出条件待方法补充'}；真实退出结果待验证。`
-                        : '模拟不介入；真实退出结果待验证。'}
+                        ? entry.skill.constraints.find((item) => item.startsWith('结束条件：')) || '退出条件待方法补充'
+                        : '当前情况下不介入。'}
                     </p>
                   </section>
                 </div>
@@ -248,8 +247,8 @@ export function ActivityPreview({
               {draft.step === 4 && (
                 <p className="activity-help">
                   配置检查记录：
-                  {simulation && draft.teacherReviewed ? '教师已检查模拟计划' : '待教师检查模拟计划'}
-                  。教学效果尚未验证。
+                  {simulation && draft.teacherReviewed ? '教师已检查执行计划' : '待教师检查执行计划'}
+                  。
                 </p>
               )}
             </>

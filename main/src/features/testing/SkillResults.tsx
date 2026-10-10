@@ -24,7 +24,7 @@ export function SkillResults({
           const own = cases.filter((item) => item.skillId === skill.id);
           const done = own.filter((item) => cases.indexOf(item) < completed);
           const attention = done.some((item) => item.attention);
-          const finished = done.length === own.length;
+          const finished = own.length > 0 && done.length === own.length;
           const active = !finished && own.some((item) => cases.indexOf(item) === completed);
           return (
             <article className="skill-result-row" key={skill.id}>
@@ -47,11 +47,9 @@ export function SkillResults({
                 <strong>{skill.name}</strong>
                 <span>
                   {finished
-                    ? skill.steps
-                      ? '教师已确认'
-                      : attention
-                        ? '示例需关注'
-                        : '示例已核对'
+                    ? attention
+                        ? '需关注'
+                        : '教师已确认'
                     : active
                       ? '核对中'
                       : '等待核对'}

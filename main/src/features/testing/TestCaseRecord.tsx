@@ -20,7 +20,7 @@ export function TestCaseRecord({
       <div className="test-case-head">
         <h1>{testCase.title}</h1>
       </div>
-      {!testCase.methodReview && <p className="scenario-copy">{testCase.scenario}</p>}
+      <p className="scenario-copy">{testCase.scenario}</p>
       {!testCase.methodReview && (
         <div className="test-question">
           <span>题目</span>
@@ -29,18 +29,19 @@ export function TestCaseRecord({
       )}
       <div className="simulation-flow">
         <div className="simulation-line student">
-          <span className="speaker">{testCase.methodReview ? '学生表现' : '学生（模拟）'}</span>
+          <span className="speaker">学生输入</span>
           <p>{testCase.studentInput}</p>
         </div>
         <div className="flow-line">
           <CircleDot />
         </div>
         <div className="simulation-line assistant">
-          <span className="speaker">{testCase.methodReview ? '教师做法' : '教学助手'}</span>
+          <span className="speaker">模型回复</span>
           <p>{testCase.assistantOutput}</p>
         </div>
       </div>
       <div className="check-list">
+        {testCase.expectedAction && <p>预期做法：{testCase.expectedAction}</p>}
         <h2>需要核对的原则</h2>
         {testCase.checks.map((check) => (
           <p key={check}>

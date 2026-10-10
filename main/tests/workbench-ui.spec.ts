@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 import {
   rentalSampleDesign,
   buildContextualProblem,
@@ -45,7 +45,9 @@ test('工作区可预览、折叠并恢复手动修改与结束条件，形成 S
     await page.getByRole('button', { name: '提交', exact: true }).click();
   await expect(page.getByRole('button', { name: '形成 SKILL', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-  await expect(page.locator('.creation-preview')).toContainText('结束条件：两次提示后仍停滞时，转交教师。');
+  await expect(page).toHaveURL(/assistant\/workbench-review\/test/);
+  const skills = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2')!)[0].skills);
+  expect(skills[0].constraints).toContain('结束条件：两次提示后仍停滞时，转交教师。');
 });
 
 test('主要页面在四种屏宽无横向溢出，工作区操作与学习内容可见', async ({ page }) => {

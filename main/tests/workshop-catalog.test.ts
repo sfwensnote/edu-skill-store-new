@@ -33,7 +33,8 @@ test('搜索教学内容并组合筛选，按真实日期排序；无日期项�
     2,
   );
   assert.equal(filterWork(c.skills, '', { ...defaultWorkFilters, query: 'needsReview' }).length, 0);
-  assert.equal(filterWork(c.skills, '', { ...defaultWorkFilters, area: 'inquiry' }).length, 0);
+  const legacyFilters = restoreWorkshopSearch(JSON.stringify({ panels: { skills: { area: 'inquiry' } } }));
+  assert.equal(filterWork(c.skills, '', legacyFilters.panels.skills!).length, c.skills.length);
   const items = c.skills.slice(0, 3).map((item, i) => ({
     ...item,
     updatedAt: [undefined, '2026-10-02', '2026-10-08'][i],

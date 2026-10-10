@@ -37,7 +37,7 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
   function leave(retry: boolean) {
     if (!destination) return;
     if (retry && !latest.current.onRetry()) {
-      setError('保存仍未成功，请释放本机存储空间后重试。');
+      setError('保存仍未成功，请释放存储空间后重试。');
       return;
     }
     currentHash.current = destination;
@@ -49,7 +49,7 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
       <DialogContent>
         <DialogHeader>
           <DialogTitle>还有未保存的修改</DialogTitle>
-          <DialogDescription>本机保存失败。可重试保存；直接离开可能丢失当前内容。</DialogDescription>
+          <DialogDescription>保存失败。可重试保存；直接离开可能丢失当前内容。</DialogDescription>
         </DialogHeader>
         {error && <p role="alert">{error}</p>}
         <div className="inline-actions">

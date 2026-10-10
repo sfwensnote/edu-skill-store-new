@@ -175,5 +175,6 @@ test('旧格式的语文方法核对也使用自己的内容，不生成数学�
   assert.equal(cases.length, skill.behaviorSteps.length);
   assert.ok(cases.every((item) => item.methodReview));
   assert.ok(!JSON.stringify(cases).includes('方程'));
-  assert.ok(cases[0].assistantOutput.includes(skill.behaviorSteps[0]));
+  assert.equal(cases[0].expectedAction, skill.behaviorSteps[0]);
+  assert.match(cases[0].assistantOutput, /你的判断依据是什么/);
 });

@@ -38,7 +38,7 @@ export function SaveStatus({ failed = false, time }: { failed?: boolean; time?: 
   return (
     <span className="save-status" data-status={failed ? 'error' : 'saved'} role="status">
       <i aria-hidden="true" />
-      {failed ? '保存失败' : '已保存'}
+      {failed ? '保存失败' : time ? '已保存' : '草稿'}
       {!failed && time ? ` ${time}` : ''}
     </span>
   );

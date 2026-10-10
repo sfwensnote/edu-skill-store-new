@@ -224,14 +224,14 @@ export function SkillApplicationFields({
           }
         >
           <FlaskConical aria-hidden="true" data-icon="inline-start" />
-          查看模拟步骤
+          查看执行计划
         </Button>
         <div className="activity-capability-note">
           <p>按教师判断展示教学步骤，未实际执行。</p>
         </div>
         {validSimulation && (
           <p role="status" className="activity-save-note">
-            模拟计划已更新
+            执行计划已更新
           </p>
         )}
       </>
@@ -260,7 +260,7 @@ export function SkillApplicationFields({
         </div>
         <div>
           <dt>配置检查</dt>
-          <dd>{validSimulation ? '已有规则模拟，尚无执行证据' : '配置已变化，需要重新模拟'}</dd>
+          <dd>{validSimulation ? '计划已检查，等待执行' : '配置已变化，需要重新检查'}</dd>
         </div>
       </dl>
       <label className="activity-check">
@@ -270,7 +270,7 @@ export function SkillApplicationFields({
           disabled={!validSimulation}
           onChange={(e) => onChange({ ...draft, teacherReviewed: e.target.checked })}
         />
-        我已检查本次模拟计划与原方法的对应关系
+        我已检查执行计划与原方法的对应关系
       </label>
       {entry && skillPermissionIssue(entry, ownedIds) && (
         <p className="activity-notice">{skillPermissionIssue(entry, ownedIds)}</p>

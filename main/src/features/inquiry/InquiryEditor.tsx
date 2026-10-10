@@ -61,7 +61,7 @@ export function InquiryEditor({
       return;
     }
     if (!onSave()) {
-      setMessage('作品保存失败，请检查本机存储空间后重试。当前修改仍保留在页面中。');
+      setMessage('作品保存失败，请检查存储空间后重试。当前修改仍保留在页面中。');
       return;
     }
     if (use) onUse();

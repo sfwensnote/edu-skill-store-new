@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  maxTeachingTags, maxTagLength, normalizeTeachingTags, suggestedTags, teachingCategories,
+  maxTeachingTags, maxTagLength, visibleTeachingTags, isPblTag, isTeachingCategory, suggestedTags, teachingCategories,
   type TeachingCategory,
 } from '../../shared/teaching-tags';
 import './teaching-tags.css';
@@ -14,7 +14,7 @@ export function TeachingCategoryField({ value, onChange }: {
   return (
     <label className="teaching-scene-field">
       教学分类
-      <select aria-label="教学分类" required value={value || ''}
+      <select aria-label="教学分类" required value={isTeachingCategory(value) ? value : ''}
         onChange={(event) => onChange((event.target.value || null) as TeachingCategory | null)}>
         <option value="">请选择教学分类</option>
         {teachingCategories.map((category) => <option key={category}>{category}</option>)}
@@ -28,16 +28,20 @@ export function TeachingTagsField({ value, onChange }: {
   onChange: (tags: string[]) => void;
 }) {
   const id = useId();
-  const tags = normalizeTeachingTags(value);
+  const tags = visibleTeachingTags(value);
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   function change(next: string[]) {
-    onChange(normalizeTeachingTags(next));
+    onChange(visibleTeachingTags(next));
     setError('');
   }
   function add() {
     const candidates = input.split(/[，,、]/).map((tag) => tag.trim()).filter(Boolean);
     if (!candidates.length) return;
+    if (candidates.some(isPblTag)) {
+      setError('不再使用 PBL、教学活动或情境任务类标签。');
+      return;
+    }
     if (candidates.some((tag) => tag.length > maxTagLength)) {
       setError(`每个标签最多 ${maxTagLength} 字，请缩短后添加。`);
       return;
@@ -93,7 +97,7 @@ export function TeachingTagsField({ value, onChange }: {
 }
 
 export function TeachingTagList({ tags }: { tags?: string[] }) {
-  const values = normalizeTeachingTags(tags);
+  const values = visibleTeachingTags(tags);
   if (!values.length) return null;
   return <ul className="teaching-tag-list" aria-label="作品标签">
     {values.map((tag) => <li key={tag}>{tag}</li>)}

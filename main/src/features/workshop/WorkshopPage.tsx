@@ -1,3 +1,4 @@
+import { readSession, writeSession } from '@/lib/session-storage';
 import { useEffect, useRef, useState } from 'react';
 import { Filter, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,7 @@ export function WorkshopPage(props: WorkshopProps) {
     ? (props.tab as WorkshopTab)
     : 'skills';
   const label = workshopTabs.find(([key]) => key === tab)![1];
-  const [search, setSearch] = useState(() => restoreWorkshopSearch(sessionStorage.getItem(searchKey)));
+  const [search, setSearch] = useState(() => restoreWorkshopSearch(readSession(searchKey)));
   const filters = search.panels[tab] || { ...defaultWorkFilters };
   const collections = workshopCollections(props);
   const counts = Object.fromEntries(
@@ -40,11 +41,9 @@ export function WorkshopPage(props: WorkshopProps) {
       collections[key].filter((item) => matchesWork(item, search.query)).length,
     ]),
   ) as Record<WorkshopTab, number>;
-  const areaEnabled = collections[tab].some((item) => item.kind === 'skill' || item.kind === 'method-draft');
   const items = filterWork(collections[tab], search.query, {
     ...filters,
     query: '',
-    area: areaEnabled ? filters.area : '全部',
   });
   const [pending, setPending] = useState<PendingRemoval | null>(null);
   const [mount, setMount] = useState<SkillEntry | null>(null);
@@ -52,12 +51,12 @@ export function WorkshopPage(props: WorkshopProps) {
   const [message, setMessage] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const dialogOrigin = useRef<HTMLButtonElement | null>(null);
-  const activeFilterCount = (['area', 'grade', 'subject', 'sort'] as const).filter(
+  const activeFilterCount = (['grade', 'subject', 'sort'] as const).filter(
     (key) => filters[key] !== defaultWorkFilters[key],
   ).length;
   const hasFilters =
     Boolean(search.query) ||
-    (['area', 'grade', 'subject', 'sort'] as const).some(
+    (['grade', 'subject', 'sort'] as const).some(
       (key) => filters[key as keyof WorkshopFilters] !== defaultWorkFilters[key as keyof WorkshopFilters],
     );
   function update(patch: Partial<WorkshopFilters>) {
@@ -71,19 +70,19 @@ export function WorkshopPage(props: WorkshopProps) {
     props.onTab(next);
   }
   useEffect(() => {
-    sessionStorage.setItem(searchKey, JSON.stringify(search));
+    writeSession(searchKey, JSON.stringify(search));
   }, [search]);
   useEffect(() => {
     const key = `teaching-method.workshop-scroll.v1:${tab}`;
     const frame = requestAnimationFrame(() =>
-      window.scrollTo({ top: Math.max(0, Number(sessionStorage.getItem(key)) || 0), behavior: 'instant' }),
+      window.scrollTo({ top: Math.max(0, Number(readSession(key)) || 0), behavior: 'instant' }),
     );
     function save() {
       const [path, query] = window.location.hash.split('?');
       const requested = new URLSearchParams(query).get('tab');
       const current = workshopTabs.some(([key]) => key === requested) ? requested : 'skills';
       if ((path === '#/workshop' || path === '#/mine') && current === tab)
-        sessionStorage.setItem(key, String(window.scrollY));
+        writeSession(key, String(window.scrollY));
     }
     window.addEventListener('scroll', save, { passive: true });
     return () => {
@@ -103,10 +102,7 @@ export function WorkshopPage(props: WorkshopProps) {
       if (item.kind === 'skill') props.onTrialSkill(item.entry);
     },
     copy: (item) => {
-      if (item.kind === 'skill') {
-        if (item.entry.assistantId) props.onCopySkill(item.entry);
-        else props.onAdaptSkill(item.entry);
-      }
+      if (item.kind === 'skill' && item.entry.assistantId) props.onCopySkill(item.entry);
     },
     favorite: props.onFavorite,
     share: (item) => {
@@ -116,7 +112,7 @@ export function WorkshopPage(props: WorkshopProps) {
       }
       if (props.onShare(item.id))
         setMessage(props.shared.includes(item.id) ? '已取消SKILL 展示。' : '已加入当前工作区的SKILL 展示。');
-      else setMessage('展示设置保存失败，请释放本机存储空间后重试。');
+      else setMessage('展示设置保存失败，请释放存储空间后重试。');
     },
     mount: (item, trigger) => {
       if (item.kind !== 'skill') return;
@@ -147,7 +143,7 @@ export function WorkshopPage(props: WorkshopProps) {
     if (tab === 'added') props.onMarket();
     else props.onCreate();
   }
-  const select = (key: 'area' | 'grade' | 'subject' | 'sort', name: string, options: [string, string][]) => (
+  const select = (key: 'grade' | 'subject' | 'sort', name: string, options: [string, string][]) => (
     <label className="workshop-filter-field">
       <span>{name}</span>
       <select
@@ -204,13 +200,6 @@ export function WorkshopPage(props: WorkshopProps) {
               筛选{activeFilterCount ? ` · ${activeFilterCount}` : ''}
             </Button>
             <div id="workshop-filters" className="workshop-filter-controls" data-expanded={filtersOpen}>
-              {areaEnabled &&
-                select('area', '板块', [
-                  ['全部', '全部'],
-                  ...[...new Set(collections[tab].map((item) => item.area).filter(Boolean))].map(
-                    (area): [string, string] => [area!, area === 'daily' ? '日常教学' : '情境探究'],
-                  ),
-                ])}
               {select(
                 'grade',
                 '学段',

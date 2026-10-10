@@ -1,6 +1,7 @@
 import type { TeachingAssistant } from '../../../shared/assistant';
 import type { SkillEntry } from '../../../shared/marketplace';
-import { teachingTagsOf } from '../../../shared/teaching-tags';
+import { teachingTagsOf, teachingCategoryOf, isPblTag } from '../../../shared/teaching-tags';
+import { skillValidationLabel } from '../../../shared/skill-display';
 
 export const workshopTabs = [
   ['skills', '全部'],
@@ -16,7 +17,6 @@ type WorkInfo = {
   keywords: string;
   grade: string;
   subject: string;
-  area?: 'daily' | 'inquiry';
   createdAt?: string;
   updatedAt?: string;
   status: string;
@@ -28,10 +28,9 @@ export type WorkItem = WorkInfo &
     | { kind: 'skill'; entry: SkillEntry }
     | { kind: 'method-draft'; assistant: TeachingAssistant }
   );
-export type WorkshopFilters = { query: string; area: string; grade: string; subject: string; sort: string };
+export type WorkshopFilters = { query: string; grade: string; subject: string; sort: string };
 export const defaultWorkFilters: WorkshopFilters = {
   query: '',
-  area: '全部',
   grade: '全部',
   subject: '全部',
   sort: 'updated',
@@ -47,7 +46,6 @@ export function restoreWorkshopSearch(raw: string | null): WorkshopSearchState {
       const value = { ...defaultWorkFilters };
       for (const key of Object.keys(value) as (keyof WorkshopFilters)[])
         if (typeof data[key] === 'string') value[key] = data[key];
-      if (!['全部', 'daily', 'inquiry'].includes(value.area)) value.area = '全部';
       if (!['updated', 'created', 'name'].includes(value.sort)) value.sort = 'updated';
       panels[tab] = value;
     }
@@ -66,21 +64,20 @@ export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): W
     summary: entry.skill.summary,
     tags: teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example),
     keywords: [
-      entry.scene,
+      ...(isPblTag(entry.scene) ? [] : [entry.scene]),
       entry.example,
       entry.skill.purpose,
       entry.skill.trigger,
       ...entry.skill.behaviorSteps,
       ...entry.skill.constraints,
       ...teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example),
-      entry.skill.category || '',
+      teachingCategoryOf(entry.skill, entry.scene, entry.area),
     ].join(' '),
     grade: entry.grade,
     subject: entry.subject,
-    area: entry.area,
     createdAt: entry.addedFrom?.addedAt || owner?.createdAt,
     updatedAt: entry.addedFrom?.addedAt || owner?.updatedAt,
-    status: entry.demo ? '待验证' : entry.validation,
+    status: skillValidationLabel(entry),
     detail: entry.version,
     canUse: Boolean(
       entry.skill.name.trim() &&
@@ -108,14 +105,13 @@ export function workshopCollections({
       assistant,
       id: `method-draft:${assistant.id}`,
       title:
-        assistant.activity && assistant.activity !== '错因诊断'
+        assistant.activity && assistant.activity !== '错因诊断' && !isPblTag(assistant.activity)
           ? `${assistant.activity} · 方法草稿`
           : '教学方法草稿',
       summary: assistant.goal,
-      keywords: assistant.activity,
+      keywords: isPblTag(assistant.activity) ? '' : assistant.activity,
       grade: assistant.grade,
       subject: assistant.subject,
-      area: assistant.area || 'daily',
       createdAt: assistant.createdAt,
       updatedAt: assistant.updatedAt,
       status: '尚未形成 SKILL',
@@ -142,7 +138,6 @@ export function filterWork(items: WorkItem[], globalQuery: string, filters: Work
     (item) =>
       matchesWork(item, globalQuery) &&
       matchesWork(item, filters.query) &&
-      (filters.area === '全部' || filters.area === item.area) &&
       (filters.grade === '全部' || filters.grade === item.grade) &&
       (filters.subject === '全部' || filters.subject === item.subject),
   );

@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 import { finishLearningActivity } from './activity-helpers';
 import { initialMine } from '../src/data/platform';
 import { rentalSampleDesign, buildContextualProblem, createTaskChain } from '../shared/contextual-design';
 
 async function prepareProblem(page: import('@playwright/test').Page) {
   await page.goto('/#/inquiry');
-  await page.getByRole('button', { name: '填入数学租赁示例' }).click();
+  await page.getByRole('button', { name: '填入数学租赁案例' }).click();
   await page.getByRole('button', { name: '开始设计', exact: true }).click();
   await page.getByLabel('情境标题', { exact: true }).fill('我的校园租赁题');
   await page.getByLabel('我已核对数据、知识要求、单位、范围和可解性').check();
@@ -14,51 +14,30 @@ async function prepareProblem(page: import('@playwright/test').Page) {
   return new URL(page.url()).hash.split('/')[2];
 }
 
-test('首页入口、SKILL 试用收藏与独立改编保留旧数据，编辑单项不覆盖其他能力', async ({ page }) => {
+test('首页与集市可试用收藏添加；编辑自己的单项不覆盖其他方法', async ({ page }) => {
   const api: string[] = [];
-  page.on('request', (r) => {
-    if (r.url().includes('/api/')) api.push(r.url());
-  });
+  page.on('request', (r) => { if (r.url().includes('/api/')) api.push(r.url()); });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '浏览集市' }).click();
   await page.getByRole('button', { name: '错误后反思引导', exact: true }).click();
-  await page.getByLabel('学生的回应').fill('我算错了，不知道检查哪里');
-  await page.getByRole('button', { name: '查看引导示例' }).click();
-  await expect(page.getByText(/【引导示例】当/)).toBeVisible();
+  const ownersBefore = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
+  await page.getByLabel('学生输入', { exact: true }).fill('我算错了，不知道检查哪里');
+  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(page.getByRole('log')).toContainText('请把你目前的做法和理由写出来');
+  await expect(page.getByRole('button', { name: /改编/ })).toHaveCount(0);
   await page.getByRole('button', { name: '收藏', exact: true }).click();
   await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
-  await page.getByRole('button', { name: '改编 SKILL', exact: true }).click();
-  await page.getByLabel('新需求', { exact: true }).fill('先询问依据，再给出有针对性的检查提示。');
-  await page.getByRole('button', { name: '开始改编', exact: true }).click();
-  await page.getByRole('button', { name: '继续', exact: true }).click();
-  await expect(page.getByRole('button', { name: '编辑SKILL 名称' })).toContainText('错误后反思引导');
-  await page.getByRole('button', { name: '编辑SKILL 名称' }).click();
-  await page.getByRole('textbox', { name: 'SKILL 名称', exact: true }).fill('我改编的方法');
-  for (const answer of ['让学生解释错误依据', '学生答错以后', '请学生说明思路', '学生仍不会时', '提醒检查下一步', '不直接给答案']) {
-    await page.getByRole('textbox', { name: '你的回答', exact: true }).fill(answer);
-    await page.getByRole('button', { name: '提交', exact: true }).click();
-  }
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-    while (await page.getByRole('button', { name: /确认并(继续|完成)/ }).count())
-    await page.getByRole('button', { name: /确认并(继续|完成)/ }).click();
-  await expect(page.getByRole('heading', { name: '教学方法核对完成' })).toBeVisible();
-  await page.getByRole('button', { name: '进入我的 SKILL' }).click();
-  await expect(page.getByRole('button', { name: '我改编的方法', exact: true })).toBeVisible();
-  const beforeEditing = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]'));
-  expect(beforeEditing).toHaveLength(3);
-  expect(beforeEditing.find((a: { id: string }) => a.id === 'assistant-demo-active').name).toBe('七年级数学教学助手');
+  expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(ownersBefore);
   await page.goto('/#/create/assistant-demo-active?skill=reflect');
   await page.getByRole('button', { name: '编辑SKILL 名称' }).click();
   await page.getByRole('textbox', { name: 'SKILL 名称', exact: true }).fill('编辑原有第一项');
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-  const old = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]').find(
-      (a: { id: string }) => a.id === 'assistant-demo-active',
-    ),
-  );
+  const old = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]')
+    .find((a: { id: string }) => a.id === 'assistant-demo-active'));
   expect(old.skills).toHaveLength(3);
-  expect(old.skills[1].name).toBe(initialMine[0].skills[1].name);
+  expect(old.skills[0].name).toBe('编辑原有第一项');
+  expect(old.skills[1]).toEqual(initialMine[0].skills[1]);
   expect(api).toEqual([]);
 });
 
@@ -100,16 +79,10 @@ test('情境题目、任务链、PBL 保存恢复、复制、导出，学生按�
   await page.getByRole('button', { name: '保存PBL 项目', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('已保存PBL 项目');
   await page.goto('/#/workshop?tab=pbl');
-  await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '更多操作：我的 PBL 方案', exact: true }).click();
-  await page.getByRole('menuitem', { name: '分享展示', exact: true }).click();
-  await page.goto('/#/market');
-  await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).not.toBeVisible();
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
-  await page.getByRole('button', { name: '作品展示', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '查看作品', exact: true }).click();
-  await page.getByRole('button', { name: '返回编辑', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).toHaveCount(0);
+  const designs = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!).designs);
+  expect(designs.find((item: { id: string }) => item.id === designId).pblProject.name).toBe('我的 PBL 方案');
+  await page.goto(`/#/inquiry/${designId}/3`);
   await expect(page.getByLabel('项目名称', { exact: true })).toHaveValue('我的 PBL 方案');
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: '导出方案' }).click();
@@ -122,7 +95,7 @@ test('情境题目、任务链、PBL 保存恢复、复制、导出，学生按�
   await page.goto(`/#/space?selection=${encodeURIComponent(`design:${designId}:3`)}`);
   await finishLearningActivity(page, { feedback: '请检查证据是否支持建议。' });
   await page.getByRole('button', { name: '打开学生预览' }).click();
-  await expect(page.getByText(/学生视角预览/)).toBeVisible();
+  await expect(page.getByLabel('阶段学习记录', { exact: true })).toBeVisible();
   for (let i = 0; i < 5; i++) {
     await page.getByLabel('阶段学习记录', { exact: true }).fill(`阶段 ${i + 1} 的证据与进展`);
     if (i < 4) await page.getByRole('button', { name: '记录完成，下一步' }).click();
@@ -154,6 +127,8 @@ test('上游修改不覆盖任务，自定义题目不套用默认数学答案',
 });
 
 test('工坊复制、收藏、分享、助手配置和确认删除可交互', async ({ page }) => {
+  await page.addInitScript((owners) => localStorage.setItem('teaching-assistant.frontend-demo.v2', JSON.stringify(
+    owners.map((owner) => ({ ...owner, revision: 2, status: 'TESTED' })))), initialMine);
   await page.goto('/#/workshop');
   const first = page.locator('[data-work-id="personal:assistant-demo-active:reflect"]');
   await first.getByRole('button', { name: /更多操作/ }).click();

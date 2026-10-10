@@ -170,7 +170,7 @@ export function GuidedMethodPage({
                     })
                   }
                 >
-                  使用示例回答
+                  填入参考回答
                 </button>
                 <Button type="button" aria-label="提交" disabled={!answer.trim()} onClick={submitAnswer}>
                   提交并继续
@@ -305,7 +305,7 @@ export function GuidedMethodPage({
                 <Eye data-icon="inline-start" />
                 预览 SKILL
               </Button>
-              <Button disabled={Boolean(question) || Boolean(methodError(method))} onClick={confirm}>
+              <Button disabled={Boolean(methodError(method))} onClick={confirm}>
                 形成 SKILL
               </Button>
             </StickyActions>

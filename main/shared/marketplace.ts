@@ -79,7 +79,7 @@ export function assistantSkillEntries(assistants: TeachingAssistant[]): SkillEnt
     assistant.skills.map((skill) => ({
       id: `personal:${assistant.id}:${skill.id}`,
       skill,
-      creator: assistant.id.startsWith('assistant-demo-') && !assistant.revision ? '预置教师示例' : '我',
+      creator: assistant.id.startsWith('assistant-demo-') && !assistant.revision ? '教师' : '我',
       grade: assistant.grade,
       subject: assistant.subject,
       area: assistant.skillAreas?.[skill.id] || assistant.area || 'daily',
@@ -87,7 +87,7 @@ export function assistantSkillEntries(assistants: TeachingAssistant[]): SkillEnt
       version: `v${assistant.revision || 1}.0`,
       validation:
         assistant.id.startsWith('assistant-demo-') && !assistant.revision
-          ? '预置示例 · 待验证'
+          ? '方法待核对'
           : ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status)
             ? '教师已核对'
             : '方法待核对',
@@ -97,7 +97,7 @@ export function assistantSkillEntries(assistants: TeachingAssistant[]): SkillEnt
         (assistant.sourceDesignId
           ? '来自项目中的教学指导方法，由教师整理并确认。'
           : assistant.id.startsWith('assistant-demo-') && !assistant.revision
-            ? '教师方法示例：保留课堂中的判断、做法与原则。'
+            ? ''
             : '来自教师课堂经验，由教师整理并确认。'),
       demo: assistant.id.startsWith('assistant-demo-') && !assistant.revision,
       assistantId: assistant.id,

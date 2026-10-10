@@ -1,3 +1,4 @@
+import { readSession, writeSession } from '@/lib/session-storage';
 import { useEffect, useState } from 'react';
 import {
   ArrowRight,
@@ -17,6 +18,7 @@ import { EmptyState } from '@/components/Workbench';
 import type { SkillEntry } from '../../../shared/marketplace';
 import { TeachingTagList } from '@/components/TeachingTagsField';
 import { teachingTagsOf } from '../../../shared/teaching-tags';
+import { skillCreatorLabel, skillValidationLabel } from '../../../shared/skill-display';
 import { MarketCategories, categoryIcons } from './MarketCategories';
 import {
   catalogBase,
@@ -47,7 +49,7 @@ export function MarketPage({
   onAdd: (entry: SkillEntry) => boolean;
   onFavorite: (id: string) => void;
 }) {
-  const [filters, setFilters] = useState(() => restoreCatalogFilters(sessionStorage.getItem(filterKey)));
+  const [filters, setFilters] = useState(() => restoreCatalogFilters(readSession(filterKey)));
   const [categoryPanel, setCategoryPanel] = useState(false);
   const base = catalogBase(entries, filters);
   const items = catalogItems(base, filters, favorites);
@@ -60,14 +62,14 @@ export function MarketPage({
     setFilters((current) => ({ ...current, ...patch }));
   }
   useEffect(() => {
-    sessionStorage.setItem(filterKey, JSON.stringify(filters));
+    writeSession(filterKey, JSON.stringify(filters));
   }, [filters]);
   useEffect(() => {
-    const y = Number(sessionStorage.getItem(scrollKey)) || 0;
+    const y = Number(readSession(scrollKey)) || 0;
     const frame = requestAnimationFrame(() => window.scrollTo({ top: Math.max(0, y), behavior: 'instant' }));
     function saveScroll() {
       if (window.location.hash.split('?')[0] === '#/market')
-        sessionStorage.setItem(scrollKey, String(window.scrollY));
+        writeSession(scrollKey, String(window.scrollY));
     }
     window.addEventListener('scroll', saveScroll, { passive: true });
     return () => {
@@ -111,21 +113,6 @@ export function MarketPage({
         </label>
         <div className="catalog-selects">
           <label>
-            板块
-            <select
-              aria-label="板块"
-              value={filters.area}
-              onChange={(event) => update({ area: event.target.value })}
-            >
-              <option>全部</option>
-              {[...new Set(entries.map((entry) => entry.area))].map((area) => (
-                <option key={area} value={area}>
-                  {area === 'daily' ? '日常教学' : '情境探究'}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
             学段
             <select
               aria-label="学段筛选"
@@ -149,19 +136,6 @@ export function MarketPage({
               ))}
             </select>
           </label>
-        </div>
-        <div className="catalog-segments" role="group" aria-label="教学板块快捷切换">
-          {['全部', ...new Set(entries.map((entry) => entry.area))].map((area) => (
-            <button
-              key={area}
-              type="button"
-              aria-pressed={filters.area === area}
-              className={filters.area === area ? 'active' : ''}
-              onClick={() => update({ area })}
-            >
-              {area === 'daily' ? '日常教学' : area === 'inquiry' ? '情境探究' : '全部'}
-            </button>
-          ))}
         </div>
       </div>
       <div className="catalog-layout">
@@ -222,7 +196,7 @@ export function MarketPage({
                     <div className="card-meta">
                       <span>
                         <UserRound />
-                        {entry.creator}
+                        {skillCreatorLabel(entry)}
                       </span>
                       <span>
                         <GraduationCap />
@@ -238,7 +212,7 @@ export function MarketPage({
                       </span>
                       <span>
                         <CircleCheck />
-                        {entry.demo ? '待验证' : entry.validation}
+                        {skillValidationLabel(entry)}
                       </span>
                     </div>
                   </div>

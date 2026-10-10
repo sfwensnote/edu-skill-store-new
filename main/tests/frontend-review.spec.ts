@@ -68,7 +68,7 @@ test('活动步骤切换定位新内容，手机保存反馈可见且底部留�
   await expect(page.getByLabel('任务名称')).toHaveCSS('font-size', '16px');
   await page.getByRole('button', { name: '保存草稿', exact: true }).click();
   await expect(page.locator('.activity-bottom-status')).toBeVisible();
-  await expect(page.locator('.activity-bottom-status')).toContainText('任务草稿已保存到本机');
+  await expect(page.locator('.activity-bottom-status')).toContainText('任务草稿已保存');
   await next.click();
   await next.click();
   const size = await page.locator('.activity-workbench').evaluate((element) => ({

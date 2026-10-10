@@ -38,7 +38,7 @@ export function invalidate(project: Project, patch: Partial<Project>): Project {
 export function createAgent(project: Project): Project {
   if (!project.brief || !project.skills.some((s) => s.enabled))
     throw new Error('请先确认教学需求，并至少启用一个能力。');
-  if (!project.materials.length) throw new Error('请上传教学材料，或使用示例材料。');
+  if (!project.materials.length) throw new Error('请上传教学材料，或使用参考材料。');
   const agent: Agent = {
     name: project.name,
     version: project.revision + 1,
@@ -85,7 +85,7 @@ export function canRelease(project: Project): boolean {
 
 export function reportMarkdown(p: Project): string {
   const e = p.evaluation;
-  return `# ${p.name} · 使用报告\n\n生成时间：${new Date().toLocaleString('zh-CN')}\n\n模式：${e?.mode === 'live' ? '真实模型' : '演示模式（不作为模型能力或教学效果证明）'}\n\n版本：v${p.agent?.version ?? 0}\n\n## 教师需求\n\n${p.demand}\n\n## 教学方案\n\n${p.brief ? `对象：${p.brief.audience}\n\n目标：${p.brief.goal}\n\n任务：${p.brief.task}\n\n边界：${p.brief.boundary}` : '尚未生成'}\n\n## 已启用能力\n\n${p.skills
+  return `# ${p.name} · 使用报告\n\n生成时间：${new Date().toLocaleString('zh-CN')}\n\n模型连接：${e?.mode === 'live' ? '已连接' : '尚未连接'}\n\n版本：v${p.agent?.version ?? 0}\n\n## 教师需求\n\n${p.demand}\n\n## 教学方案\n\n${p.brief ? `对象：${p.brief.audience}\n\n目标：${p.brief.goal}\n\n任务：${p.brief.task}\n\n边界：${p.brief.boundary}` : '尚未生成'}\n\n## 已启用能力\n\n${p.skills
     .filter((s) => s.enabled)
     .map(
       (s) =>
@@ -93,5 +93,5 @@ export function reportMarkdown(p: Project): string {
     )
     .join(
       '\n\n',
-    )}\n\n## 教学材料\n\n${p.materials.map((m) => `- ${m.name}`).join('\n')}\n\n## 检测证据\n\n${e?.checks.map((c) => `### ${c.name} · ${{ pass: '通过', review: '需调整', pending: '待验证' }[c.status]}\n\n${c.reason}${c.input ? `\n\n测试输入：${c.input}\n\n实际回答：${c.output}` : ''}`).join('\n\n') ?? '尚未检测'}\n\n## 试用记录\n\n${p.messages.map((m) => `**${m.role === 'user' ? '教师试问' : '智能体'}**：${m.content}`).join('\n\n')}\n\n## 教师反馈\n\n${p.feedback || '未填写'}\n\n教师判断：${p.verdict === 'yes' ? '符合需求' : p.verdict === 'adjust' ? '需要调整' : '未确认'}\n\n## 使用决定\n\n${p.released ? (e?.mode === 'demo' ? '已保存为演示智能体' : '教师已确认在平台内启用') : '尚未启用'}\n\n本报告反映当前版本的功能检查和教师试用，不等于学生学习效果的实证结论。\n`;
+    )}\n\n## 教学材料\n\n${p.materials.map((m) => `- ${m.name}`).join('\n')}\n\n## 检测证据\n\n${e?.checks.map((c) => `### ${c.name} · ${{ pass: '通过', review: '需调整', pending: '待验证' }[c.status]}\n\n${c.reason}${c.input ? `\n\n测试输入：${c.input}\n\n实际回答：${c.output}` : ''}`).join('\n\n') ?? '尚未检测'}\n\n## 试用记录\n\n${p.messages.map((m) => `**${m.role === 'user' ? '教师试问' : '智能体'}**：${m.content}`).join('\n\n')}\n\n## 教师反馈\n\n${p.feedback || '未填写'}\n\n教师判断：${p.verdict === 'yes' ? '符合需求' : p.verdict === 'adjust' ? '需要调整' : '未确认'}\n\n## 使用决定\n\n${p.released ? (e?.mode === 'demo' ? '配置已保存' : '教师已确认在平台内启用') : '尚未启用'}\n\n本报告反映当前版本的功能检查和教师试用，不等于学生学习效果的实证结论。\n`;
 }

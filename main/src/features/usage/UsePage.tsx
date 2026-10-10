@@ -28,7 +28,7 @@ export function UsePage({
       {
         role: 'assistant',
         content: skill
-          ? `【引导示例】当${skill.trigger}，教师会：${skill.steps?.[0]?.action || skill.behaviorSteps[0]}`
+          ? `当${skill.trigger}，教师会：${skill.steps?.[0]?.action || skill.behaviorSteps[0]}`
           : '尚未配置教学方法，请返回我的 SKILL补充。',
       },
     ]);
@@ -44,7 +44,6 @@ export function UsePage({
         <h1>{assistant.name}</h1>
         <p>{assistant.goal}</p>
       </div>
-      <div className="demo-banner">固定引导示例，不执行真实 Agent。</div>
       <section className="student-chat">
         {messages.map((message, index) => (
           <div className={`student-message ${message.role}`} key={`${message.role}-${index}`}>

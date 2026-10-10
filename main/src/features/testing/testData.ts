@@ -1,4 +1,5 @@
 import type { EducationalSkill } from '../../../shared/assistant';
+import { demoSkillReply } from '../../../shared/skill-preview';
 
 export type DemoTestCase = {
   id: string;
@@ -10,6 +11,7 @@ export type DemoTestCase = {
   checks: string[];
   attention?: string;
   methodReview?: boolean;
+  expectedAction?: string;
 };
 
 export function createTestCases(skills: EducationalSkill[]): DemoTestCase[] {
@@ -26,8 +28,10 @@ export function createTestCases(skills: EducationalSkill[]): DemoTestCase[] {
       title: `${skill.name} · 情况 ${index + 1}`,
       methodReview: true,
       scenario: `教学方法核对：${step.condition}`,
-      studentInput: step.condition,
-      assistantOutput: step.action,
+      studentInput: '我不确定自己的做法是否正确，可以帮我看看吗？',
+      assistantOutput: demoSkillReply({ skill, caseId: `${skill.id}:${index}`,
+        messages: [{ role: 'user', content: '我不确定自己的做法是否正确，可以帮我看看吗？' }] }),
+      expectedAction: step.action,
       checks: skill.constraints,
     })),
   );

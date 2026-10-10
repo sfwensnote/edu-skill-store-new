@@ -4,7 +4,8 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import type { TeachingAssistant } from '../../../shared/assistant';
 import { Button } from '@/components/ui/button';
 import { MethodSituationSelect } from '@/components/MethodSituationSelect';
-import { methodPreviewCases, methodPreviewReply, type MethodPreviewCase } from '../../../shared/method-preview';
+import { methodPreviewCases, type MethodPreviewCase } from '../../../shared/method-preview';
+import { demoSkillReply, skillPreviewSchema } from '../../../shared/skill-preview';
 import { ViewTabs } from '@/components/ViewTabs';
 import { MethodSteps } from './MethodSteps';
 import './preview-workspace.css';
@@ -32,9 +33,13 @@ function initialMessages(equationDemo: boolean): PreviewMessage[] {
     : [{ role: 'assistant', content: '请说说你正在处理的问题，以及你已经尝试过什么。' }];
 }
 
-function fixedReply(input: string, equationDemo: boolean, example?: MethodPreviewCase): string {
+function fixedReply(input: string, equationDemo: boolean, example?: MethodPreviewCase, skill?: TeachingAssistant['skills'][number], history: PreviewMessage[] = []): string {
   if (!equationDemo) {
-    return methodPreviewReply(example);
+    if (!skill) return '请先选择一项 SKILL。';
+    return demoSkillReply({ skill, caseId: example?.id, messages: [
+      ...history.slice(1).map((item) => ({ role: item.role === 'student' ? 'user' as const : 'assistant' as const, content: item.content })),
+      { role: 'user', content: input },
+    ] });
   }
   if (/12\s*\+\s*6|移到右边|移项/.test(input))
     return '你已经说出了关键一步。为了消去左边的 +6，等式两边应该同时做加法还是减法？先试着写出这一步。';
@@ -75,6 +80,7 @@ export function StudentPreviewPage({
   const [view, setView] = useState<'chat' | 'method'>('chat');
   const [messages, setMessages] = useState<PreviewMessage[]>(() => initialMessages(equationDemo));
   const [value, setValue] = useState('');
+  const [error, setError] = useState('');
   const chatRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const chat = chatRef.current;
@@ -83,24 +89,34 @@ export function StudentPreviewPage({
   function send() {
     const input = value.trim();
     if (!input) return;
+    if (!activeSkill || !skillPreviewSchema.safeParse({ skill: activeSkill, caseId: selected?.id, messages: [
+      ...messages.slice(1).map((item) => ({ role: item.role === 'student' ? 'user' : 'assistant', content: item.content })),
+      { role: 'user', content: input },
+    ] }).success) { setError('对话过长，请重新开始。当前输入仍保留。'); return; }
     setMessages((items) => [
       ...items,
       { role: 'student', content: input },
-      { role: 'assistant', content: fixedReply(input, equationDemo, selected) },
+      { role: 'assistant', content: fixedReply(input, equationDemo, selected, activeSkill,
+        messages) },
     ]);
     setValue('');
+    setError('');
   }
   function reset() {
+    setError('');
     setMessages(initialMessages(equationDemo));
     setValue('');
   }
   function selectCase(id: string) {
+    setError('');
     setEquationDemo(false);
     setCaseId(id);
     setMessages(initialMessages(false));
     setValue('');
   }
   const backText = backLabel;
+  if (!activeSkill) return <main className="page-frame not-found"><h1>还没有可试用的 SKILL</h1>
+    <Button onClick={onContinue}>返回方法编辑</Button></main>;
   return (
     <main className="student-preview-page page-frame">
       <button className="back-link" onClick={onBack}>
@@ -109,9 +125,8 @@ export function StudentPreviewPage({
       </button>
       <header className="student-preview-heading">
         <h1>学生视角预览</h1>
-        <p>{assistant.name}</p>
+        <p>{activeSkill.name}</p>
       </header>
-      <div className="preview-notice">固定对话示例，不判断真实触发条件，不作为执行证据。</div>
       <ViewTabs className="preview-view-tabs" label="学生预览视图" value={view} onChange={setView} items={[
         { value: 'chat', label: '体验引导', panelId: 'preview-experience' },
         { value: 'method', label: '方法步骤', panelId: 'preview-method' },
@@ -127,11 +142,12 @@ export function StudentPreviewPage({
       >
         {messages.map((message, index) => (
           <div className={`student-message ${message.role === 'student' ? 'user' : 'assistant'}`} key={index}>
-            <span>{message.role === 'student' ? '学生' : '教学助手'}</span>
+            <span>{message.role === 'student' ? '学生' : '模型回复'}</span>
             <p>{message.content}</p>
           </div>
         ))}
       </section>
+      {error && <p role="alert">{error}</p>}
       <ChatComposer
         id="preview-student-input"
         value={value}
@@ -193,7 +209,6 @@ export function StudentPreviewPage({
           <Button onClick={onDone}>完成，返回我的 SKILL</Button>
         </>}
       </footer>
-      {checked && !shared && <p className="preview-share-scope">分享当前方法，仅在本机工作区可见。</p>}
     </main>
   );
 }

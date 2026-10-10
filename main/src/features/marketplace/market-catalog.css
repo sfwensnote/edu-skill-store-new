@@ -74,28 +74,6 @@
   min-height: 38px;
   max-width: 132px;
 }
-.catalog-segments {
-  display: flex;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--card);
-}
-.catalog-segments button {
-  border: 0;
-  border-radius: 5px;
-  min-height: 34px;
-  padding: 5px 12px;
-  background: transparent;
-  color: var(--ink-2);
-  white-space: nowrap;
-  font-size: 13px;
-}
-.catalog-segments button.active {
-  background: var(--primary);
-  color: var(--primary-foreground);
-}
 .catalog-layout {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
@@ -248,10 +226,6 @@
   color: #a97927;
   background: #fcf6e9;
 }
-.catalog-resource-icon[data-category='情境任务'] {
-  color: #8c70b1;
-  background: #f5f0fa;
-}
 .catalog-resource-body {
   flex: 1;
   min-width: 0;
@@ -383,13 +357,6 @@
     min-width: 0;
     padding-inline: 4px;
     font-size: 12px;
-  }
-  .catalog-segments {
-    width: 100%;
-  }
-  .catalog-segments button {
-    flex: 1;
-    min-height: 36px;
   }
   .catalog-list-toolbar {
     flex-wrap: wrap;

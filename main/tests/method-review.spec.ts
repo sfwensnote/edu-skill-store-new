@@ -37,7 +37,7 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await expect(page.locator('.test-case-head')).toContainText('情况 1');
   await page.reload();
   await page.getByRole('button', { name: '确认并继续' }).click();
-  await expect(page.locator('.simulation-line.assistant')).toContainText('请学生标出不确定的一步');
+  await expect(page.locator('.check-list')).toContainText('请学生标出不确定的一步');
   await page.getByRole('button', { name: '确认并完成' }).click();
   await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
   await expect(page).toHaveURL(/student-preview\?from=test/);
@@ -49,7 +49,7 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.screenshot({ path: 'docs/assets/简化后-方法预览.png', fullPage: true });
   await page.getByLabel('以学生身份输入').fill('我回顾了，还是找不到问题。');
   await page.getByRole('button', { name: '发送学生问题' }).click();
-  await expect(page.locator('.student-message').last()).toContainText('请学生标出不确定的一步');
+  await expect(page.locator('.student-message').last()).toContainText('先标出你不确定的一步');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('review-method:1');
   await expect(page.getByRole('button', { name: '完成，返回我的 SKILL' })).toBeVisible();
   await page.getByText('核对记录', { exact: true }).click();
@@ -86,7 +86,7 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   await page.getByLabel('预览教学情况').selectOption('method-two:0');
   await page.getByLabel('以学生身份输入').fill('我不知道依据在哪里');
   await page.getByRole('button', { name: '发送学生问题' }).click();
-  await expect(page.locator('.student-message').last()).toContainText('请学生指出原文依据');
+  await expect(page.locator('.student-message').last()).toContainText('你的判断依据是什么');
   await page.getByRole('button', { name: '分享到集市', exact: true }).click();
   const workspace = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!));
   expect(workspace.sharedSkillIds).toEqual(['personal:multi-review:method-two']);
@@ -158,7 +158,7 @@ test('修改可以放弃，未核对版本不能分享，保存失败不替换�
   await editor.getByLabel('做法 1', { exact: true }).fill('不保存的修改');
   await editor.getByRole('button', { name: '取消', exact: true }).click();
   await editor.getByRole('button', { name: '放弃修改' }).click();
-  await expect(page.locator('.simulation-line.assistant')).toContainText('先让学生回顾思路');
+  await expect(page.locator('.check-list')).toContainText('先让学生回顾思路');
   await page.getByRole('button', { name: '修改当前方法' }).click();
   await editor.getByRole('button', { name: '编辑做法 1' }).click();
   await editor.getByLabel('做法 1', { exact: true }).fill('存储失败时的修改');

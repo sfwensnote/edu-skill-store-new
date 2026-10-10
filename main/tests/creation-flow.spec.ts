@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './demo-workspace-fixture';
 
 test('教师回答逐步形成方法，修改后封装为相同 SKILL，创建流程不请求 API', async ({ page }) => {
   const apiRequests: string[] = [];
@@ -33,7 +33,8 @@ test('教师回答逐步形成方法，修改后封装为相同 SKILL，创建�
   await page.getByRole('textbox', { name: '做法 1' }).fill('请学生先标出不确定的一步');
   await page.getByRole('button', { name: '这就是我的教学方法' }).click();
   await expect(page).toHaveURL(/#\/assistant\/e2e-guided-flow\/test/);
-  await expect(page.locator('.simulation-line.assistant')).toContainText('请学生先标出不确定的一步');
+  await expect(page.locator('.check-list')).toContainText('请学生先标出不确定的一步');
+  await expect(page.locator('.simulation-line.assistant')).toContainText('先标出你不确定的一步');
   await page.getByRole('button', { name: '返回方法编辑', exact: true }).click();
   await page.getByRole('button', { name: '修改', exact: true }).click();
   await page.getByRole('button', { name: '继续', exact: true }).click();

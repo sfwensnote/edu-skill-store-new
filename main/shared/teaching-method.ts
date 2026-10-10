@@ -16,6 +16,7 @@ export type TeachingMethod = {
 export type MethodAnswer = { questionId: string; question: string; answer: string };
 
 export type CreationDraft = {
+  sourceRevision?: number;
   originalIdea: string;
   exampleIdea?: boolean;
   grade: string;
@@ -37,13 +38,13 @@ export const demoIdea =
 export const mockQuestions = [
   {
     id: 'outcome',
-    question: '你希望通过这种做法，学生最终能够发生什么变化？',
+    question: '你希望学生学会什么？',
     placeholder: '说说你最希望学生学会什么……',
     example: '我希望他不要马上依赖答案，而是先回顾自己的思路，尝试自己发现哪里出了问题。',
   },
   {
     id: 'trigger',
-    question: '你通常在看到学生什么表现时，会开始这样做？',
+    question: '学生出现什么情况时，你会这样做？',
     placeholder: '说说你通常在什么情况下开始……',
     example: '学生第一次回答错误，而且自己还没有意识到问题的时候。',
   },
@@ -55,7 +56,7 @@ export const mockQuestions = [
   },
   {
     id: 'next-condition',
-    question: '学生完成这一步以后，什么表现会让你改变接下来的做法？',
+    question: '如果学生仍有困难，你会在什么情况下继续帮助？',
     placeholder: '说说什么情况会让你继续介入……',
     example: '如果他回顾以后还是没有发现问题，我就会继续介入。',
   },
@@ -67,8 +68,8 @@ export const mockQuestions = [
   },
   {
     id: 'principle',
-    question: '在这个过程中，有没有你明确不希望助手做的事情？',
-    placeholder: '说说你希望助手遵守的原则……',
+    question: '有哪些做法需要避免？',
+    placeholder: '写下需要遵守的原则……',
     example: '第一次答错的时候不要直接给完整答案。',
   },
 ] as const;

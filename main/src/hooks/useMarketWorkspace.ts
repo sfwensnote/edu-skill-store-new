@@ -36,7 +36,7 @@ export function useMarketWorkspace() {
       setStorageError('');
     } catch {
       lastSaved.current = false;
-      setStorageError(message || '本机存储空间不足，最近修改尚未保存。请保持页面打开，并导出作品。');
+      setStorageError(message || '存储空间不足，最近修改尚未保存。请保持页面打开，并导出作品。');
       if (mustSave) return false;
     }
     stateRef.current = next;
@@ -54,7 +54,7 @@ export function useMarketWorkspace() {
         designs: [design, ...current.designs],
       },
       true,
-      '作品创建失败，教学背景仍在页面中，请释放本机存储空间后重试。',
+      '作品创建失败，教学背景仍在页面中，请释放存储空间后重试。',
     );
   }
   function updateDesign(id: string, patch: Partial<ContextualDesign>) {
@@ -67,7 +67,7 @@ export function useMarketWorkspace() {
     if (!lastSaved.current) setUnsavedDesignIds((ids) => [...new Set([...ids, id])]);
   }
   function retryDesignSave() {
-    return commit(stateRef.current, true, '作品草稿仍未保存，请释放本机存储空间后重试。');
+    return commit(stateRef.current, true, '作品草稿仍未保存，请释放存储空间后重试。');
   }
   function saveDesign(id: string, level: DesignLevel) {
     const current = stateRef.current;
@@ -93,7 +93,7 @@ export function useMarketWorkspace() {
         ),
       },
       true,
-      '作品保存失败，修改仍在当前页面，请释放本机存储空间后重试。',
+      '作品保存失败，修改仍在当前页面，请释放存储空间后重试。',
     );
   }
   function copyDesign(id: string) {
@@ -133,7 +133,7 @@ export function useMarketWorkspace() {
     const current = stateRef.current;
     const addedSkills = addMarketSkill(current.addedSkills, entry, new Date().toISOString());
     if (addedSkills === current.addedSkills) return true;
-    return commit({ ...current, addedSkills }, true, '添加未保存，请释放本机存储空间后重试。');
+    return commit({ ...current, addedSkills }, true, '添加未保存，请释放存储空间后重试。');
   }
   function removeAddedSkill(id: string) {
     return update((current) => ({
@@ -175,7 +175,7 @@ export function useMarketWorkspace() {
           ? current.tasks.filter((t) => t.id !== draft.id || t.submissions.length > 0)
           : current.tasks,
     };
-    return commit(next, true, '草稿保存失败，请释放本机存储空间后重试。当前修改仍保留在页面中。');
+    return commit(next, true, '草稿保存失败，请释放存储空间后重试。当前修改仍保留在页面中。');
   }
   function submitTask(id: string, submission: TaskSubmission) {
     const current = stateRef.current;
@@ -189,7 +189,7 @@ export function useMarketWorkspace() {
         ),
       },
       true,
-      '学习记录保存失败，请释放本机存储空间后重试。回答仍保留在页面中。',
+      '学习记录保存失败，请释放存储空间后重试。回答仍保留在页面中。',
     );
   }
   return {

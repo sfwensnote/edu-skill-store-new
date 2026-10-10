@@ -59,14 +59,14 @@ export function TestingPage({
     if (done) return;
     const next = completed + 1;
     if (next === cases.length && !onComplete()) {
-      setError('核对结果未保存，请释放本机存储空间后重新确认。');
+      setError('核对结果未保存，请释放存储空间后重新确认。');
       return;
     }
     try {
       localStorage.setItem(progressKey, JSON.stringify({ signature, completed: next }));
     } catch {
       if (next < cases.length) {
-        setError('核对进度未保存，请释放本机存储空间后重新确认。');
+        setError('核对进度未保存，请释放存储空间后重新确认。');
         return;
       }
     }
@@ -111,7 +111,6 @@ export function TestingPage({
           { value: 'results', label: '核对进度', panelId: 'testing-results' },
         ]}
       />
-      <div className="demo-banner page-frame">固定引导示例 · 实际执行待验证</div>
       {error && (
         <p className="page-frame" role="alert">
           {error}
@@ -145,7 +144,7 @@ export function TestingPage({
                       <small>{assistant.skills.find((skill) => skill.id === item.skillId)?.name}</small>
                     </p>
                     <em className={item.attention ? 'attention' : ''}>
-                      {item.methodReview ? '已确认' : item.attention ? '示例需关注' : '示例已核对'}
+                      {item.methodReview ? '已确认' : item.attention ? '需关注' : '已核对'}
                     </em>
                   </div>
                 ))}

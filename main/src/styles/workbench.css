@@ -237,10 +237,9 @@ summary:focus-visible {
   margin-top: 20px;
 }
 .status-message,
-.demo-banner,
+.status-banner,
 .review-banner,
-.storage-alert,
-.preview-notice {
+.storage-alert {
   border: 1px solid var(--line);
   background: var(--blue-faint);
   color: var(--blue-deep);
@@ -263,7 +262,7 @@ summary:focus-visible {
   background: var(--red-soft);
 }
 .tag,
-.demo-label,
+.content-label,
 .tag-green {
   border-radius: 4px;
   padding: 3px 8px;

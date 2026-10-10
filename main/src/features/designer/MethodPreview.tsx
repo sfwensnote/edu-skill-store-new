@@ -1,12 +1,13 @@
 import type { TeachingMethod } from '../../../shared/teaching-method';
 import { TeachingTagList } from '@/components/TeachingTagsField';
+import { isTeachingCategory } from '../../../shared/teaching-tags';
 
 export function MethodPreview({ method }: { method: TeachingMethod }) {
   return (
     <div className="method-preview-content">
       <h3>{method.name || '未命名教学方法'}</h3>
       <p>{method.description || '简介待补充'}</p>
-      {method.category && <p>教学分类：{method.category}</p>}
+      {isTeachingCategory(method.category) && <p>教学分类：{method.category}</p>}
       <TeachingTagList tags={method.tags} />
       <h4>教学目标</h4>
       <p>{method.expectedOutcome || method.problem || '待补充'}</p>

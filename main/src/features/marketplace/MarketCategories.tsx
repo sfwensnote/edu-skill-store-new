@@ -3,9 +3,7 @@ import {
   ChartNoAxesColumnIncreasing,
   CircleHelp,
   Compass,
-  FileText,
   MessageCircle,
-  Network,
   Star,
 } from 'lucide-react';
 import type { SkillEntry } from '../../../shared/marketplace';
@@ -16,8 +14,6 @@ export const categoryIcons = {
   错因辅导: MessageCircle,
   智能练习: ChartNoAxesColumnIncreasing,
   知识讲解: BookOpen,
-  情境任务: FileText,
-  项目式学习: Network,
   未分类: Compass,
 };
 

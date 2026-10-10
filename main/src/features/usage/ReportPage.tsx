@@ -54,11 +54,9 @@ export function ReportPage({
           ))}
           {!assistant.skills.length && <p>尚未形成教学方法，请返回创建流程。</p>}
       </section>
-      <p className="report-advice">实际执行与教学效果待验证，学生预览不作为执行证据。</p>
       <footer className="report-publish">
           <div>
             <h2>{shared && checked ? '方法已在集市展示' : '分享到教学 SKILL 集市'}</h2>
-            <p>仅保存在本机工作区，不对外发布。</p>
           </div>
           <div className="inline-actions">
             <Button variant="outline" onClick={onEdit}>修改方法</Button>

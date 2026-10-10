@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { maxTeachingTags, maxTagLength, teachingCategories } from './teaching-tags';
+import { maxTeachingTags, maxTagLength, storedTeachingCategories } from './teaching-tags';
 
 const text = (max = 2000) => z.string().trim().min(1).max(max);
 
@@ -11,7 +11,7 @@ export const skillSchema = z.object({
   name: text(80),
   summary: text(300),
   description: z.string().optional(),
-  category: z.enum(teachingCategories).nullable().optional(),
+  category: z.enum(storedTeachingCategories).nullable().optional(),
   tags: z.array(z.string().trim().min(1).max(maxTagLength)).max(maxTeachingTags).optional(),
   steps: z
     .array(z.object({ condition: text(500), action: text(500) }))
@@ -44,9 +44,6 @@ export const assistantSchema = z.object({
   sourceDesignId: z.string().optional(),
   skillAreas: z.record(z.string(), z.enum(['daily', 'inquiry'])).optional(),
   skillSources: z.record(z.string(), z.string()).optional(),
-  adaptation: z.object({
-    sourceId: z.string(), sourceVersion: z.string(), requirements: text(500),
-  }).optional(),
 });
 export type TeachingAssistant = z.infer<typeof assistantSchema>;
 

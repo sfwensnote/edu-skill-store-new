@@ -26,7 +26,7 @@ export function ActivityList({
     return (
       task && (
         <>
-          <small>本机预览记录 · {task.submissions.length} 次提交</small>
+          <small>预览记录 · {task.submissions.length} 次提交</small>
           {!!task.submissions.length && (
             <details className="activity-submissions">
               <summary>查看学习记录</summary>
@@ -95,7 +95,7 @@ export function ActivityList({
           </span>
           <div className="activity-list-copy">
             <h3>{task.title}</h3>
-            <p>{levelNames[task.level]} · 本机预览</p>
+            <p>{levelNames[task.level]} · 预览</p>
             {records(task)}
           </div>
           <Button variant="outline" onClick={() => onPreview(task.id)}>

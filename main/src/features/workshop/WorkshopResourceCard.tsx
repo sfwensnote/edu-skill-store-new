@@ -127,10 +127,10 @@ export function WorkshopResourceCard({
           <DropdownMenuContent align="end">
             {item.kind !== 'method-draft' && (
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => actions.copy(item)}>
+                {own && <DropdownMenuItem onSelect={() => actions.copy(item)}>
                   <Copy />
-                  {own ? '复制' : '改编 SKILL'}
-                </DropdownMenuItem>
+                  复制
+                </DropdownMenuItem>}
                 <DropdownMenuItem onSelect={() => actions.favorite(item.id)}>
                   <Heart fill={favorite ? 'currentColor' : 'none'} />
                   {favorite ? '取消收藏' : '收藏'}

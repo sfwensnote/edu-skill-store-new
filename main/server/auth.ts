@@ -5,8 +5,7 @@ import { db } from './store';
 
 const account = z.object({
   email: z
-    .email()
-    .max(200)
+    .string().trim().max(200).pipe(z.email())
     .transform((s) => s.toLowerCase()),
   password: z.string().min(8).max(128),
   name: z.string().trim().min(1).max(50).optional(),

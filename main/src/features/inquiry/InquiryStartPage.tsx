@@ -59,7 +59,7 @@ export function InquiryStartPage({
       sessionStorage.setItem(draftKey, JSON.stringify(draft));
       setStorageError('');
     } catch {
-      setStorageError('本机草稿保存失败，当前输入仍保留在页面中。请释放存储空间后继续。');
+      setStorageError('草稿保存失败，当前输入仍保留在页面中。请释放存储空间后继续。');
     }
   }, [draft]);
   function patch(p: Partial<ContextualDesign>) {
@@ -91,7 +91,7 @@ export function InquiryStartPage({
       draft.currentLevel,
     );
     if (!onCreate(design)) {
-      setError('作品创建失败，教学背景仍在当前页面，请释放本机存储空间后重试。');
+      setError('作品创建失败，教学背景仍在当前页面，请释放存储空间后重试。');
       return;
     }
     try {
@@ -155,7 +155,7 @@ export function InquiryStartPage({
         </section>
         <aside className="inquiry-start-aside">
           <section className="market-panel">
-            <h2>参考示例</h2>
+            <h2>参考案例</h2>
             <Button
               variant="outline"
               onClick={() =>
@@ -166,7 +166,7 @@ export function InquiryStartPage({
                 })
               }
             >
-              填入数学租赁示例
+              填入数学租赁案例
             </Button>
             <Button
               variant="outline"
@@ -179,7 +179,7 @@ export function InquiryStartPage({
                 })
               }
             >
-              填入校园观察示例
+              填入校园观察案例
             </Button>
           </section>
           <section className="market-panel">

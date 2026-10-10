@@ -78,7 +78,7 @@ export function ProblemEditor({
       <DesignSection title="情境题目">
         {p ? (
           <>
-            <span className="demo-label">{p.mode === 'sample' ? '参考案例' : '教师设计'}</span>
+            <span className="content-label">{p.mode === 'sample' ? '参考案例' : '教师设计'}</span>
             {(
               [
                 ['title', '情境标题'],

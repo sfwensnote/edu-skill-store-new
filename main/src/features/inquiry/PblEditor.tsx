@@ -38,7 +38,7 @@ export function PblEditor({
               {question}
             </label>
           ))}
-          <div className={ready ? 'demo-banner' : 'review-banner'}>
+          <div className={ready ? 'status-banner' : 'review-banner'}>
             {ready ? '实施条件已确认' : '实施条件未全部确认，可先保存草案。'}
           </div>
           <div className="inline-actions">

@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import type { AssistantStatus, DesignerMessage, TeachingAssistant } from '../../shared/assistant';
-import { coreSkills, initialDesignerMessages, initialMine } from '@/data/platform';
+import { useRef, useState } from 'react';
+import type { AssistantStatus, TeachingAssistant } from '../../shared/assistant';
 import type { SkillEntry } from '../../shared/marketplace';
 import type { EducationalSkill } from '../../shared/assistant';
 import { isStoredAssistant } from '../../shared/workspace-storage';
@@ -9,23 +8,13 @@ import type { TeachingMethod } from '../../shared/teaching-method';
 
 const storageKey = 'teaching-assistant.frontend-demo.v2';
 const excludedKey = 'teaching-assistant.excluded-skills.v1';
-const messagesKey = 'teaching-assistant.designer-messages.v1';
 
 function loadAssistants() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || 'null') as TeachingAssistant[] | null;
-    return Array.isArray(saved) ? saved.filter(isStoredAssistant) : initialMine;
+    return Array.isArray(saved) ? saved.filter(isStoredAssistant) : [];
   } catch {
-    return initialMine;
-  }
-}
-
-function loadMessages() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(messagesKey) || '{}') as Record<string, DesignerMessage[]>;
-    return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
-  } catch {
-    return {};
+    return [];
   }
 }
 
@@ -33,11 +22,13 @@ function withoutKey<T>(record: Record<string, T>, key: string) {
   return Object.fromEntries(Object.entries(record).filter(([entryKey]) => entryKey !== key));
 }
 
+function discardCache(key: string) {
+  try { localStorage.removeItem(key); } catch { /* 缓存清理失败不撤销已保存的方法。 */ }
+}
+
 export function useDemoPlatform() {
   const [assistants, setAssistantState] = useState<TeachingAssistant[]>(loadAssistants);
   const assistantsRef = useRef(assistants);
-  const [messagesByAssistant, setMessagesByAssistant] =
-    useState<Record<string, DesignerMessage[]>>(loadMessages);
   const [excludedByAssistant, setExcludedByAssistant] = useState<Record<string, string[]>>(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(excludedKey) || '{}');
@@ -54,13 +45,24 @@ export function useDemoPlatform() {
   const [storageErrors, setStorageErrors] = useState<Record<string, string>>({});
   function persist(key: string, value: unknown) {
     try {
+      if (key === storageKey) {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          let damaged = false;
+          try {
+            const previous = JSON.parse(raw);
+            damaged = !Array.isArray(previous) || !previous.every(isStoredAssistant);
+          } catch { damaged = true; }
+          if (damaged) localStorage.setItem(`${key}.recovery:${crypto.randomUUID()}`, raw);
+        }
+      }
       localStorage.setItem(key, JSON.stringify(value));
       setStorageErrors((errors) => withoutKey(errors, key));
       return true;
     } catch {
       setStorageErrors((errors) => ({
         ...errors,
-        [key]: '教学方法保存失败，当前修改仍在页面中，请释放本机存储空间后重试。',
+        [key]: '教学方法保存失败，当前修改仍在页面中，请释放存储空间后重试。',
       }));
       return false;
     }
@@ -73,16 +75,6 @@ export function useDemoPlatform() {
     setAssistantState(next);
     return saved;
   }
-
-  useEffect(() => {
-    persist(storageKey, assistants);
-  }, []);
-  useEffect(() => {
-    persist(excludedKey, excludedByAssistant);
-  }, [excludedByAssistant]);
-  useEffect(() => {
-    persist(messagesKey, messagesByAssistant);
-  }, [messagesByAssistant]);
 
   function getAssistant(id: string) {
     return assistantsRef.current.find((assistant) => assistant.id === id);
@@ -143,26 +135,8 @@ export function useDemoPlatform() {
         (key) => key in patch && JSON.stringify(patch[key]) !== JSON.stringify(current[key]),
       )
     )
-      localStorage.removeItem(`teaching-assistant.check-progress:${id}`);
+      discardCache(`teaching-assistant.check-progress:${id}`);
     return saved;
-  }
-
-  function messagesFor(id: string) {
-    const saved = messagesByAssistant[id];
-    if (saved) return saved;
-    const initial = initialDesignerMessages.map((message) => ({ ...message, assistantId: id }));
-    const assistant = getAssistant(id);
-    if (!assistant?.skills.length) return initial;
-    return [
-      ...initial,
-      {
-        id: `recovered-${id}`,
-        assistantId: id,
-        role: 'assistant' as const,
-        content: `已恢复这个助手的设计稿，右侧共有 ${assistant.skills.length} 项教学技能。之前的对话没有保存在当前设备，你可以从这里继续调整。`,
-        createdAt: new Date().toISOString(),
-      },
-    ];
   }
 
   function saveReviewedMethod(id: string, skillId: string, method: TeachingMethod) {
@@ -170,77 +144,22 @@ export function useDemoPlatform() {
     if (!assistant) return false;
     const next = reviseReviewedMethod(assistant, skillId, method);
     if (!setAssistants((items) => items.map((item) => item.id === id ? next : item), true)) return false;
-    localStorage.removeItem(`teaching-assistant.check-progress:${id}`);
+    discardCache(`teaching-assistant.check-progress:${id}`);
     // 同步创建草稿，防止重新进入设计页时旧做法覆盖检测中的修改。
     const prefix = `teaching-assistant.method-draft.v1:${id}`;
     Object.keys(localStorage).filter((key) => key === prefix || key.startsWith(`${prefix}:`)).forEach((key) => {
       try {
         const draft = JSON.parse(localStorage.getItem(key) || 'null');
         if ((draft?.editingSkillId || assistant.skills[0]?.id) !== skillId) return;
-        localStorage.setItem(key, JSON.stringify({ ...draft, method, teachingScene: method.category || '', stage: 'method',
+        localStorage.setItem(key, JSON.stringify({ ...draft, sourceRevision: next.revision, method, teachingScene: method.category || '', stage: 'method',
           editingSkillId: skillId, manualEdits: ['name', 'description', 'category', 'tags', 'problem', 'expectedOutcome', 'trigger', 'principles',
             ...method.teachingSteps.flatMap((_, index) => [`step-${index}-condition`, `step-${index}-action`])],
         }));
       } catch {
-        localStorage.removeItem(key);
+        // 保留旧草稿；设计页按来源版本恢复，避免旧缓存覆盖已保存的修改。
       }
     });
     return true;
-  }
-
-  function design(id: string, content: string, adjustingSkill?: string) {
-    const now = new Date().toISOString();
-    const userMessage: DesignerMessage = {
-      id: crypto.randomUUID(),
-      assistantId: id,
-      role: 'user',
-      content,
-      createdAt: now,
-    };
-    const current = getAssistant(id);
-    const hasProgressive = current?.skills.some((skill) => skill.id === 'progressive-hint');
-    const hasCheck = current?.skills.some((skill) => skill.id === 'understanding-check');
-    const shouldAddProgressive = !adjustingSkill && /逐步|提示|不会|卡住/.test(content) && !hasProgressive;
-    const shouldAddCheck = !adjustingSkill && /理解|检查|检测|学会/.test(content) && !hasCheck;
-    const assistantMessage: DesignerMessage = {
-      id: crypto.randomUUID(),
-      assistantId: id,
-      role: 'assistant',
-      content: adjustingSkill
-        ? `已经按你的想法调整了「${adjustingSkill}」。你可以在右侧展开查看。`
-        : current?.skills.length
-          ? shouldAddProgressive || shouldAddCheck
-            ? '我根据这次补充新增了一项教学技能。是否加入助手，由你在右侧决定。'
-            : '我已经把这次补充整理进当前设计。你可以继续描述另一个需要助手处理的教学情境。'
-          : '我先整理出最核心的一项教学技能。你可以查看并决定是否加入助手，再继续补充其他教学情境。',
-      createdAt: now,
-    };
-    setMessagesByAssistant((all) => ({ ...all, [id]: [...messagesFor(id), userMessage, assistantMessage] }));
-    let skills = current?.skills.length
-      ? current.skills.map((skill) =>
-          adjustingSkill === skill.name && /第二次|具体/.test(content)
-            ? {
-                ...skill,
-                behaviorSteps: [
-                  ...skill.behaviorSteps,
-                  '如果学生第二次仍无法继续，给出更具体但不包含最终答案的提示',
-                ],
-              }
-            : skill,
-        )
-      : [coreSkills[0]];
-    if (shouldAddProgressive) skills = [...skills, coreSkills[1]];
-    if (shouldAddCheck) skills = [...skills, coreSkills[2]];
-    updateAssistant(id, {
-      name: current?.name || '七年级数学教学助手',
-      goal:
-        current?.goal ||
-        '帮助七年级学生理解一元一次方程，在出现错误时先引导学生解释思路，再根据需要逐步提供帮助。',
-      grade: '初中',
-      subject: '数学',
-      activity: '错因诊断',
-      skills,
-    });
   }
 
   function setStatus(id: string, status: AssistantStatus) {
@@ -270,7 +189,7 @@ export function useDemoPlatform() {
   }
 
   function toggleSkill(assistantId: string, skillId: string) {
-    if (!updateAssistant(assistantId, { status: 'DRAFT', isPublic: false }, true)) return false;
+    if (!getAssistant(assistantId)?.skills.some((skill) => skill.id === skillId)) return false;
     const excluded = excludedByAssistant[assistantId] || [];
     const next = {
       ...excludedByAssistant,
@@ -279,28 +198,29 @@ export function useDemoPlatform() {
         : [...excluded, skillId],
     };
     if (!persist(excludedKey, next)) return false;
-    localStorage.removeItem(`teaching-assistant.check-progress:${assistantId}`);
+    if (!updateAssistant(assistantId, { status: 'DRAFT', isPublic: false }, true)) {
+      persist(excludedKey, excludedByAssistant);
+      return false;
+    }
+    discardCache(`teaching-assistant.check-progress:${assistantId}`);
     setExcludedByAssistant(next);
     return true;
   }
 
   function removeAssistant(id: string) {
     if (!setAssistants((items) => items.filter((assistant) => assistant.id !== id), true)) return false;
-    localStorage.removeItem(`teaching-assistant.check-progress:${id}`);
-    localStorage.removeItem(`teaching-assistant.method-draft.v1:${id}`);
+    discardCache(`teaching-assistant.check-progress:${id}`);
+    discardCache(`teaching-assistant.method-draft.v1:${id}`);
     Object.keys(localStorage)
       .filter((key) => key.startsWith(`teaching-assistant.method-draft.v1:${id}:`))
-      .forEach((key) => localStorage.removeItem(key));
-    setMessagesByAssistant((current) => withoutKey(current, id));
-    setExcludedByAssistant((current) => withoutKey(current, id));
+      .forEach((key) => discardCache(key));
+    const nextExcluded = withoutKey(excludedByAssistant, id);
+    if (persist(excludedKey, nextExcluded)) setExcludedByAssistant(nextExcluded);
     return true;
   }
 
-  function publishAssistant(id: string) {
-    return updateAssistant(id, { isPublic: true }, true);
-  }
-
-  function copySkill(entry: SkillEntry, requirements?: string) {
+  function copySkill(entry: SkillEntry) {
+    if (!entry.assistantId) return null;
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const skill = { ...structuredClone(entry.skill), id: crypto.randomUUID() };
@@ -309,18 +229,15 @@ export function useDemoPlatform() {
         {
           id,
           userId: 'demo-teacher',
-          name: `${skill.name}助手`,
-          goal: requirements?.trim() || skill.purpose,
+          name: skill.name,
+          goal: skill.purpose,
           grade: entry.grade,
           subject: entry.subject,
           activity: entry.scene,
           status: 'DRAFT',
           isPublic: false,
           skills: [skill],
-          skillSources: { [skill.id]: `${requirements ? '改编' : '复制'}自“${entry.skill.name}”（${entry.creator}，${entry.version}）。${entry.source}` },
-          ...(requirements ? { adaptation: {
-            sourceId: entry.addedFrom?.id || entry.id, sourceVersion: entry.version, requirements: requirements.trim(),
-          } } : {}),
+          skillSources: { [skill.id]: `复制自“${entry.skill.name}”（${entry.creator}，${entry.version}）。${entry.source}` },
           area: entry.area,
           revision: 1,
           createdAt: now,
@@ -368,8 +285,8 @@ export function useDemoPlatform() {
       true,
     );
     if (!saved) return false;
-    localStorage.removeItem(`teaching-assistant.method-draft.v1:${assistantId}:${skillId}`);
-    localStorage.removeItem(`teaching-assistant.method-draft.v1:${assistantId}`);
+    discardCache(`teaching-assistant.method-draft.v1:${assistantId}:${skillId}`);
+    discardCache(`teaching-assistant.method-draft.v1:${assistantId}`);
     return true;
   }
 
@@ -380,13 +297,10 @@ export function useDemoPlatform() {
     ensureAssistant,
     updateAssistant,
     saveReviewedMethod,
-    messagesFor,
-    design,
     setStatus,
     isSkillIncluded,
     toggleSkill,
     removeAssistant,
-    publishAssistant,
     copySkill,
     mountSkill,
     removeSkill,

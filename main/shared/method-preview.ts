@@ -11,6 +11,3 @@ export function methodPreviewCases(skills: EducationalSkill[]): MethodPreviewCas
     ...step, id: `${skill.id}:${index}`, skillId: skill.id, title: `${skill.name} · 步骤 ${index + 1}`,
   })));
 }
-export function methodPreviewReply(example?: MethodPreviewCase): string {
-  return example ? `【引导示例】当${example.condition}，教师会：${example.action}` : '尚未配置教学方法，请返回我的作品补充。';
-}

@@ -7,7 +7,7 @@ import {
   type ContextualDesign,
   type DesignLevel,
 } from './contextual-design';
-import { normalizeTeachingTags, isTeachingCategory } from './teaching-tags';
+import { normalizeTeachingTags, isStoredTeachingCategory } from './teaching-tags';
 
 export function parseInquiryStartDraft(raw: string | null): ContextualDesign {
   const base = { ...newContextualDesign('draft'), title: '' };
@@ -17,7 +17,7 @@ export function parseInquiryStartDraft(raw: string | null): ContextualDesign {
     if (!data || typeof data !== 'object' || Array.isArray(data)) return base;
     const fields = data as Record<string, unknown>;
     base.tags = normalizeTeachingTags(fields.tags);
-    if (isTeachingCategory(fields.category) || fields.category === null) base.category = fields.category;
+    if (isStoredTeachingCategory(fields.category) || fields.category === null) base.category = fields.category;
     const strings = [
       'title',
       'year',

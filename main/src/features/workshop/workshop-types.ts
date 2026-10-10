@@ -12,7 +12,6 @@ export type WorkshopProps = {
   onEditSkill: (entry: SkillEntry) => void;
   onOpenSkill: (id: string) => void;
   onCopySkill: (entry: SkillEntry) => void;
-  onAdaptSkill: (entry: SkillEntry) => void;
   onDeleteSkill: (entry: SkillEntry) => boolean;
   onMount: (assistantId: string, entry: SkillEntry) => boolean;
   onFavorite: (id: string) => void;

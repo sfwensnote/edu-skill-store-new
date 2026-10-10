@@ -61,7 +61,7 @@ test('真实未通过或缺少试用确认不能启用；演示明确标记', ()
   assert.equal(canRelease(p), false);
   p.evaluation.checks[0].status = 'pending';
   assert.equal(canRelease(p), true);
-  assert.match(reportMarkdown(p), /不作为模型能力/);
+  assert.match(reportMarkdown(p), /模型连接：尚未连接/);
   p.evaluation.version = 2;
   assert.equal(canRelease(p), false);
 });

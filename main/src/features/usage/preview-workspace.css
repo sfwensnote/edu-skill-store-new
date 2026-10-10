@@ -11,7 +11,6 @@
 .preview-review-record { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 14px; }
 .preview-review-record summary { cursor: pointer; }
 .preview-review-record p { margin: 10px 0; }
-.preview-share-scope { text-align: right; color: var(--ink-2); font-size: 12px; margin-top: 10px; }
 .preview-shared-status { color: var(--primary); font-size: 14px; }
 .student-preview-page .method-situation-select { padding: 0; margin-bottom: 18px; border-bottom: 0; }
 .student-preview-page .method-situation-select .form-field { margin-top: 0; }
@@ -19,5 +18,4 @@
   .student-preview-page .preview-chat { padding: 16px; }
   .student-preview-page .student-message { max-width: 90%; }
   .preview-next-step { flex-wrap: wrap; }
-  .preview-share-scope { text-align: left; }
 }
