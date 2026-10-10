@@ -37,6 +37,7 @@ function parseRoute(hash: string): RoutePage {
     return { page: 'home' };
   }
   if (!parts.length || parts[0] === 'home') return { page: 'home' };
+  if (parts[0] === 'legacy-market') return { page: 'market' };
   if (parts[0] === 'space')
     return {
       page: 'space',

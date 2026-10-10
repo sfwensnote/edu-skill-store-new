@@ -8,10 +8,12 @@ export function IdeaForm({
   draft,
   onChange,
   onContinue,
+  tagSuggestions,
 }: {
   draft: CreationDraft;
   onChange: (draft: CreationDraft) => void;
   onContinue: () => void;
+  tagSuggestions?: readonly string[];
 }) {
   return (
     <form
@@ -100,7 +102,7 @@ export function IdeaForm({
         <TeachingCategoryField value={draft.method.category}
           onChange={(category) => onChange({ ...draft, teachingScene: category || '', method: { ...draft.method, category } })} />
       </div>
-      <TeachingTagsField value={draft.method.tags}
+      <TeachingTagsField value={draft.method.tags} suggestions={tagSuggestions}
         onChange={(tags) => onChange({ ...draft, method: { ...draft.method, tags } })} />
       <footer className="creation-footer">
         <Button size="lg" type="submit" disabled={!draft.originalIdea.trim()}>

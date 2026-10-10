@@ -23,9 +23,10 @@ export function TeachingCategoryField({ value, onChange }: {
   );
 }
 
-export function TeachingTagsField({ value, onChange }: {
+export function TeachingTagsField({ value, onChange, suggestions = suggestedTags }: {
   value?: string[];
   onChange: (tags: string[]) => void;
+  suggestions?: readonly string[];
 }) {
   const id = useId();
   const tags = normalizeTeachingTags(value);
@@ -78,7 +79,7 @@ export function TeachingTagsField({ value, onChange }: {
         </div>
       )}
       <div className="teaching-tag-options" role="group" aria-label="常用标签">
-        {suggestedTags.map((tag) => (
+        {suggestions.map((tag) => (
           <label key={tag} data-selected={tags.includes(tag)}>
             <input type="checkbox" aria-label={`标签 ${tag}`} checked={tags.includes(tag)}
               disabled={!tags.includes(tag) && tags.length >= maxTeachingTags}

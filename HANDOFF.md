@@ -4,6 +4,14 @@
 
 ## 当前状态
 
+本轮新增 SKILL Demo。2026-10-10 用户明确要求将此次更新上传到仓库并通过 GitHub Actions 发布到 Pages；实际提交、推送和部署状态以 Git 与 Actions 记录为准。用户要求先聚焦教师经验整理与复用，PBL 暂时搁置，模型接入方向未定。首页与新 SKILL 路由使用独立数据；LLM 只在作者检测页有效，集市只有说明和 SKILL.md 下载，使用者自行挂载。用户确认本轮只做检测与发布流程 Demo，不接真实接口。
+
+关键实现为 `main/shared/skill-workspace.ts`、`main/src/features/skills` 和 `main/src/RootApp.tsx`。旧版 `App.tsx`、助手／PBL／任务模块与存储保留，页脚可查看旧作品。新存储键为 `teaching-skill.workspace.v1`，没有自动迁移旧资料。检测与发布规则在 `main/shared/skill-detection.ts` 及 `main/tests/skill-publication.test.ts`；旧集市入口为 `#/legacy-market`。当前验收应以 `main/tests/skill-demo.spec.ts` 和 `main/tests/skill-workspace.test.ts` 为新增范围，不能照搬旧首页断言。
+
+产品方向及 Demo 操作关系见 `main/docs/教学工坊产品重设计草案.md`。下面保留此前迁移与部署记录。
+
+检测与发布这一轮验证完成：73 项单元／集成检查、10 个 SKILL 浏览器场景全部通过。生产构建及 Pages 子路径的 10 个新旧路由检查、完整检测发布流程、刷新持久化和手机布局通过；具体范围见设计说明。旧版 43 项浏览器基线未重跑。可从 main/ 用 `npx vite --host 127.0.0.1 --port 5173` 只运行演示前端。
+
 项目名称：教学工坊。应用位于 main/。前端流程简化与三轮审查、Mac／Windows 迁移准备已完成。2026-10-10 用户进一步授权使用 GitHub Actions 部署前端到 GitHub Pages。
 
 Pages 工作流为 .github/workflows/pages.yml，推送 main 或手动运行时验证、构建并部署 main/dist；首次需在仓库 Settings → Pages 将 Source 设置为 GitHub Actions。生产构建使用 /edu-skill-store-with-pbl/ 子路径，页面图片跟随 Vite BASE_URL。网站预期地址：https://sfwensnote.github.io/edu-skill-store-with-pbl/#/home 。实际部署结果以 Actions 记录为准。

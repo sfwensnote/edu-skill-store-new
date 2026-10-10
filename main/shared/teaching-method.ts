@@ -67,8 +67,8 @@ export const mockQuestions = [
   },
   {
     id: 'principle',
-    question: '在这个过程中，有没有你明确不希望助手做的事情？',
-    placeholder: '说说你希望助手遵守的原则……',
+    question: '在这个过程中，有哪些必须坚持的原则或明确不能做的事情？',
+    placeholder: '写下采用这份方法时必须遵守的原则……',
     example: '第一次答错的时候不要直接给完整答案。',
   },
 ] as const;

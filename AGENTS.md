@@ -8,11 +8,17 @@
 2. 按任务规模组织模块，避免新增超大或高耦合文件；只为复杂、非显然逻辑添加必要注释。
 3. 用户指令优先于 Skill；只在点名或任务直接匹配时加载。清晰、可逆的小任务直接执行。
 4. 验证与风险相称；相关检查通过后，没有新变化就不重复或扩大测试。
-5. 未经明确授权不主动提交或推送 Git，不删除、清理或重构现有代码。2026-10-10 用户已批准本次迁移首次提交和推送；此授权不代表后续所有改动均可自动发布。
+5. 未经明确授权不主动提交或推送 Git，不删除、清理或重构现有代码。2026-10-10 用户已批准迁移首次提交和推送，并进一步明确要求将本轮 SKILL Demo 更新上传到仓库、通过 GitHub Actions 发布到 Pages；此授权不代表后续所有改动均可自动发布。
 6. 不清空教师的浏览器存储或数据库；测试写入使用隔离资料。
 7. 源码、注释、文档、界面和错误提示使用简体中文；教师界面中的 SKILL 大写。
 
 ## 当前产品与架构
+
+本轮用户要求先做聚焦 SKILL 的 Demo，PBL 暂时搁置，模型接入方向保持开放。首页及 `#/skills`、`#/market` 路由由 `src/RootApp.tsx` 进入新 Demo；旧路由仍加载 `src/App.tsx`，页脚提供旧版作品入口。以下旧版能力属于兼容范围。
+
+新主流程为经验 → 整理 → 教师核对 → LLM 检测 → 发布到集市 → 使用者自行挂载。SKILL 独立身份、草稿、内容版本与教师核对记录，定义在 `shared/skill-workspace.ts`；新存储键为 `teaching-skill.workspace.v1`。检测与集市说明读取同一份形成内容；LLM 只在作者检测工作区有效，集市没有预览或模型调用。问答为可选整理工具，不强制六问完成。形成改动后的版本清除本 SKILL 的旧核对、检测和本机发布；副本保留来源但不继承这些状态。检测包含所有教学分支及信息不足情境，需当前版本全部通过才能发布。
+
+旧资料不自动迁移或覆盖；禁止为 Demo 清空旧存储。用户确认先完成检测与发布流程 Demo：界面按检测模型已接入设计，返回明确标注为演示，不调用真实模型。下载提供 SKILL.md，使用者按目标平台自行挂载；发布为本机演示。旧集市移至 `#/legacy-market`，旧 `#/examples` 地址兼容为新集市说明，不恢复预览。最新设计见 `main/docs/教学工坊产品重设计草案.md`。
 
 教学工坊是面向教师的客户演示工作台。当前主要流程只做前端，不调用真实 LLM、不新增复杂后端或真实学生账号。2026-10-10 用户明确授权使用 GitHub Actions 部署前端到 GitHub Pages；只发布静态构建，不公开本机数据库或 Express 服务。
 
@@ -36,6 +42,7 @@
 | 目录 | 用途 |
 | --- | --- |
 | main/src/features/designer | 想法、六问、教师方法编辑与封装 |
+| main/src/features/skills | 独立 SKILL Demo、内容版本、教师核对与双用途视图 |
 | main/src/features/testing、usage | 方法核对、就地修改、步骤阅读、学生视角预览和旧报告 |
 | main/src/features/inquiry | 情境题、任务链、PBL 编辑、确认与导出 |
 | main/src/features/marketplace、workshop、space | 首页、集市、作品、教学任务、应用配置 |
@@ -78,6 +85,8 @@ npx --no-install playwright test tests/creation-flow.spec.ts tests/frontend-revi
 ```
 
 E2E 运行前保持开发服务和 Chrome 可用。测试地址固定 5173。完整 test:e2e 还包括历史用例，部分保留旧页面断言，不能把“当前 43 项通过”说成“全部历史 E2E 已通过”。
+
+新 Demo 浏览器检查使用 `npx playwright test --config tests/skill-demo.config.ts`，默认本机 Chrome；可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` 指定已安装 Chromium，`SKILL_DEMO_URL` 指定预览地址。旧首页测试属于旧版基线，不适用于新的主入口；历史用例不删除。
 
 ## 产品规则与测试重点
 

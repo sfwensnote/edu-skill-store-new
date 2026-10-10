@@ -22,6 +22,8 @@ export function GuidedMethodPage({
   onConfirm,
   savedAt,
   saveFailed,
+  requireAllAnswers = true,
+  tagSuggestions,
 }: {
   draft: CreationDraft;
   onChange: (draft: CreationDraft) => void;
@@ -29,6 +31,8 @@ export function GuidedMethodPage({
   onConfirm: () => void;
   savedAt?: string;
   saveFailed?: boolean;
+  requireAllAnswers?: boolean;
+  tagSuggestions?: readonly string[];
 }) {
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(false);
@@ -238,10 +242,10 @@ export function GuidedMethodPage({
                 >
                   还需要补充
                 </Button>
-                <Button onClick={confirm}>
+                {requireAllAnswers && <Button onClick={confirm}>
                   这就是我的教学方法
                   <ArrowRight data-icon="inline-end" />
-                </Button>
+                </Button>}
               </div>
             </div>
           )}
@@ -278,6 +282,7 @@ export function GuidedMethodPage({
               method={method}
               onChange={updateMethod}
               updatedSection={updated?.section ?? null}
+              tagSuggestions={tagSuggestions}
             />
             <StickyActions
               status={
@@ -305,7 +310,7 @@ export function GuidedMethodPage({
                 <Eye data-icon="inline-start" />
                 预览 SKILL
               </Button>
-              <Button disabled={Boolean(question) || Boolean(methodError(method))} onClick={confirm}>
+              <Button disabled={(requireAllAnswers && Boolean(question)) || Boolean(methodError(method))} onClick={confirm}>
                 形成 SKILL
               </Button>
             </StickyActions>
