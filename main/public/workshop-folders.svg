@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 140" fill="none">
+  <g opacity=".65">
+    <rect x="14" y="71" width="62" height="46" rx="5" transform="rotate(-18 14 71)" fill="#E1EFE8"/>
+    <path d="m30 88 9-3 4 5 14-5 6 19-26 9-7-25Z" fill="#BADCCB"/>
+    <rect x="106" y="27" width="63" height="43" rx="5" transform="rotate(-12 106 27)" fill="#F5FAF7" stroke="#D5E8DD" stroke-width="2"/>
+    <rect x="119" y="37" width="17" height="19" rx="3" transform="rotate(-12 119 37)" fill="#C3E2D2"/>
+    <path d="m144 34 16-3m-14 12 11-2" stroke="#CCE2D5" stroke-width="3" stroke-linecap="round"/>
+    <rect x="183" y="13" width="42" height="35" rx="4" transform="rotate(7 183 13)" fill="#E5F1EB"/>
+    <path d="m190 23 25 3m-26 4 18 2" stroke="#C9E4D5" stroke-width="3" stroke-linecap="round"/>
+    <rect x="270" y="19" width="81" height="93" rx="7" transform="rotate(16 270 19)" fill="#CBE5D7"/>
+    <path d="m280 39 31 9m-33 2 42 12m-44-3 22 6" stroke="#F5FAF7" stroke-width="4" stroke-linecap="round"/>
+    <path d="M209 56c0-5 4-9 9-9h29l10 8h43c5 0 9 4 9 9v53h-100V56Z" fill="#96C9B1"/>
+    <path d="M164 72c0-5 4-9 9-9h28l11 8h43c5 0 9 4 9 9v45H164V72Z" fill="#B8DBCA" stroke="#E8F4ED" stroke-width="2"/>
+    <path d="m188 93 24-10 24 10-24 10-24-10Z" fill="#609F82"/>
+    <path d="M198 99v12c7 5 20 5 27 0V99" stroke="#609F82" stroke-width="4"/>
+    <rect x="355" y="74" width="52" height="42" rx="5" transform="rotate(17 355 74)" fill="#E1EFE8"/>
+    <path d="m364 87 11 3-3 10-11-3 3-10Zm16 5 13 4-2 7-13-4 2-7Z" fill="#C1DECE"/>
+  </g>
+</svg>

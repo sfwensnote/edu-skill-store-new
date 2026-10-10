@@ -1,0 +1,428 @@
+.market-catalog.page-frame {
+  max-width: 1500px;
+  padding-top: 24px;
+}
+.catalog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 120px;
+  gap: 24px;
+}
+.market-catalog .catalog-heading h1 {
+  font-size: 34px;
+  font-weight: 700;
+}
+.market-catalog .catalog-heading p {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.catalog-heading img {
+  width: 280px;
+  height: 120px;
+  object-fit: contain;
+}
+.catalog-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 24px;
+  flex-wrap: wrap;
+}
+.catalog-search {
+  display: flex;
+  align-items: center;
+  flex: 1 1 300px;
+  gap: 10px;
+  height: 46px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+}
+.catalog-search:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px var(--blue-soft);
+}
+.catalog-search > svg {
+  width: 18px;
+  color: var(--ink-2);
+}
+.market-catalog.page-frame .catalog-filters .catalog-search input {
+  border: 0;
+  padding: 0;
+  min-height: 38px;
+  width: 100%;
+  outline: none;
+  box-shadow: none;
+}
+.catalog-selects {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.catalog-selects label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.market-catalog.page-frame .catalog-selects select {
+  padding: 6px 8px;
+  min-height: 38px;
+  max-width: 132px;
+}
+.catalog-segments {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+.catalog-segments button {
+  border: 0;
+  border-radius: 5px;
+  min-height: 34px;
+  padding: 5px 12px;
+  background: transparent;
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-size: 13px;
+}
+.catalog-segments button.active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.market-categories {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+.market-categories > nav + nav,
+.catalog-tags {
+  border-top: 1px solid var(--line-soft);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.market-catalog .market-categories h2,
+.market-filter-dialog .market-categories h2 {
+  font-size: 13px;
+  margin: 4px 8px 10px;
+}
+.market-categories nav button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  min-height: 39px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-2);
+  text-align: left;
+  font-size: 13px;
+}
+.market-categories nav button svg {
+  width: 16px;
+  height: 16px;
+}
+.market-categories nav button small {
+  margin-left: auto;
+  padding: 0 6px;
+  background: var(--muted);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.market-categories nav button.active,
+.market-categories nav button:hover {
+  color: var(--primary);
+  background: var(--blue-soft);
+}
+.catalog-tags > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 0 8px 8px;
+}
+.catalog-tags button {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 4px 7px;
+  color: var(--ink-2);
+  background: var(--muted);
+  font-size: 12px;
+}
+.catalog-tags button.active {
+  color: var(--primary);
+  background: var(--blue-soft);
+  border-color: var(--primary);
+}
+.catalog-results {
+  min-width: 0;
+}
+.catalog-list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 34px;
+  margin: 0 0 8px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.catalog-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.market-catalog.page-frame .catalog-sort select {
+  background: transparent;
+  border: 0;
+  padding: 3px 4px;
+  min-height: 32px;
+  font-size: 13px;
+}
+.catalog-mobile-filter[data-slot='button'] {
+  display: none;
+}
+.catalog-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--primary);
+}
+.market-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.market-catalog .catalog-results .market-resource-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px;
+  min-height: 116px;
+  background: var(--card);
+  transition: border-color 180ms;
+}
+.market-catalog .catalog-results .market-resource-card:hover {
+  border-color: var(--line-strong);
+}
+.catalog-resource-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 9px;
+  color: var(--primary);
+  background: var(--blue-soft);
+}
+.catalog-resource-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.6;
+}
+.catalog-resource-icon[data-category='智能练习'] {
+  color: #588bc7;
+  background: #eef4fc;
+}
+.catalog-resource-icon[data-category='知识讲解'] {
+  color: #a97927;
+  background: #fcf6e9;
+}
+.catalog-resource-icon[data-category='情境任务'] {
+  color: #8c70b1;
+  background: #f5f0fa;
+}
+.catalog-resource-body {
+  flex: 1;
+  min-width: 0;
+}
+.catalog-resource-title {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.market-catalog .catalog-resource-title h2 {
+  font-size: 18px;
+  line-height: 1.45;
+}
+.catalog-resource-title h2 button {
+  background: transparent;
+  border: 0;
+  text-align: left;
+}
+.catalog-status {
+  flex: none;
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--blue-soft);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.market-catalog .skill-practice {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 14px;
+  margin: 6px 0 8px;
+  line-height: 1.65;
+}
+.market-catalog .card-meta {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.market-catalog .card-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.market-catalog .card-meta svg {
+  width: 13px;
+  height: 13px;
+}
+.catalog-resource-actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 8px;
+  color: var(--primary);
+}
+.market-catalog .catalog-resource-actions [data-variant='outline'] {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, white);
+  min-height: 40px;
+  white-space: nowrap;
+}
+.market-filter-dialog .market-categories {
+  border: 0;
+  padding: 0;
+  max-height: 65dvh;
+  overflow-y: auto;
+}
+@media (max-width: 1200px) {
+  .catalog-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .catalog-search {
+    flex-basis: 100%;
+  }
+  .catalog-resource-icon {
+    width: 54px;
+    height: 54px;
+  }
+}
+@media (max-width: 900px) {
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+  .catalog-sidebar {
+    display: none;
+  }
+  .catalog-mobile-filter[data-slot='button'] {
+    display: inline-flex;
+    font-size: 13px;
+  }
+}
+@media (max-width: 760px) {
+  .catalog-heading {
+    min-height: 92px;
+  }
+  .market-catalog .catalog-heading h1 {
+    font-size: 27px;
+  }
+  .market-catalog .catalog-heading p {
+    font-size: 14px;
+  }
+  .catalog-heading img {
+    display: none;
+  }
+  .catalog-selects {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .catalog-selects label {
+    flex: 1;
+    min-width: 96px;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .market-catalog.page-frame .catalog-selects select {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 4px;
+    font-size: 12px;
+  }
+  .catalog-segments {
+    width: 100%;
+  }
+  .catalog-segments button {
+    flex: 1;
+    min-height: 36px;
+  }
+  .catalog-list-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .catalog-sort {
+    gap: 4px;
+  }
+  .market-catalog .catalog-results .market-resource-card {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    padding: 16px;
+    gap: 10px 12px;
+    align-items: start;
+  }
+  .catalog-resource-icon {
+    width: 44px;
+    height: 44px;
+  }
+  .catalog-resource-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+  .catalog-resource-title {
+    gap: 4px;
+  }
+  .market-catalog .catalog-resource-title h2 {
+    font-size: 17px;
+  }
+  .catalog-resource-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+  .market-filter-dialog .market-categories nav button,
+  .market-filter-dialog .catalog-tags button {
+    min-height: 44px;
+  }
+}

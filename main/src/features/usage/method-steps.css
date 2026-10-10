@@ -1,0 +1,30 @@
+.method-reading { min-width: 0; }
+.method-context { display: grid; gap: 14px; padding: 22px 24px; background: var(--blue-faint); border-radius: 12px; }
+.method-context > div, .method-step-list dl > div { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 16px; }
+.method-reading dt { color: var(--ink-2); font-size: 13px; padding-top: 2px; }
+.method-reading dd { margin: 0; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.method-step-list { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 16px; }
+.method-step-list > li { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.method-step-list header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line-soft); }
+.method-step-list h3 { font-size: 16px; }
+.method-step-list dl { margin: 0; }
+.method-step-list dl > div { padding: 18px 24px; }
+.method-step-list .method-step-action { background: var(--blue-faint); }
+.method-step-action dt { color: var(--primary); }
+.method-step-action dd { font-weight: 550; }
+.method-boundaries { padding: 24px; margin-top: 20px; border-top: 1px solid var(--line); }
+.method-boundaries h2 { font-size: 16px; margin-bottom: 12px; }
+.method-boundaries ul { margin: 0; padding-left: 20px; list-style: disc; line-height: 1.8; color: var(--ink-2); }
+.method-detail-page.page-frame { max-width: 960px; }
+.method-detail-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin: 24px 0; }
+.method-detail-heading p { color: var(--ink-2); margin-bottom: 8px; font-size: 13px; }
+.method-detail-heading h1 { font-size: var(--text-title); }
+.method-detail-heading .section-help { margin-top: 8px; }
+.method-detail-footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 20px; }
+@media (max-width: 640px) {
+  .method-detail-heading { flex-direction: column; gap: 14px; }
+  .method-context, .method-step-list header { padding: 16px; }
+  .method-context > div, .method-step-list dl > div { grid-template-columns: 1fr; gap: 6px; }
+  .method-step-list dl > div { padding: 16px; }
+  .method-boundaries { padding: 18px 0; }
+}

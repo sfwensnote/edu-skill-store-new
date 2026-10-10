@@ -1,0 +1,101 @@
+.teaching-scene-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.teaching-tags-field {
+  min-width: 0;
+  padding: 0;
+  margin: 22px 0 0;
+  border: 0;
+}
+.teaching-tags-field legend {
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.teaching-tag-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 560px;
+}
+.teaching-tag-input input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--input);
+  border-radius: 7px;
+  padding: 9px 12px;
+  background: var(--card);
+  font: inherit;
+}
+.teaching-tag-input input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.teaching-tags-field > small {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.teaching-selected-tags, .teaching-tag-options, .teaching-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.teaching-tag-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  color: var(--ink-2);
+  background: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.teaching-tag-options label[data-selected='true'] {
+  color: var(--primary);
+  background: var(--green-soft);
+}
+.teaching-tag-options label:has(input:disabled) {
+  opacity: .5;
+  cursor: default;
+}
+.teaching-tag-options input[type='checkbox'] {
+  width: 13px;
+  min-width: 13px;
+  height: 13px;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--primary);
+}
+.teaching-tags-field > [role='alert'] {
+  margin-top: 8px;
+  color: var(--red);
+  font-size: 13px;
+}
+.teaching-tag-list li {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--green-soft);
+  color: var(--primary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.method-situation-select {
+  margin: 16px 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.method-situation-select p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}

@@ -1,0 +1,15 @@
+# 两个平台的源码、文档统一使用 LF；二进制文件不做换行转换。
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.sqlite binary
+*.sqlite3 binary
+*.db binary
+*.bat text eol=crlf
+*.cmd text eol=crlf

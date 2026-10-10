@@ -1,0 +1,109 @@
+/* 公共操作细节集中在此，保留各页面自己的布局与配色。 */
+html {
+  scroll-padding-top: calc(var(--header-height) + 56px);
+  scroll-padding-bottom: 230px;
+}
+:is(input, textarea, select, summary, button, [tabindex='-1']) {
+  scroll-margin-block: 16px;
+}
+main:focus,
+.activity-configure-panel:focus,
+.activity-form-error:focus {
+  outline: none;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 7px;
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+.skip-link:not(:focus) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+[data-slot='dialog-content'] {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+  scroll-padding-block: 20px;
+}
+[data-slot='dialog-header'] {
+  padding-right: 32px;
+}
+[data-slot='dialog-title'] {
+  line-height: 1.5;
+}
+[data-slot='dialog-content'] :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid var(--input);
+  border-radius: 7px;
+  color: var(--ink);
+  background: var(--card);
+}
+[data-slot='dialog-content'] :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+[data-slot='dialog-content'] textarea {
+  resize: none;
+}
+.page-frame .chat-composer textarea.auto-textarea:focus {
+  outline: none;
+}
+.activity-workbench .activity-search:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px var(--blue-soft);
+}
+.activity-workbench .activity-search input:focus {
+  outline: none;
+}
+@media (max-width: 900px) {
+  [data-slot='button'][data-size^='icon'],
+  .chat-composer-actions [data-slot='button'] {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  [data-slot='dropdown-menu-item'] {
+    min-height: 44px;
+  }
+  .page-frame :is(input:not([type='checkbox']):not([type='radio']), select),
+  [data-slot='button'],
+  .catalog-segments button,
+  .preview-suggestions button,
+  .teacher-avatar {
+    min-height: 44px;
+  }
+  .page-frame :is(input:not([type='checkbox']):not([type='radio']), textarea, select),
+  .workshop-page.page-frame .workshop-tools .workshop-filter-field select,
+  .market-catalog.page-frame .catalog-selects select,
+  [data-slot='dialog-content'] :is(input, textarea, select) {
+    font-size: 16px;
+  }
+  .workshop-page .workshop-card-actions [data-slot='button'],
+  .header-actions [data-slot='button'],
+  .market-catalog.page-frame .catalog-selects select {
+    min-height: 44px;
+  }
+  .teacher-avatar {
+    min-width: 44px;
+  }
+  [data-slot='dialog-content'] {
+    padding: 20px;
+  }
+  [data-slot='dialog-header'] {
+    padding-right: 40px;
+  }
+}

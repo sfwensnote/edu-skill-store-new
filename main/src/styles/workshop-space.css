@@ -1,0 +1,86 @@
+.workshop-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+}
+.workshop-item > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.workshop-item h2 {
+  font-size: 18px;
+  margin-top: 8px;
+}
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  max-width: 490px;
+}
+.item-actions [data-slot='button'] {
+  font-size: 13px;
+}
+.local-task {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+}
+.local-task:first-of-type {
+  margin-top: 18px;
+}
+.local-task > div {
+  flex: 1;
+  min-width: 0;
+}
+.local-task details {
+  margin-top: 14px;
+}
+.local-task summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-size: 14px;
+}
+.submission-record {
+  border: 1px solid var(--line);
+  padding: 16px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.submission-record p {
+  white-space: pre-wrap;
+}
+.student-task {
+  max-width: 900px;
+}
+.student-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.student-progress button {
+  background: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 10px 14px;
+  color: var(--ink-2);
+}
+.student-progress button.active {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.preserve-lines {
+  white-space: pre-wrap;
+}
+.submission-complete > svg {
+  color: var(--green);
+  margin-bottom: 16px;
+}
+.student-task > .page-title-block {
+  margin-top: 24px;
+}

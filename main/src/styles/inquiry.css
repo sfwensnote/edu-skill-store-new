@@ -1,0 +1,118 @@
+.editor-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.editor-heading > div {
+  flex: 1;
+}
+.editor-heading > span {
+  margin-top: 8px;
+}
+.editor-heading p {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.editor-levels,
+.workshop-tabs {
+  display: flex;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+  overflow-x: auto;
+}
+.editor-levels button,
+.workshop-tabs button {
+  padding: 13px 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  white-space: nowrap;
+  min-height: 44px;
+}
+.editor-levels button.active,
+.workshop-tabs button.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 600;
+}
+.editor-levels small {
+  margin-left: 8px;
+  font-size: 11px;
+  color: var(--green);
+}
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+}
+.editor-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 24px;
+  align-items: start;
+}
+.design-section h2 {
+  margin-bottom: 16px;
+}
+.check-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.8;
+  font-size: 14px;
+  margin: 20px 0;
+}
+.check-row input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--blue);
+}
+.task-editor {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.task-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.task-editor-heading > div {
+  display: flex;
+}
+.task-editor .form-field {
+  margin: 12px 0;
+}
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.editor-footer .inline-actions {
+  margin-top: 0;
+}
+.design-preview h3 {
+  margin-top: 24px;
+}
+.design-preview h4 {
+  font-weight: 600;
+}
+.design-preview p {
+  white-space: pre-wrap;
+}
+.design-preview ol {
+  padding-left: 22px;
+  list-style: decimal;
+}
+.design-preview li {
+  margin: 14px 0;
+}

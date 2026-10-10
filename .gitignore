@@ -1,0 +1,38 @@
+# 规则对根目录及 main/ 下的同名目录均生效。
+# 依赖、构建和测试产物：在每台设备重新生成。
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.npm-cache/
+*.log
+
+# 私有配置：模板可提交，实际配置不可提交。
+.env
+.env.*
+!.env.example
+.envrc
+.npmrc
+
+# 数据库及手工迁移备份：通过私有渠道单独迁移。
+/data/
+/main/data/
+migration-private/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+teaching-workspace-backup*.json
+
+# 凭据及操作系统杂项。
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+Thumbs.db
+Desktop.ini
+~$*

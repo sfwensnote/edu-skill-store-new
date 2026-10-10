@@ -1,0 +1,23 @@
+.student-preview-page.page-frame { max-width: 960px; }
+.student-preview-page .student-preview-heading { text-align: left; margin: 22px 0 18px; }
+.student-preview-heading h1 { font-size: 28px; }
+.student-preview-page .student-preview-heading p { margin: 6px 0 0; }
+.preview-view-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); margin: 24px 0; }
+.preview-view-tabs button { padding: 12px 4px; min-height: 44px; border: 0; border-bottom: 3px solid transparent; color: var(--ink-2); background: transparent; }
+.preview-view-tabs button.active { border-bottom-color: var(--primary); color: var(--primary); font-weight: 650; }
+.student-preview-page [hidden] { display: none; }
+.student-preview-page .preview-chat { min-height: 260px; max-height: 430px; border-radius: 12px; }
+.preview-next-step { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 24px; }
+.preview-review-record { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 14px; }
+.preview-review-record summary { cursor: pointer; }
+.preview-review-record p { margin: 10px 0; }
+.preview-share-scope { text-align: right; color: var(--ink-2); font-size: 12px; margin-top: 10px; }
+.preview-shared-status { color: var(--primary); font-size: 14px; }
+.student-preview-page .method-situation-select { padding: 0; margin-bottom: 18px; border-bottom: 0; }
+.student-preview-page .method-situation-select .form-field { margin-top: 0; }
+@media (max-width: 640px) {
+  .student-preview-page .preview-chat { padding: 16px; }
+  .student-preview-page .student-message { max-width: 90%; }
+  .preview-next-step { flex-wrap: wrap; }
+  .preview-share-scope { text-align: left; }
+}

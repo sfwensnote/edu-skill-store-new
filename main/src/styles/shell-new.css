@@ -1,0 +1,27 @@
+.application { min-height: 100vh; }
+[data-slot='button'][data-variant='default'] { color: #fff; background: var(--blue); }
+[data-slot='button'][data-variant='default']:not(:disabled):hover { color: #fff; background: var(--blue-deep); }
+[data-slot='button'][data-variant='default']:disabled { background: var(--blue); }
+.app-header { height: 58px; background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); }
+.header-inner { width: min(100% - 64px, 1480px); height: 100%; margin: 0 auto; display: flex; align-items: stretch; }
+.brand { display: flex; align-items: center; gap: 11px; border: 0; background: transparent; padding: 0 26px 0 0; color: var(--ink); }
+.brand svg { width: 28px; height: 28px; color: var(--blue); stroke-width: 1.8; }
+.brand span { font-size: 18px; font-weight: 680; letter-spacing: -.02em; white-space: nowrap; }
+.header-nav { display: flex; align-items: stretch; height: 100%; }
+.header-nav button { min-width: 88px; padding: 0 20px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-2); font-size: 15px; transition: color .15s, border-color .15s; }
+.header-nav button:hover { color: var(--ink); }
+.header-nav button.active { color: var(--ink); border-bottom-color: var(--blue); font-weight: 620; }
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 22px; }
+.header-actions [data-slot='button'] { height: 40px; padding-inline: 17px; box-shadow: 0 3px 10px rgba(37,99,235,.13); }
+.teacher-avatar { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--blue-deep); background: var(--blue-soft); font-weight: 650; }
+.page-frame { width: min(100% - 80px, 1480px); margin-inline: auto; }
+.wide-frame { max-width: 1480px; }
+.narrow-frame { max-width: 1220px; }
+.page-title-block h1 { font-size: var(--text-title); line-height: 1.35; letter-spacing: -.02em; font-weight: 650; }
+.page-title-block p { margin-top: 4px; color: var(--ink-2); font-size: 15px; }
+.back-link { display: inline-flex; min-width: 40px; min-height: 40px; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-2); padding: 4px; font-size: var(--text-body); }
+.back-link:hover { color: var(--ink); }
+.back-link svg { width: 18px; height: 18px; }
+.not-found { padding-top: 120px; text-align: center; }
+.not-found h1 { font-size: 28px; }
+.not-found button { margin-top: 24px; border: 0; color: var(--blue); background: transparent; }

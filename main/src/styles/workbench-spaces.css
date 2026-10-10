@@ -1,0 +1,426 @@
+/* 探究、核对和使用空间共用工作台尺度，各自保留适合任务的栏位。 */
+.inquiry-page.page-frame {
+  width: 100%;
+  max-width: none;
+  padding: 0 32px 72px;
+}
+.inquiry-page > .editor-heading {
+  margin: 0 -32px;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+  align-items: center;
+}
+.editor-heading h1 {
+  font-size: 22px;
+}
+.editor-heading p {
+  margin-top: 4px;
+}
+.editor-levels {
+  margin-top: 20px;
+}
+.editor-toolbar {
+  gap: 8px;
+  margin: 16px 0 8px;
+}
+.inquiry-page .editor-columns {
+  grid-template-columns: minmax(300px, 3fr) minmax(0, 7fr);
+  gap: 24px;
+}
+.inquiry-page .editor-columns > .design-section:first-child {
+  background: var(--card);
+}
+.design-section h2 {
+  font-size: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.design-section h3 {
+  margin-top: 20px;
+}
+.design-section .step-section h3 {
+  margin-top: 0;
+}
+.design-section > p {
+  line-height: 1.8;
+}
+.design-section .form-field {
+  margin: 15px 0;
+}
+.design-field-count {
+  text-align: right;
+  font-size: 12px;
+}
+.inquiry-page .editor-columns > .design-section:last-child .form-field {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px 16px;
+}
+.inquiry-page .editor-columns > .design-section:last-child .form-field > span {
+  padding-top: 8px;
+}
+.inquiry-page .editor-columns > .design-section:last-child .form-field > small {
+  grid-column: 2;
+}
+.inquiry-page > .editor-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  background: var(--card);
+  padding: 14px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 24px;
+}
+.task-editor {
+  position: relative;
+  padding-top: 20px;
+}
+.task-editor-heading {
+  gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 12px;
+}
+.task-editor-heading > strong {
+  flex: 1;
+  font-size: 16px;
+}
+.brief-summary {
+  margin-top: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.brief-summary summary {
+  padding: 14px 18px;
+}
+.brief-summary .inquiry-brief {
+  padding: 0 18px 18px;
+}
+.outcome-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  overflow: hidden;
+}
+.outcome-option {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 4px 18px;
+  align-items: center;
+  padding: 20px 24px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
+  text-align: left;
+}
+.outcome-option:last-child {
+  border-bottom: 0;
+}
+.outcome-option:hover {
+  background: var(--blue-faint);
+}
+.outcome-option.selected {
+  background: var(--blue-soft);
+  box-shadow: none;
+}
+.outcome-option > svg {
+  grid-row: 1 / span 2;
+  width: 24px;
+  height: 24px;
+  color: var(--blue);
+}
+.outcome-option > strong {
+  grid-column: 2;
+  font-size: 17px;
+}
+.outcome-option > p {
+  grid-column: 2;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.outcome-option > span {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  color: var(--blue);
+  font-size: 13px;
+}
+.inquiry-start-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 24px;
+  align-items: start;
+}
+.inquiry-start-aside .market-panel {
+  background: var(--card);
+}
+.inquiry-start-aside [data-slot='button'] {
+  margin-top: 12px;
+  width: 100%;
+}
+.inquiry-start-aside h2 {
+  font-size: 18px;
+}
+.inquiry-start-aside .recent-design {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.testing-page {
+  background: var(--canvas);
+  min-height: calc(100dvh - var(--header-height));
+}
+.testing-toolbar {
+  height: 64px;
+}
+.testing-workspace {
+  max-width: none;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+  gap: 24px;
+  padding-bottom: 32px;
+  min-height: 0;
+}
+.testing-main,
+.testing-side {
+  padding: 24px 0;
+  border: 0;
+  min-width: 0;
+}
+.testing-side .skill-results {
+  padding: 22px;
+  position: sticky;
+  top: 144px;
+}
+.test-record {
+  max-width: none;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 28px;
+}
+.case-confirmation {
+  position: sticky;
+  bottom: 0;
+  justify-content: flex-end;
+  padding: 12px 0 0;
+  border: 0;
+  background: var(--card);
+}
+.simulation-line.assistant,
+.test-question,
+.conversation-turn.assistant {
+  border-color: var(--line);
+}
+.flow-line {
+  background: var(--line);
+}
+.flow-line svg {
+  background: var(--card);
+}
+.result-icon.waiting {
+  background: var(--muted);
+}
+.testing-side .skill-result-row div {
+  grid-template-columns: 1fr;
+}
+.complete-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  padding: 14px;
+}
+.test-complete {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 9px;
+}
+.task-form-step {
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+}
+.task-feedback-settings {
+  margin: 16px 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.task-feedback-settings summary {
+  cursor: pointer;
+}
+.task-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.local-task {
+  padding: 18px 0;
+}
+.student-task {
+  max-width: 1020px;
+}
+.student-task > .market-panel {
+  padding: 28px;
+}
+.student-progress {
+  gap: 8px;
+  margin: 0 0 20px;
+}
+.student-progress button {
+  min-height: 40px;
+  padding: 8px 14px;
+  background: var(--card);
+}
+.student-progress button.active {
+  background: var(--blue-soft);
+}
+.student-task .editor-footer {
+  position: sticky;
+  bottom: 0;
+  background: var(--card);
+  padding: 14px;
+}
+.student-chat {
+  background: var(--card);
+}
+.student-message {
+  max-width: 85%;
+}
+.preview-chat {
+  background: var(--card);
+  border-color: var(--line);
+}
+.student-message.user p {
+  border-color: var(--line);
+}
+.student-composer {
+  background: var(--card);
+}
+.student-composer textarea {
+  border: 0;
+  min-height: 94px;
+}
+.student-composer button {
+  border-radius: 7px;
+}
+.summary-icon {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+.record-filters button.active,
+.report-publish {
+  border-color: var(--line);
+}
+.report-sections,
+.detail-summary {
+  gap: 24px;
+}
+.report-sections > section {
+  background: var(--card);
+}
+.detail-summary > div {
+  background: var(--card);
+}
+.session-time,
+.session-time small,
+.session-detail small,
+.session-anomaly,
+.usage-row small,
+.breadcrumbs button {
+  color: var(--ink-2);
+}
+.session-anomaly.has {
+  color: var(--orange);
+}
+@media (max-width: 1100px) {
+  .inquiry-start-columns {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+  .inquiry-page .editor-columns {
+    grid-template-columns: minmax(280px, 35fr) minmax(0, 65fr);
+  }
+  .inquiry-page .editor-columns > .design-section:last-child .form-field {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 10px;
+  }
+}
+@media (max-width: 900px) {
+  .inquiry-page .editor-columns,
+  .inquiry-start-columns {
+    grid-template-columns: 1fr;
+  }
+  .inquiry-start-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .testing-workspace {
+    grid-template-columns: 1fr;
+  }
+  .testing-side .skill-results {
+    position: static;
+  }
+}
+@media (max-width: 760px) {
+  .inquiry-page.page-frame {
+    padding: 0 16px 48px;
+  }
+  .inquiry-page > .editor-heading {
+    margin-inline: -16px;
+    padding: 16px;
+  }
+  .inquiry-page > .editor-heading h1 {
+    font-size: 20px;
+  }
+  .outcome-option {
+    padding: 18px 16px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 5px 12px;
+  }
+  .outcome-option > span {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .outcome-level {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .inquiry-start-aside {
+    display: block;
+  }
+  .inquiry-page .editor-columns > .design-section:last-child .form-field {
+    display: flex;
+  }
+  .inquiry-page > .editor-footer {
+    padding: 12px;
+  }
+  .test-record {
+    padding: 20px 16px;
+  }
+  .student-task > .market-panel {
+    padding: 20px;
+  }
+  .testing-toolbar-inner {
+    gap: 10px;
+  }
+  .testing-title strong {
+    max-width: 170px;
+    overflow-wrap: anywhere;
+  }
+}
+@media print {
+  .creation-heading,
+  .sticky-actions {
+    display: none;
+  }
+  .inquiry-page.page-frame {
+    padding: 0;
+  }
+}
