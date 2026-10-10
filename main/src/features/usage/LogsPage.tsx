@@ -45,7 +45,6 @@ export function LogsPage({
           <section className="run-records">
             <header className="records-head">
               <h2>教学方法</h2>
-              <span>v{assistant.revision || 1}.0</span>
             </header>
             <div className="session-list">
               {assistant.skills.map((skill) => (

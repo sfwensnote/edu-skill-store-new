@@ -21,7 +21,7 @@ test('旧资料的展示去掉演示标识，保留核对状态和来源快照�
   assert.equal(skillValidationLabel(entry), '待核对');
   assert.equal(skillSourceText(entry), '');
   assert.deepEqual(entry, before);
-  assert.equal(skillSourceText({ ...entry, source: '复制自“原方法”（预置教师示例，v1.0）。平台预置的虚构教学方法。' }), '复制自“原方法”（教师，v1.0）。');
+  assert.equal(skillSourceText({ ...entry, source: '复制自“原方法”（预置教师示例，v1.0）。平台预置的虚构教学方法。' }), '复制自“原方法”（教师）。');
   const reviewed = { ...entry, demo: false, creator: '李老师', validation: '教师已核对', source: '李老师整理的阅读笔记' };
   assert.equal(skillValidationLabel(reviewed), '教师已核对');
   assert.equal(skillSourceText(reviewed), reviewed.source);

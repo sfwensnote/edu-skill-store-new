@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ArrowLeft, LoaderCircle } from 'lucide-react';
 import type { TeachingAssistant } from '../../../shared/assistant';
 import {
   defaultCreationDraft,
@@ -13,6 +13,7 @@ import {
   type TeachingMethod,
 } from '../../../shared/teaching-method';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SaveFailureExitGuard } from '@/components/SaveFailureExitGuard';
 import { IdeaForm } from './IdeaForm';
 import { GuidedMethodPage } from './GuidedMethodPage';
@@ -140,6 +141,7 @@ export function DesignerPage({
   const [draft, setDraft] = useState(() => restore(storage, assistant, selectedSkillId, sourceTags, sourceCategory));
   const [storageError, setStorageError] = useState('');
   const [savedAt, setSavedAt] = useState('');
+  const [forming, setForming] = useState(false);
   const previousStage = useRef(draft.stage);
   const headingRef = useRef<HTMLHeadingElement>(null);
   useLayoutEffect(() => {
@@ -148,6 +150,16 @@ export function DesignerPage({
     window.scrollTo(0, 0);
     headingRef.current?.focus({ preventScroll: true });
   }, [draft.stage]);
+  useEffect(() => {
+    if (!forming) return;
+    const timer = window.setTimeout(() => {
+      if (!onStartTest()) {
+        setForming(false);
+        setStorageError('方法已整理，核对流程未能保存，请释放存储空间后重试。');
+      }
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [forming, onStartTest]);
   function save(next: CreationDraft) {
     setDraft(next);
     try {
@@ -186,6 +198,7 @@ export function DesignerPage({
     return saved;
   }
   function confirmMethod() {
+    if (forming) return;
     const skill = packageTeachingMethod(
       draft.method,
       draft.editingSkillId || `method-${assistant.id}`,
@@ -206,8 +219,7 @@ export function DesignerPage({
       setStorageError('教学方法保存失败，当前内容仍在页面中，请释放存储空间后重试。');
       return;
     }
-    if (!onStartTest())
-      setStorageError('方法已整理，核对流程未能保存，请释放存储空间后重试。');
+    setForming(true);
   }
   return (
     <main className="creation-flow page-frame">
@@ -264,6 +276,16 @@ export function DesignerPage({
           saveFailed={Boolean(storageError)}
         />
       )}
+      <Dialog open={forming}>
+        <DialogContent className="skill-creation-transition" showCloseButton={false} onEscapeKeyDown={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}>
+          <LoaderCircle className="spin" aria-hidden="true" />
+          <DialogHeader>
+            <DialogTitle>SKILL 已创建</DialogTitle>
+            <DialogDescription role="status">正在打开方法检验…</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

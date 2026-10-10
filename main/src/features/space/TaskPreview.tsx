@@ -96,7 +96,7 @@ export function TaskPreview({
           <p>截止时间：{task.activitySettings.endsAt.replace('T', ' ') || '未设置'}</p>
           {task.supportSkill && (
             <p>
-              智能支持配置：{task.supportSkill.skill.name} {task.supportSkill.version} · 本次预览不执行
+              智能支持配置：{task.supportSkill.skill.name} · 本次预览不执行
               SKILL。
             </p>
           )}

@@ -46,7 +46,7 @@ export function SkillDetailPage({
           <h1>{entry.skill.name}</h1>
           <p>{entry.skill.summary}</p>
           <p className="subtle">
-            {skillCreatorLabel(entry)} · {entry.grade} · {entry.subject} · {teachingCategoryOf(entry.skill, entry.scene, entry.area)} · {entry.version}
+            {skillCreatorLabel(entry)} · {entry.grade} · {entry.subject} · {teachingCategoryOf(entry.skill, entry.scene, entry.area)}
           </p>
           <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example)} />
           <small>{skillValidationLabel(entry)}</small>

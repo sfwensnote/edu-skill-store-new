@@ -32,7 +32,7 @@ export function ReportPage({
       </button>
       <div className="report-heading">
         <h1>核对摘要</h1>
-        <p>{assistant.name} · v{assistant.revision || 1}.0</p>
+        <p>{assistant.name}</p>
         <Button variant="outline" onClick={onOpenPreview}>
           <Play data-icon="inline-start" />
           学生视角预览

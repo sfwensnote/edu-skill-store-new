@@ -35,7 +35,9 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
   await expect(editor).toBeHidden();
-  await expect(page.locator('.testing-title')).toContainText('v3.0');
+  await expect(page.getByRole('heading', { name: /方法检验/, level: 1 })).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: '方法检验进度' })).toHaveAttribute('value', '0');
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
   await expect(page.locator('.test-case-head')).toContainText('情况 1');
   await page.reload();
   await page.getByRole('button', { name: '确认并继续' }).click();
@@ -55,7 +57,8 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await expect(page.getByLabel('预览教学情况')).toHaveValue('review-method:1');
   await expect(page.getByRole('button', { name: '完成，返回我的 SKILL' })).toBeVisible();
   await page.getByText('核对记录', { exact: true }).click();
-  await expect(page.getByText('v3.0 · 教师已核对方法内容')).toBeVisible();
+  await expect(page.locator('.preview-review-record')).toContainText('教师已核对方法内容');
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
   await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '分享到集市', exact: true }).click();
   await expect(page).toHaveURL(/#\/market/);
@@ -169,5 +172,6 @@ test('修改可以放弃，未核对版本不能分享，保存失败不替换�
   await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
   await expect(editor.getByRole('alert')).toContainText('修改未保存');
-  await expect(page.locator('.testing-title')).toContainText('v2.0');
+  await expect(page.locator('.testing-progress progress')).toHaveAttribute('value', '0');
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
 });

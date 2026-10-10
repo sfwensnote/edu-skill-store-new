@@ -82,7 +82,7 @@ test('活动步骤切换定位新内容，手机保存反馈可见且底部留�
   await page.screenshot({ path: 'docs/assets/前端审查-活动手机可见区.png' });
 });
 
-test('手机活动与核对视图支持方向键切换，焦点和选中状态保持同步', async ({ page }) => {
+test('手机活动支持方向键切换，方法检验与进度同时显示', async ({ page }) => {
   await seed(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/space?draft=frontend-review-activity');
@@ -96,14 +96,9 @@ test('手机活动与核对视图支持方向键切换，焦点和选中状态�
   await expect(configure).toBeFocused();
   await expect(page.locator('#activity-configure-panel')).toBeVisible();
   await page.goto('/#/assistant/assistant-demo-active/test');
-  const process = page.getByRole('tab', { name: '核对方法', exact: true });
-  const results = page.getByRole('tab', { name: '核对进度', exact: true });
-  await process.press('End');
-  await expect(results).toBeFocused();
-  await expect(results).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('#testing-process')).toBeHidden();
-  await results.press('ArrowLeft');
-  await expect(process).toBeFocused();
+  await expect(page.getByRole('progressbar', { name: '方法检验进度' })).toBeVisible();
+  await expect(page.locator('#testing-process')).toBeVisible();
+  await expect(page.getByRole('tab', { name: '核对进度', exact: true })).toHaveCount(0);
 });
 
 test('长内容弹窗在低屏高可滚动，Escape 关闭后恢复焦点', async ({ page }) => {

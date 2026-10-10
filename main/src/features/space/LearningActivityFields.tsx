@@ -18,7 +18,6 @@ export function SkillMethodSummary({ entry }: { entry: SkillEntry }) {
     <div className="activity-method-summary">
       <div className="activity-summary-heading">
         <h3>{entry.skill.name}</h3>
-        <span>{entry.version}</span>
       </div>
       <p>{entry.skill.description || entry.skill.summary}</p>
       <dl>
@@ -342,7 +341,7 @@ export function LearningActivityFields({
                     <span>
                       <strong>{e.skill.name}</strong>
                       <small>
-                        {e.version} · {e.grade} · {e.subject}
+                        {e.grade} · {e.subject}
                       </small>
                       {issue && <small className="activity-warning-text">{issue}</small>}
                     </span>
@@ -384,7 +383,7 @@ export function LearningActivityFields({
         </div>
         <div>
           <dt>智能支持</dt>
-          <dd>{entry ? `${entry.skill.name} ${entry.version} · 待执行验证` : '不使用教学 SKILL'}</dd>
+          <dd>{entry ? `${entry.skill.name} · 待执行验证` : '不使用教学 SKILL'}</dd>
         </div>
       </dl>
     </>

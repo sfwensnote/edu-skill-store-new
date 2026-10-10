@@ -199,7 +199,7 @@ export function StudentPreviewPage({
       </div>
       <details className="preview-review-record">
         <summary>核对记录</summary>
-        <p>v{assistant.revision || 1}.0 · {checked ? '教师已核对方法内容' : '方法内容待核对'}</p>
+        <p>{checked ? '教师已核对方法内容' : '方法内容待核对'}</p>
         {assistant.skills.map((skill) => <p key={skill.id}>{skill.name}</p>)}
       </details>
       <footer className="preview-next-step">

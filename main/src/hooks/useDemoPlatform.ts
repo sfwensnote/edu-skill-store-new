@@ -237,7 +237,7 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
           status: 'DRAFT',
           isPublic: false,
           skills: [skill],
-          skillSources: { [skill.id]: `复制自“${entry.skill.name}”（${entry.creator}，${entry.version}）。${entry.source}` },
+          skillSources: { [skill.id]: `复制自“${entry.skill.name}”（${entry.creator}）。${entry.source}` },
           area: entry.area,
           revision: 1,
           createdAt: now,

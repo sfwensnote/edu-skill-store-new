@@ -84,7 +84,7 @@ export function SkillApplicationFields({
                 <span>
                   <strong>{e.skill.name}</strong>
                   <small>
-                    {e.version} · {e.grade} · {e.subject} · {e.validation}
+                    {e.grade} · {e.subject} · {e.validation}
                   </small>
                 </span>
                 {draft.skillId === e.id && <Check aria-label="已选择" />}
@@ -243,7 +243,7 @@ export function SkillApplicationFields({
         <div>
           <dt>教学方法</dt>
           <dd>
-            {entry?.skill.name} · {entry?.version}
+            {entry?.skill.name}
           </dd>
         </div>
         <div>

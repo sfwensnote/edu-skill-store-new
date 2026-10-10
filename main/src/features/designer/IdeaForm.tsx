@@ -25,7 +25,7 @@ export function IdeaForm({
       }}
     >
       <header>
-        <h2>说说你的教学想法<span className="required-mark" aria-hidden="true"> *</span></h2>
+        <h2>说说你的教学想法</h2>
       </header>
       {!draft.originalIdea && (
         <Button
@@ -94,6 +94,7 @@ export function IdeaForm({
                 '科学',
                 '信息技术',
                 '其他',
+                '任意学科',
                 draft.subject,
               ]),
             ].map((item) => (

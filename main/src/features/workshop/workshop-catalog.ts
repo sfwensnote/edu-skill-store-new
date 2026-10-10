@@ -78,7 +78,7 @@ export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): W
     createdAt: entry.addedFrom?.addedAt || owner?.createdAt,
     updatedAt: entry.addedFrom?.addedAt || owner?.updatedAt,
     status: skillValidationLabel(entry),
-    detail: entry.version,
+    detail: '',
     canUse: Boolean(
       entry.skill.name.trim() &&
       entry.skill.purpose.trim() &&

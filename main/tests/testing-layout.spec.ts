@@ -1,0 +1,70 @@
+import { test, expect } from './workspace-fixture';
+import { editMethodField, fillMethodDetails } from './fixtures/method-form';
+
+test('任意学科创建、过渡显示与标题下进度条，手机与桌面在同一页核对', async ({ page }, info) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/#/create/check-layout');
+  await expect(page.getByRole('heading', { name: '说说你的教学想法' })).toHaveText('说说你的教学想法');
+  await page.getByLabel('教学想法').fill('学生答错后，我想让他先回顾自己的思路。');
+  await page.getByRole('combobox', { name: '学科', exact: true }).selectOption('任意学科');
+  await page.getByRole('checkbox', { name: '标签 错因辅导', exact: true }).check();
+  await page.reload();
+  await expect(page.getByRole('combobox', { name: '学科', exact: true })).toHaveValue('任意学科');
+  await page.getByRole('button', { name: '继续', exact: true }).click();
+  await fillMethodDetails(page, '思路追问', '引导学生检查不确定的步骤', '学生能独立说明思路时结束');
+  await editMethodField(page, '希望学生达到', '能回顾并解释自己的解题思路');
+  await editMethodField(page, '什么时候开始', '学生第一次答错');
+  for (const [condition, action] of [['学生第一次答错', '请学生回顾步骤'], ['学生仍找不到问题', '提醒学生标出不确定的一步']]) {
+    await page.getByRole('button', { name: '补充一种情况和做法', exact: true }).click();
+    const index = await page.locator('.outline-step').count();
+    await editMethodField(page, `情况 ${index}`, condition);
+    await editMethodField(page, `做法 ${index}`, action);
+  }
+  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'SKILL 已创建' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '正在打开方法检验' })).toBeVisible();
+  await expect(page).toHaveURL(/check-layout\/test/);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  const heading = page.getByRole('heading', { name: '思路追问 方法检验', level: 1 });
+  await expect(heading).toBeVisible();
+  const progress = page.getByRole('progressbar', { name: '方法检验进度' });
+  await expect(progress).toHaveAttribute('value', '0');
+  await expect(progress).toHaveAttribute('max', '2');
+  const titleBounds = await heading.boundingBox();
+  const progressBounds = await progress.boundingBox();
+  const recordBounds = await page.locator('.test-record').boundingBox();
+  expect(progressBounds!.y).toBeGreaterThan(titleBounds!.y + titleBounds!.height);
+  expect(progressBounds!.y + progressBounds!.height).toBeLessThan(recordBounds!.y);
+  await expect(page.locator('.testing-side')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '修改方法', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '修改当前方法', exact: true })).toHaveCount(1);
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+  await page.screenshot({ path: info.outputPath('check-layout-desktop.png'), fullPage: true });
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(progress).toBeVisible();
+    await expect(page.locator('.test-record')).toBeVisible();
+    await expect(page.getByRole('tab', { name: '核对进度', exact: true })).toHaveCount(0);
+    const checks = await page.locator('.check-list').boundingBox();
+    const actions = await page.locator('.case-confirmation').boundingBox();
+    expect(actions!.y).toBeGreaterThanOrEqual(checks!.y + checks!.height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.screenshot({ path: info.outputPath('check-layout-mobile.png'), fullPage: true });
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await expect(progress).toHaveAttribute('value', '1');
+  await page.reload();
+  await expect(progress).toHaveAttribute('value', '1');
+  await page.getByRole('button', { name: '确认并完成', exact: true }).click();
+  await expect(progress).toHaveAttribute('value', '2');
+  await expect(page.getByRole('heading', { name: '教学方法核对完成' })).toBeVisible();
+  await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await expect(page.locator('.market-resource-card')).toContainText('任意学科');
+  await page.getByRole('button', { name: '查看与试用', exact: true }).click();
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+  await page.goto('/#/workshop?tab=created');
+  await expect(page.locator('.workshop-item')).toContainText('任意学科');
+  await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+});

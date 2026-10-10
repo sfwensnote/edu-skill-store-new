@@ -172,31 +172,6 @@
   padding: 12px 0;
   border-bottom: 1px solid var(--line-soft);
 }
-.testing-page {
-  background: var(--canvas);
-  min-height: calc(100dvh - var(--header-height));
-}
-.testing-toolbar {
-  height: 64px;
-}
-.testing-workspace {
-  max-width: none;
-  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
-  gap: 24px;
-  padding-bottom: 32px;
-  min-height: 0;
-}
-.testing-main,
-.testing-side {
-  padding: 24px 0;
-  border: 0;
-  min-width: 0;
-}
-.testing-side .skill-results {
-  padding: 22px;
-  position: sticky;
-  top: 144px;
-}
 .test-record {
   max-width: none;
   background: var(--card);
@@ -222,12 +197,6 @@
 }
 .flow-line svg {
   background: var(--card);
-}
-.result-icon.waiting {
-  background: var(--muted);
-}
-.testing-side .skill-result-row div {
-  grid-template-columns: 1fr;
 }
 .complete-actions {
   position: sticky;
@@ -361,12 +330,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
-  .testing-workspace {
-    grid-template-columns: 1fr;
-  }
-  .testing-side .skill-results {
-    position: static;
-  }
 }
 @media (max-width: 760px) {
   .inquiry-page.page-frame {
@@ -404,15 +367,11 @@
   .test-record {
     padding: 20px 16px;
   }
+  .case-confirmation {
+    position: static;
+  }
   .student-task > .market-panel {
     padding: 20px;
-  }
-  .testing-toolbar-inner {
-    gap: 10px;
-  }
-  .testing-title strong {
-    max-width: 170px;
-    overflow-wrap: anywhere;
   }
 }
 @media print {

@@ -6,7 +6,7 @@ export function MethodTrialRecord({ task, onBack }: { task: LocalTeachingTask; o
   return <main className="page-frame detail-page method-detail-page">
     <button className="back-link" onClick={onBack}><ArrowLeft />返回我的 SKILL</button>
     <header className="method-detail-heading"><div>
-      <p>历史方法试用 · {task.skill?.version}</p>
+      <p>历史方法试用</p>
       <h1>{task.skill?.skill.name || task.title}</h1>
     </div></header>
     {task.skill && <MethodSteps skill={task.skill.skill} />}

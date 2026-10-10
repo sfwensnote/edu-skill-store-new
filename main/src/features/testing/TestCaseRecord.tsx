@@ -18,7 +18,7 @@ export function TestCaseRecord({
   return (
     <section className="test-record">
       <div className="test-case-head">
-        <h1>{testCase.title}</h1>
+        <h2>{testCase.title}</h2>
       </div>
       <p className="scenario-copy">{testCase.scenario}</p>
       {!testCase.methodReview && (

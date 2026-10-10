@@ -2,10 +2,8 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { TeachingAssistant } from '../../../shared/assistant';
 import { Button } from '@/components/ui/button';
-import { ViewTabs } from '@/components/ViewTabs';
 import { createTestCases } from './testData';
 import { TestCaseRecord } from './TestCaseRecord';
-import { SkillResults } from './SkillResults';
 import { TestMethodEditor } from './TestMethodEditor';
 import type { TeachingMethod } from '../../../shared/teaching-method';
 import { useAccount } from '@/features/accounts/AccountProvider';
@@ -52,7 +50,6 @@ export function TestingPage({
     return 0;
   });
   const [error, setError] = useState('');
-  const [mobilePanel, setMobilePanel] = useState<'process' | 'results'>('process');
   const [editingSkillId, setEditingSkillId] = useState<string>();
   const editingSkill = assistant.skills.find((skill) => skill.id === editingSkillId);
   const done = completed >= cases.length;
@@ -92,27 +89,15 @@ export function TestingPage({
             {backLabel}
           </button>
           <div className="testing-title">
-            <strong>{assistant.name}</strong>
-            <span>v{assistant.revision || 1}.0</span>
+            <h1><span>{assistant.name}</span>{' '}<span>方法检验</span></h1>
             <i className={done ? 'done' : ''}>{done ? '核对完成' : '待核对'}</i>
           </div>
           <div className="testing-progress">
-            <span>
-              {Math.min(completed + (done ? 0 : 1), cases.length)} / {cases.length}
-            </span>
+            <span aria-live="polite">已核对 {completed} / {cases.length}</span>
+            <progress aria-label="方法检验进度" value={completed} max={cases.length} />
           </div>
         </div>
       </header>
-      <ViewTabs
-        className="mobile-workspace-tabs testing-tabs"
-        label="方法核对视图"
-        value={mobilePanel}
-        onChange={setMobilePanel}
-        items={[
-          { value: 'process', label: '核对方法', panelId: 'testing-process' },
-          { value: 'results', label: '核对进度', panelId: 'testing-results' },
-        ]}
-      />
       {error && (
         <p className="page-frame" role="alert">
           {error}
@@ -121,9 +106,7 @@ export function TestingPage({
       <div className="testing-workspace page-frame">
         <div
           id="testing-process"
-          role="tabpanel"
-          aria-labelledby="testing-process-tab"
-          className={`testing-main ${mobilePanel === 'process' ? 'mobile-active' : ''}`}
+          className="testing-main"
         >
           {done ? (
             <section className="test-complete">
@@ -132,7 +115,7 @@ export function TestingPage({
                   <Check />
                 </span>
                 <div>
-                  <h1>教学方法核对完成</h1>
+                  <h2>教学方法核对完成</h2>
                 </div>
               </div>
               <div className="completed-cases">
@@ -174,14 +157,6 @@ export function TestingPage({
               onEdit={() => setEditingSkillId(current.skillId)}
             />
           )}
-        </div>
-        <div
-          id="testing-results"
-          role="tabpanel"
-          aria-labelledby="testing-results-tab"
-          className={`testing-side ${mobilePanel === 'results' ? 'mobile-active' : ''}`}
-        >
-          <SkillResults skills={assistant.skills} cases={cases} completed={completed} onEdit={setEditingSkillId} />
         </div>
       </div>
       {editingSkill && <TestMethodEditor skill={editingSkill} onClose={() => setEditingSkillId(undefined)} onSave={(method) => onSaveMethod(editingSkill.id, method)} />}

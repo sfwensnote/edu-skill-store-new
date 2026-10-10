@@ -472,6 +472,17 @@
   font-size: 13px;
   margin-top: 6px;
 }
+.skill-creation-transition[data-slot='dialog-content'] {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.skill-creation-transition > svg {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: var(--primary);
+}
 .field-error-space {
   min-height: 26px;
 }

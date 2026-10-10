@@ -58,7 +58,6 @@ export function AssistantDraft({
     <section className="assistant-draft" aria-label="助手设计稿">
       <header className="draft-panel-head">
         <h2>助手设计稿</h2>
-        {hasDraft && <span className="version-label">v1.0</span>}
       </header>
       {!hasDraft ? (
         <div className="draft-empty">

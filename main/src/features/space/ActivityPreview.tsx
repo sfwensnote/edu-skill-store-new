@@ -131,7 +131,7 @@ export function ActivityPreview({
                   <Sparkles aria-hidden="true" />
                   智能教学支持
                 </h4>
-                <p>{support ? `${support.skill.name} · ${support.version}` : '不使用教学 SKILL'}</p>
+                <p>{support ? support.skill.name : '不使用教学 SKILL'}</p>
                 {support && (
                   <>
                     <p>触发：{support.skill.trigger}</p>
@@ -190,10 +190,9 @@ export function ActivityPreview({
             <>
               <h3>
                 {entry.skill.name}
-                <small>{entry.version}</small>
               </h3>
               {!simulation ? (
-                <p className="activity-notice">请检查执行计划。配置或版本变化后需重新检查。</p>
+                <p className="activity-notice">请检查执行计划。配置或方法变化后需重新检查。</p>
               ) : (
                 <div className="activity-evidence-list">
                   <section>

@@ -55,15 +55,9 @@
   .skill-details dl > div { grid-template-columns: 1fr; gap: 5px; }
   .generation-steps { flex-direction: column; gap: 6px; }
   .empty-guide { gap: 20px; }
-  .testing-toolbar { height: auto; min-height: 70px; }
-  .testing-toolbar-inner { grid-template-columns: 1fr auto; gap: 8px; padding-block: 12px; }
-  .testing-title { grid-column: 1 / -1; grid-row: 1; }
-  .testing-toolbar-inner .back-link { grid-column: 1; grid-row: 2; }
-  .testing-progress { grid-column: 2; grid-row: 2; }
-  .testing-progress [data-slot='button'] { display: none; }
-  .testing-workspace { width: 100%; display: block; min-height: calc(100vh - 170px); }
-  .testing-main, .testing-side { display: none; padding: 24px 18px 60px; border: 0; }
-  .testing-main.mobile-active, .testing-side.mobile-active { display: block; }
+  .testing-toolbar-inner { padding-block: 18px; gap: 12px; }
+  .testing-title h1 { font-size: 24px; gap: 8px; }
+  .testing-title h1 span:first-child { font-size: 20px; }
   .logs-hero { display: block; }
   .logs-hero-actions { margin-top: 18px; }
   .logs-grid { display: block; }

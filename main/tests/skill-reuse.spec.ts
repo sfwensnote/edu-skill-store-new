@@ -106,7 +106,7 @@ test('从已发布个人来源添加也不会取得所有权，来源移除后�
   await expect(page.locator('.workshop-item')).toHaveCount(1);
   await page.locator('.workshop-item').getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.getByRole('heading', { name: source.skill.name, exact: true })).toBeVisible();
-  await expect(page.locator('.detail-heading')).toContainText(source.version);
+  await expect(page.locator('.detail-heading')).not.toContainText(source.version);
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
 });
 

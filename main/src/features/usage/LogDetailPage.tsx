@@ -19,7 +19,7 @@ export function LogDetailPage({
     return (
       <main className="page-frame not-found">
         <h1>没有找到这项方法</h1>
-        <p>方法已移除或版本已变化。</p>
+        <p>方法已移除或内容已变化。</p>
         <Button onClick={onBack}>返回教学预览</Button>
       </main>
     );
@@ -31,7 +31,7 @@ export function LogDetailPage({
       </button>
       <div className="method-detail-heading">
         <div>
-          <p>{assistant.name} · v{assistant.revision || 1}.0</p>
+          <p>{assistant.name}</p>
           <h1>{skill.name}</h1>
         </div>
         <Button onClick={() => onPreview(0)}>学生视角预览</Button>

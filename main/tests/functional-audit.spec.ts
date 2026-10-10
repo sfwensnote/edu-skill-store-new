@@ -74,14 +74,14 @@ test('未提交的教师回答刷新和保存退出后仍能继续，不提前�
 
 test('中途核对进度保存失败保留当前项，恢复后可继续', async ({ page }) => {
   await page.goto('/#/assistant/assistant-demo-active/test');
-  const title = await page.locator('.test-case-head h1').textContent();
+  const title = await page.locator('.test-case-head h2').textContent();
   await blockStorage(page, 'teaching-assistant.check-progress:assistant-demo-active');
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('核对进度未保存');
-  await expect(page.locator('.test-case-head h1')).toHaveText(title!);
+  await expect(page.locator('.test-case-head h2')).toHaveText(title!);
   await restoreStorage(page);
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
-  await expect(page.locator('.test-case-head h1')).not.toHaveText(title!);
+  await expect(page.locator('.test-case-head h2')).not.toHaveText(title!);
 });
 
 test('旧探究直接地址复制失败不新增幽灵副本，恢复后可创建副本', async ({ page }) => {
