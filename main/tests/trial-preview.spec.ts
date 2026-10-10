@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './workspace-fixture';
 import { initialMine } from '../src/data/platform';
 
 test('教师从试用记录和报告打开学生视角 Demo，可发送示例并返回来源页', async ({ page }) => {

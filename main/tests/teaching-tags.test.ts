@@ -7,7 +7,7 @@ import { parseMarketWorkspace } from '../shared/marketplace';
 import { categoryOf, tagsOf, catalogBase, defaultCatalogFilters, restoreCatalogFilters } from '../src/features/marketplace/market-catalog';
 import { teachingCategories, suggestedTags, isPblTag, teachingTagsOf } from '../shared/teaching-tags';
 import { skillSchema } from '../shared/assistant';
-import { marketSkills } from '../src/data/marketplace';
+import { marketSkills } from './fixtures/marketplace';
 
 test('教师选择的场景和自定义标签在 SKILL 封装与重新编辑时保留', () => {
   const method = {

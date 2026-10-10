@@ -1,5 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
-import { marketSkills } from '../src/data/marketplace';
+import { test, expect, type Page } from './market-catalog-fixture';
+import { marketSkills } from './fixtures/marketplace';
+import { skillTrialBindings } from './fixtures/skill-trial-bindings';
 import { skillTrialCases } from '../src/data/skill-trial-cases';
 import { addMarketSkill } from '../shared/marketplace';
 
@@ -73,8 +74,8 @@ test('五种方法的案例均可走通全部分支，不调用模型 API', asyn
   page.on('request', (request) => { if (request.url().includes('/api/')) requests.push(request.url()); });
   for (const entry of marketSkills) {
     await openSkill(page, entry.skill.name);
-    for (const example of skillTrialCases(entry.skill)) {
-      if (skillTrialCases(entry.skill).length > 1) await page.getByLabel('试用案例', { exact: true }).selectOption(example.id);
+    for (const example of skillTrialCases(entry.skill, skillTrialBindings)) {
+      if (skillTrialCases(entry.skill, skillTrialBindings).length > 1) await page.getByLabel('试用案例', { exact: true }).selectOption(example.id);
       for (const choice of example.start.choices || []) {
         const reset = trial(page).getByRole('button', { name: '重新试用', exact: true });
         if (await reset.count()) await reset.click();

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialMine } from '../src/data/platform';
 import { assistantSkillEntries, addMarketSkill } from '../shared/marketplace';
-import { marketSkills } from '../src/data/marketplace';
+import { marketSkills } from './fixtures/marketplace';
 import {
   defaultWorkFilters,
   filterWork,

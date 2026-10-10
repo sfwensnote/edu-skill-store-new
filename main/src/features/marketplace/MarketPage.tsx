@@ -240,14 +240,14 @@ export function MarketPage({
           </div>
           {!items.length && (
             <EmptyState
-              title={favoriteEmpty ? '还没有收藏的教学方法' : '没有找到符合条件的教学方法'}
-              action={
+              title={!entries.length ? '集市暂无 SKILL' : favoriteEmpty ? '还没有收藏的教学方法' : '没有找到符合条件的教学方法'}
+              action={entries.length > 0 &&
                 <Button variant="outline" onClick={() => setFilters({ ...defaultCatalogFilters })}>
                   {favoriteEmpty ? '浏览全部方法' : '清除筛选'}
                 </Button>
               }
             >
-              {!favoriteEmpty && '尝试调整关键词或筛选条件。'}
+              {entries.length > 0 && !favoriteEmpty && '尝试调整关键词或筛选条件。'}
             </EmptyState>
           )}
         </section>

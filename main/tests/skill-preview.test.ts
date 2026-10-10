@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { compileSkillInstructions, demoSkillReply, skillPreviewSchema } from '../shared/skill-preview';
 import { initialMine } from '../src/data/platform';
-import { marketSkills } from '../src/data/marketplace';
+import { marketSkills } from './fixtures/marketplace';
 import { skillCreatorLabel, skillSourceText, skillValidationLabel } from '../shared/skill-display';
 
 const skill = { ...initialMine[0].skills[0], id: 'reading', name: '阅读证据追问',

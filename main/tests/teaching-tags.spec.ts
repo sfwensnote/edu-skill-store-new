@@ -1,7 +1,7 @@
 import { test, expect } from './demo-workspace-fixture';
 import { mockQuestions } from '../shared/teaching-method';
 import { teachingCategories } from '../shared/teaching-tags';
-import { marketSkills } from '../src/data/marketplace';
+import { marketSkills } from './fixtures/marketplace';
 import { addMarketSkill } from '../shared/marketplace';
 
 test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和预览不产生学生任务', async ({ page }) => {

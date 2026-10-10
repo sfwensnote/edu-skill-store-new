@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 import { defaultCreationDraft, methodFromSkill } from '../shared/teaching-method';
 

@@ -12,7 +12,7 @@ import {
   sampleOriginal,
 } from '../shared/contextual-design';
 import { assistantSkillEntries, parseMarketWorkspace, addMarketSkill } from '../shared/marketplace';
-import { marketSkills } from '../src/data/marketplace';
+import { marketSkills } from './fixtures/marketplace';
 
 test('添加保留独立来源快照，重复添加不覆盖版本、不取得编辑权限', () => {
   const source = structuredClone(assistantSkillEntries(initialMine)[0]);

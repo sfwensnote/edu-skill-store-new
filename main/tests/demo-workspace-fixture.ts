@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 
 // 历史资料兼容检查显式装入样例；真实新用户的个人工作区保持为空。

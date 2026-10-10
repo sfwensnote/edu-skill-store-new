@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 
 const fixture = {

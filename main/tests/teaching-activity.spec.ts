@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { buildContextualProblem, createTaskChain, rentalSampleDesign } from '../shared/contextual-design';
 
