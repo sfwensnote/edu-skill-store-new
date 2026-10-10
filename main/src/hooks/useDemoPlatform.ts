@@ -5,13 +5,14 @@ import type { EducationalSkill } from '../../shared/assistant';
 import { isStoredAssistant } from '../../shared/workspace-storage';
 import { reviseReviewedMethod } from '../../shared/method-review';
 import type { TeachingMethod } from '../../shared/teaching-method';
+import { workspaceKeys, type WorkspaceStorage } from '@/lib/account-workspace';
 
 const storageKey = 'teaching-assistant.frontend-demo.v2';
 const excludedKey = 'teaching-assistant.excluded-skills.v1';
 
-function loadAssistants() {
+function loadAssistants(storage: WorkspaceStorage) {
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey) || 'null') as TeachingAssistant[] | null;
+    const saved = JSON.parse(storage.getItem(storageKey) || 'null') as TeachingAssistant[] | null;
     return Array.isArray(saved) ? saved.filter(isStoredAssistant) : [];
   } catch {
     return [];
@@ -22,16 +23,15 @@ function withoutKey<T>(record: Record<string, T>, key: string) {
   return Object.fromEntries(Object.entries(record).filter(([entryKey]) => entryKey !== key));
 }
 
-function discardCache(key: string) {
-  try { localStorage.removeItem(key); } catch { /* 缓存清理失败不撤销已保存的方法。 */ }
-}
-
-export function useDemoPlatform() {
-  const [assistants, setAssistantState] = useState<TeachingAssistant[]>(loadAssistants);
+export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
+  function discardCache(key: string) {
+    try { storage.removeItem(key); } catch { /* 缓存清理失败不撤销已保存的方法。 */ }
+  }
+  const [assistants, setAssistantState] = useState<TeachingAssistant[]>(() => loadAssistants(storage));
   const assistantsRef = useRef(assistants);
   const [excludedByAssistant, setExcludedByAssistant] = useState<Record<string, string[]>>(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(excludedKey) || '{}');
+      const saved = JSON.parse(storage.getItem(excludedKey) || '{}');
       if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return {};
       return Object.fromEntries(
         Object.entries(saved)
@@ -46,17 +46,17 @@ export function useDemoPlatform() {
   function persist(key: string, value: unknown) {
     try {
       if (key === storageKey) {
-        const raw = localStorage.getItem(key);
+        const raw = storage.getItem(key);
         if (raw) {
           let damaged = false;
           try {
             const previous = JSON.parse(raw);
             damaged = !Array.isArray(previous) || !previous.every(isStoredAssistant);
           } catch { damaged = true; }
-          if (damaged) localStorage.setItem(`${key}.recovery:${crypto.randomUUID()}`, raw);
+          if (damaged) storage.setItem(`${key}.recovery:${crypto.randomUUID()}`, raw);
         }
       }
-      localStorage.setItem(key, JSON.stringify(value));
+      storage.setItem(key, JSON.stringify(value));
       setStorageErrors((errors) => withoutKey(errors, key));
       return true;
     } catch {
@@ -85,7 +85,7 @@ export function useDemoPlatform() {
     if (found) return found;
     const created: TeachingAssistant = {
       id,
-      userId: 'demo-teacher',
+      userId: accountId,
       name: '',
       goal: '',
       grade: '初中',
@@ -147,11 +147,11 @@ export function useDemoPlatform() {
     discardCache(`teaching-assistant.check-progress:${id}`);
     // 同步创建草稿，防止重新进入设计页时旧做法覆盖检测中的修改。
     const prefix = `teaching-assistant.method-draft.v1:${id}`;
-    Object.keys(localStorage).filter((key) => key === prefix || key.startsWith(`${prefix}:`)).forEach((key) => {
+    workspaceKeys(storage).filter((key) => key === prefix || key.startsWith(`${prefix}:`)).forEach((key) => {
       try {
-        const draft = JSON.parse(localStorage.getItem(key) || 'null');
+        const draft = JSON.parse(storage.getItem(key) || 'null');
         if ((draft?.editingSkillId || assistant.skills[0]?.id) !== skillId) return;
-        localStorage.setItem(key, JSON.stringify({ ...draft, sourceRevision: next.revision, method, teachingScene: method.category || '', stage: 'method',
+        storage.setItem(key, JSON.stringify({ ...draft, sourceRevision: next.revision, method, teachingScene: method.category || '', stage: 'method',
           editingSkillId: skillId, manualEdits: ['name', 'description', 'category', 'tags', 'problem', 'expectedOutcome', 'trigger', 'principles',
             ...method.teachingSteps.flatMap((_, index) => [`step-${index}-condition`, `step-${index}-action`])],
         }));
@@ -211,7 +211,7 @@ export function useDemoPlatform() {
     if (!setAssistants((items) => items.filter((assistant) => assistant.id !== id), true)) return false;
     discardCache(`teaching-assistant.check-progress:${id}`);
     discardCache(`teaching-assistant.method-draft.v1:${id}`);
-    Object.keys(localStorage)
+    workspaceKeys(storage)
       .filter((key) => key.startsWith(`teaching-assistant.method-draft.v1:${id}:`))
       .forEach((key) => discardCache(key));
     const nextExcluded = withoutKey(excludedByAssistant, id);
@@ -228,7 +228,7 @@ export function useDemoPlatform() {
       (items) => [
         {
           id,
-          userId: 'demo-teacher',
+          userId: accountId,
           name: skill.name,
           goal: skill.purpose,
           grade: entry.grade,

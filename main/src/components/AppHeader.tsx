@@ -1,6 +1,7 @@
 import { GraduationCap, Plus } from 'lucide-react';
 import { activeNavigationPage, type AppRoute } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
+import { AccountMenu } from '@/features/accounts/AccountMenu';
 export function AppHeader({ route, onNavigate, applicationDraftIds = [] }: {
   route: AppRoute;
   onNavigate: (route: AppRoute) => void;
@@ -41,14 +42,7 @@ export function AppHeader({ route, onNavigate, applicationDraftIds = [] }: {
             <Plus data-icon="inline-start" />
             创建
           </Button>
-          <button
-            className="teacher-avatar"
-            aria-label="打开我的 SKILL"
-            title="教师"
-            onClick={() => onNavigate({ page: 'workshop' })}
-          >
-            师
-          </button>
+          <AccountMenu onMine={() => onNavigate({ page: 'workshop' })} />
         </div>
       </div>
     </header>

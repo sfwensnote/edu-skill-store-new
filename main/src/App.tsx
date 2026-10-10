@@ -39,24 +39,33 @@ import { marketSkills } from '@/data/marketplace';
 import { assistantSkillEntries, type SkillEntry } from '../shared/marketplace';
 import type { ContextualDesign } from '../shared/contextual-design';
 import { isMethodReviewed } from '../shared/method-review';
+import { AccountProvider, useAccount } from '@/features/accounts/AccountProvider';
+import { readPublishedSkills } from '@/lib/account-workspace';
 
 export default function App() {
+  return <AccountProvider><SkillWorkspace /></AccountProvider>;
+}
+function SkillWorkspace() {
+  const { account, storage } = useAccount();
   const route = useAppRoute();
   usePageFocus(route);
-  const platform = useDemoPlatform();
-  const market = useMarketWorkspace();
+  const platform = useDemoPlatform(storage, account.id);
+  const market = useMarketWorkspace(storage);
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
   const personalSkills = assistantSkillEntries(platform.assistants).map((entry) =>
     entry.assistantId && !platform.isSkillIncluded(entry.assistantId, entry.skill.id)
       ? { ...entry, validation: '待核对' as const } : entry);
-  const allSkills = [...personalSkills, ...marketSkills, ...market.addedSkills];
+  let publishedSkills: SkillEntry[] = [];
+  let catalogError = '';
+  try { publishedSkills = readPublishedSkills(localStorage, account.id); }
+  catch { catalogError = '集市资料读取失败，请检查浏览器存储后重试。'; }
+  const allSkills = [...personalSkills, ...marketSkills, ...publishedSkills, ...market.addedSkills];
   const addedIds = [...personalSkills.map((entry) => entry.id), ...market.addedSkills.map((entry) => entry.addedFrom!.id)];
   const visibleMarketSkills = [
     ...marketSkills,
-    ...personalSkills.filter((e) => market.sharedSkillIds.includes(e.id) &&
-      platform.assistants.some((assistant) => assistant.id === e.assistantId && isMethodReviewed(assistant) && platform.isSkillIncluded(assistant.id, e.skill.id))),
+    ...publishedSkills,
   ];
   const selectedSkill =
     route.page === 'skill-detail' ? allSkills.find((e) => e.id === route.skillId) : undefined;
@@ -177,9 +186,9 @@ export default function App() {
         onNavigate={navigate}
         applicationDraftIds={applicationDraftIds}
       />
-      {(market.storageError || platform.storageError) && (
+      {(market.storageError || platform.storageError || catalogError) && (
         <p className="storage-alert" role="alert">
-          {market.storageError || platform.storageError}
+          {market.storageError || platform.storageError || catalogError}
         </p>
       )}
       {route.page === 'home' && <HomePage navigate={navigate} />}
@@ -363,6 +372,7 @@ export default function App() {
         <DesignerPage
           key={current.id + (route.skillId || '')}
           assistant={current}
+          storage={storage}
           selectedSkillId={route.skillId}
           sourceTags={market.designs.find((item) => item.id === current.sourceDesignId)?.tags}
           sourceCategory={market.designs.find((item) => item.id === current.sourceDesignId)?.category}

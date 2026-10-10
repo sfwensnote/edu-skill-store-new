@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './account-session-fixture';
 import { skillResetKey } from '../shared/skill-reset';
 import { initialMine } from '../src/data/platform';
 import { addMarketSkill } from '../shared/marketplace';

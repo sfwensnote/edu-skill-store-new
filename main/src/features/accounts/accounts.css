@@ -1,0 +1,19 @@
+.account-login { min-height: calc(100dvh - var(--header-height)); display: grid; place-items: center; padding-block: 40px; }
+.account-login-panel { width: 100%; max-width: 390px; padding: 32px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.account-login-panel h1 { font-size: 24px; font-weight: 600; margin-bottom: 28px; }
+.account-form { display: flex; flex-direction: column; gap: 16px; }
+.account-field { display: flex; flex-direction: column; gap: 8px; }
+.account-field input { width: 100%; min-height: 44px; border: 1px solid var(--input); border-radius: var(--radius-md); padding: 10px 12px; background: var(--card); color: var(--ink); }
+.account-field input:disabled { background: var(--muted); }
+.account-hint { color: var(--ink-2); font-size: var(--text-caption); margin-top: -10px; }
+.account-error { color: var(--red); overflow-wrap: anywhere; }
+.account-menu-name { padding: 8px 12px; overflow-wrap: anywhere; }
+.account-menu-name small { display: block; color: var(--ink-2); }
+.account-menu-error { max-width: 240px; padding: 8px 12px; }
+[data-slot='dialog-content'].account-management { width: calc(100% - 32px); max-width: 520px; }
+.account-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.account-list li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; }
+.account-list li + li { border-top: 1px solid var(--line); }
+.account-list li > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+.account-list span, .account-list small { color: var(--ink-2); }
+@media (max-width: 480px) { .account-login { padding-block: 24px; align-items: start; } .account-login-panel { padding: 24px; } }

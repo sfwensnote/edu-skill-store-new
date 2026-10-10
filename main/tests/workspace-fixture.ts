@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect } from './account-session-fixture';
 import { skillResetKey } from '../shared/skill-reset';
 
 // 原流程测试的资料视为清理之后新建；一次性清理另用未标记的隔离浏览器核验。

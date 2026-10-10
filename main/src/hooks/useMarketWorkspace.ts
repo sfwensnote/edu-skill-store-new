@@ -14,12 +14,13 @@ import {
 } from '../../shared/marketplace';
 import { outcomeIssue } from '../../shared/inquiry-workflow';
 import type { TeachingActivityDraft } from '../../shared/teaching-activity';
+import type { WorkspaceStorage } from '@/lib/account-workspace';
 
 export const marketStorageKey = 'teaching-method.market-workspace.v1';
-export function useMarketWorkspace() {
+export function useMarketWorkspace(storage: WorkspaceStorage) {
   const [state, setState] = useState(() => {
     try {
-      return parseMarketWorkspace(localStorage.getItem(marketStorageKey));
+      return parseMarketWorkspace(storage.getItem(marketStorageKey));
     } catch {
       return parseMarketWorkspace(null);
     }
@@ -30,7 +31,7 @@ export function useMarketWorkspace() {
   const lastSaved = useRef(true);
   function commit(next: MarketWorkspace, mustSave = false, message?: string) {
     try {
-      localStorage.setItem(marketStorageKey, JSON.stringify(next));
+      storage.setItem(marketStorageKey, JSON.stringify(next));
       lastSaved.current = true;
       setUnsavedDesignIds([]);
       setStorageError('');

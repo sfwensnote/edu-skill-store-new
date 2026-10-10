@@ -8,6 +8,7 @@ import { TestCaseRecord } from './TestCaseRecord';
 import { SkillResults } from './SkillResults';
 import { TestMethodEditor } from './TestMethodEditor';
 import type { TeachingMethod } from '../../../shared/teaching-method';
+import { useAccount } from '@/features/accounts/AccountProvider';
 
 export function TestingPage({
   assistant,
@@ -28,6 +29,7 @@ export function TestingPage({
   backLabel: string;
   onSaveMethod: (skillId: string, method: TeachingMethod) => boolean;
 }) {
+  const { storage } = useAccount();
   const cases = useMemo(() => createTestCases(assistant.skills), [assistant.skills]);
   const progressKey = `teaching-assistant.check-progress:${assistant.id}`;
   const signature = JSON.stringify([
@@ -41,7 +43,7 @@ export function TestingPage({
     const preset = assistant.id.startsWith('assistant-demo-') && !assistant.revision;
     if (!preset && ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status)) return cases.length;
     try {
-      const saved = JSON.parse(localStorage.getItem(progressKey) || 'null');
+      const saved = JSON.parse(storage.getItem(progressKey) || 'null');
       if (saved?.signature === signature && Number.isInteger(saved.completed))
         return Math.max(0, Math.min(saved.completed, Math.max(0, cases.length - 1)));
     } catch {
@@ -63,7 +65,7 @@ export function TestingPage({
       return;
     }
     try {
-      localStorage.setItem(progressKey, JSON.stringify({ signature, completed: next }));
+      storage.setItem(progressKey, JSON.stringify({ signature, completed: next }));
     } catch {
       if (next < cases.length) {
         setError('核对进度未保存，请释放存储空间后重新确认。');

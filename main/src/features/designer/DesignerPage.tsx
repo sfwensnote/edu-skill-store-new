@@ -18,13 +18,14 @@ import { IdeaForm } from './IdeaForm';
 import { GuidedMethodPage } from './GuidedMethodPage';
 import { visibleTeachingTags, isTeachingCategory, teachingCategoryOf, teachingTagsOf, type TeachingCategory } from '../../../shared/teaching-tags';
 import './creation-flow.css';
+import type { WorkspaceStorage } from '@/lib/account-workspace';
 
 const draftKey = (id: string, skillId?: string) =>
   `teaching-assistant.method-draft.v1:${id}${skillId ? `:${skillId}` : ''}`;
-function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: string[], sourceCategory?: TeachingCategory | null): CreationDraft {
+function restore(storage: WorkspaceStorage, assistant: TeachingAssistant, skillId?: string, sourceTags?: string[], sourceCategory?: TeachingCategory | null): CreationDraft {
   try {
     const saved = JSON.parse(
-      localStorage.getItem(draftKey(assistant.id, skillId)) || 'null',
+      storage.getItem(draftKey(assistant.id, skillId)) || 'null',
     ) as CreationDraft | null;
     if (
       saved &&
@@ -115,6 +116,7 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
 
 export function DesignerPage({
   assistant,
+  storage,
   selectedSkillId,
   sourceTags,
   sourceCategory,
@@ -127,6 +129,7 @@ export function DesignerPage({
   sourceTags?: string[];
   sourceCategory?: TeachingCategory | null;
   assistant: TeachingAssistant;
+  storage: WorkspaceStorage;
   onBack: () => void;
   onSaveExit: () => void;
   onUpdate: (patch: Partial<TeachingAssistant>) => boolean;
@@ -134,7 +137,7 @@ export function DesignerPage({
   isSkillIncluded: (id: string) => boolean;
   onToggleSkill: (id: string) => void;
 }) {
-  const [draft, setDraft] = useState(() => restore(assistant, selectedSkillId, sourceTags, sourceCategory));
+  const [draft, setDraft] = useState(() => restore(storage, assistant, selectedSkillId, sourceTags, sourceCategory));
   const [storageError, setStorageError] = useState('');
   const [savedAt, setSavedAt] = useState('');
   const previousStage = useRef(draft.stage);
@@ -148,7 +151,7 @@ export function DesignerPage({
   function save(next: CreationDraft) {
     setDraft(next);
     try {
-      localStorage.setItem(draftKey(assistant.id, selectedSkillId), JSON.stringify({ ...next, sourceRevision: assistant.revision }));
+      storage.setItem(draftKey(assistant.id, selectedSkillId), JSON.stringify({ ...next, sourceRevision: assistant.revision }));
       setStorageError('');
       setSavedAt(new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }));
       return true;
