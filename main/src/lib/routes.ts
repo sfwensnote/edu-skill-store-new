@@ -37,7 +37,6 @@ function parseRoute(hash: string): RoutePage {
     return { page: 'home' };
   }
   if (!parts.length || parts[0] === 'home') return { page: 'home' };
-  if (parts[0] === 'legacy-market') return { page: 'market' };
   if (parts[0] === 'space')
     return {
       page: 'space',
@@ -163,7 +162,7 @@ export function navigationRoute(current: AppRoute, next: AppRoute): AppRoute {
 }
 export function returnLabel(route: AppRoute, fallback: AppRoute): string {
   const parent = returnRoute(route, fallback);
-  return `返回${({ home: '首页', daily: '日常教学', inquiry: '情境探究', workshop: '我的作品', mine: '我的作品', market: '集市', space: '教学任务', create: '方法编辑', test: '方法核对', logs: '教学预览', report: '核对摘要', 'log-detail': '方法步骤', 'skill-detail': '方法详情', 'inquiry-editor': '探究设计', library: '集市', 'library-detail': '助手详情' } as Record<string, string>)[parent.page] || '上一页'}`;
+  return `返回${({ home: '首页', daily: '日常教学', inquiry: '情境探究', workshop: '我的 SKILL', mine: '我的 SKILL', market: '集市', space: '教学任务', create: '方法编辑', test: '方法核对', logs: '教学预览', report: '核对摘要', 'log-detail': '方法步骤', 'skill-detail': '方法详情', 'inquiry-editor': '探究设计', library: '集市', 'library-detail': '助手详情' } as Record<string, string>)[parent.page] || '上一页'}`;
 }
 function pageHash(route: AppRoute): string {
   switch (route.page) {

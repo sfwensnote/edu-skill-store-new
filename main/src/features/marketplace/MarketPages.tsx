@@ -57,7 +57,7 @@ export function SkillDetailPage({
         <div className="inline-actions">
           {applicationContext ? <Button onClick={onUse}>继续配置</Button> : onPreview ?
             <Button onClick={() => onPreview()}>{entry.validation === '教师已核对' ? '预览方法' : '核对方法'}</Button> :
-            <Button onClick={onReuse}>复用到我的作品<ArrowRight /></Button>}
+            <Button onClick={onReuse}>复用到我的 SKILL<ArrowRight /></Button>}
           {onEdit && <Button variant="outline" onClick={onEdit}>编辑我的方法</Button>}
           {entry.assistantId ? <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="更多方法操作"><MoreHorizontal /></Button></DropdownMenuTrigger>

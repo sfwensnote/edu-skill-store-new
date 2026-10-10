@@ -1,14 +1,10 @@
-import { Box, Bot, ChevronRight, FileCheck2, FileText, Heart, Images, Network } from 'lucide-react';
+import { ChevronRight, FileCheck2, Heart, Images } from 'lucide-react';
 import { workshopTabs, type WorkshopTab, type WorkItem } from './workshop-catalog';
 
 export const workshopIcons = {
   skills: FileCheck2,
-  problems: FileText,
-  chains: Network,
-  pbl: Box,
   favorites: Heart,
   showcase: Images,
-  assistants: Bot,
 };
 export function WorkshopOverview({
   collections,
@@ -20,8 +16,8 @@ export function WorkshopOverview({
   onTab: (tab: WorkshopTab) => void;
 }) {
   return (
-    <section className="workshop-overview" aria-label="作品概览">
-      {workshopTabs.slice(0, 4).map(([key, label]) => {
+    <section className="workshop-overview" aria-label="SKILL 概览">
+      {workshopTabs.map(([key, label]) => {
         const Icon = workshopIcons[key];
         const drafts = collections[key].filter((item) => item.kind === 'method-draft').length;
         return (
@@ -63,8 +59,8 @@ export function WorkshopNavigation({
   return (
     <aside className="workshop-sidebar">
       <label className="workshop-mobile-category">
-        作品分类
-        <select aria-label="作品分类" value={tab} onChange={(e) => onTab(e.target.value as WorkshopTab)}>
+        SKILL 分类
+        <select aria-label="SKILL 分类" value={tab} onChange={(e) => onTab(e.target.value as WorkshopTab)}>
           {workshopTabs.map(([key, label]) => (
             <option key={key} value={key}>
               {label}（{counts[key]}）
@@ -72,8 +68,8 @@ export function WorkshopNavigation({
           ))}
         </select>
       </label>
-      <nav aria-label="作品分类">
-        {[workshopTabs.slice(0, 4), workshopTabs.slice(4)].map((group, index) => (
+      <nav aria-label="SKILL 分类">
+        {[workshopTabs.slice(0, 1), workshopTabs.slice(1)].map((group, index) => (
           <div className="workshop-nav-group" key={index}>
             {group.map(([key, label]) => {
               const Icon = workshopIcons[key];

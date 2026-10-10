@@ -99,7 +99,7 @@ export function ActivityWorkbench({
         <div>
           <button className="back-link" onClick={onClose}>
             <ArrowLeft aria-hidden="true" />
-            {draft.path === 'learning' ? '返回任务列表' : '返回我的作品'}
+            {draft.path === 'learning' ? '返回任务列表' : '返回我的 SKILL'}
           </button>
           <h1>{draft.path === 'learning' ? '新建教学任务' : '应用教学 SKILL'}</h1>
         </div>

@@ -156,7 +156,7 @@ export function TestingPage({
                 </Button>
                 {onCreated && (
                   <Button variant="outline" size="lg" onClick={onCreated}>
-                    进入我的作品
+                    进入我的 SKILL
                   </Button>
                 )}
                 <Button size="lg" onClick={onStartTrial}>

@@ -27,7 +27,7 @@ test('首页入口、SKILL 体验收藏复用与保留旧数据，编辑单项�
   await page.getByRole('button', { name: '查看引导示例' }).click();
   await expect(page.getByText(/【引导示例】若符合/)).toBeVisible();
   await page.getByRole('button', { name: '收藏', exact: true }).click();
-  await page.getByRole('button', { name: '复用到我的作品' }).click();
+  await page.getByRole('button', { name: '复用到我的 SKILL' }).click();
   await expect(page.getByRole('button', { name: '编辑SKILL 名称' })).toContainText('错误后反思引导');
   await page.getByRole('button', { name: '编辑SKILL 名称' }).click();
   await page.getByRole('textbox', { name: 'SKILL 名称', exact: true }).fill('我复用的方法');
@@ -35,7 +35,7 @@ test('首页入口、SKILL 体验收藏复用与保留旧数据，编辑单项�
     while (await page.getByRole('button', { name: /确认并(继续|完成)/ }).count())
     await page.getByRole('button', { name: /确认并(继续|完成)/ }).click();
   await expect(page.getByRole('heading', { name: '教学方法核对完成' })).toBeVisible();
-  await page.getByRole('button', { name: '进入我的作品' }).click();
+  await page.getByRole('button', { name: '进入我的 SKILL' }).click();
   await expect(page.getByRole('button', { name: '我复用的方法', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '我的助手', exact: true }).click();
   await expect(page.getByText('七年级数学教学助手', { exact: true })).toBeVisible();
@@ -96,7 +96,7 @@ test('情境题目、任务链、PBL 保存恢复、复制、导出，学生按�
   await page.getByRole('menuitem', { name: '分享展示', exact: true }).click();
   await page.goto('/#/market');
   await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).not.toBeVisible();
-  await page.getByRole('button', { name: '我的作品', exact: true }).click();
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
   await page.getByRole('button', { name: '作品展示', exact: true }).click();
   await expect(page.getByRole('heading', { name: '我的 PBL 方案', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '查看作品', exact: true }).click();

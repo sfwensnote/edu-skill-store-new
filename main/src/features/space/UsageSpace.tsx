@@ -79,7 +79,7 @@ export function UsageSpace({
   const dirtyRef = useRef(dirty);
   const [message, setMessage] = useState(
     initialDraftId && !drafts.some((d) => d.id === initialDraftId)
-      ? '没有找到这份草稿，请从我的任务或我的作品中继续。'
+      ? '没有找到这份草稿，请从我的任务或我的 SKILL中继续。'
       : '',
   );
   const [pending, setPending] = useState<(() => void) | null>(null);

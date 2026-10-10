@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialMine } from '../src/data/platform';
 import { assistantSkillEntries } from '../shared/marketplace';
-import { rentalSampleDesign, buildContextualProblem, createTaskChain } from '../shared/contextual-design';
 import {
   defaultWorkFilters,
   filterWork,
@@ -11,47 +10,29 @@ import {
 } from '../src/features/workshop/workshop-catalog';
 
 function catalog() {
-  const d = rentalSampleDesign('lesson');
-  d.contextualProblem = { ...buildContextualProblem(d), confirmed: true };
-  d.taskChain = { ...createTaskChain(d), needsReview: false };
-  d.savedLevels = [1, 2];
-  d.currentLevel = 3;
   const skills = assistantSkillEntries(initialMine);
   return workshopCollections({
     skills,
     allEntries: skills,
-    designs: [d],
     assistants: initialMine,
     favorites: [skills[0].id, 'design:lesson:2', 'missing'],
     shared: [skills[1].id, 'design:lesson:1', 'missing'],
   });
 }
-test('作品分类按实际结果计数，草稿保留；收藏和展示仅包含仍存在的资源', () => {
+test('我的 SKILL 仅收录方法，旧探究收藏与展示不会混入计数', () => {
   const c = catalog();
-  assert.deepEqual(
-    [c.skills.length, c.problems.length, c.chains.length, c.pbl.length, c.assistants.length],
-    [6, 1, 1, 1, 2],
-  );
-  assert.equal(c.problems[0].canUse, true);
-  assert.equal(c.chains[0].canUse, true);
-  assert.equal(c.pbl[0].canUse, false);
-  assert.equal(c.pbl[0].status, '草稿');
-  assert.deepEqual(
-    c.favorites.map((item) => item.kind),
-    ['skill', 'design'],
-  );
-  assert.deepEqual(
-    c.showcase.map((item) => item.kind),
-    ['skill', 'design'],
-  );
+  assert.deepEqual(Object.keys(c), ['skills', 'favorites', 'showcase']);
+  assert.equal(c.skills.length, 6);
+  assert.deepEqual(c.favorites.map((item) => item.kind), ['skill']);
+  assert.deepEqual(c.showcase.map((item) => item.kind), ['skill']);
 });
 test('搜索教学内容并组合筛选，按真实日期排序；无日期项保持稳定顺序', () => {
   const c = catalog();
   assert.equal(
-    filterWork(c.chains, '临界', { ...defaultWorkFilters, query: '数学', subject: '数学' }).length,
-    1,
+    filterWork(c.skills, '反思', { ...defaultWorkFilters, query: '数学', subject: '数学' }).length,
+    2,
   );
-  assert.equal(filterWork(c.chains, '', { ...defaultWorkFilters, query: 'needsReview' }).length, 0);
+  assert.equal(filterWork(c.skills, '', { ...defaultWorkFilters, query: 'needsReview' }).length, 0);
   assert.equal(filterWork(c.skills, '', { ...defaultWorkFilters, area: 'inquiry' }).length, 0);
   const items = c.skills.slice(0, 3).map((item, i) => ({
     ...item,
@@ -80,11 +61,12 @@ test('分类筛选恢复时保留合法字段，损坏数据和无效枚举退�
   const restored = restoreWorkshopSearch(
     JSON.stringify({
       query: '费用',
-      panels: { chains: { query: '证据', sort: 'name', area: 'unknown', subject: 4 } },
+      panels: { skills: { query: '证据', sort: 'name', area: 'unknown', subject: 4 }, pbl: { query: '旧项目' } },
     }),
   );
   assert.equal(restored.query, '费用');
-  assert.deepEqual(restored.panels.chains, { ...defaultWorkFilters, query: '证据', sort: 'name' });
+  assert.deepEqual(Object.keys(restored.panels), ['skills']);
+  assert.deepEqual(restored.panels.skills, { ...defaultWorkFilters, query: '证据', sort: 'name' });
 });
 
 test('未完成方法可以在我的 SKILL 中恢复，但不会当作已形成方法应用或展示', () => {
@@ -98,7 +80,6 @@ test('未完成方法可以在我的 SKILL 中恢复，但不会当作已形成�
   const c = workshopCollections({
     skills: [],
     allEntries: [],
-    designs: [],
     assistants: [assistant],
     favorites: [],
     shared: [],
@@ -110,7 +91,6 @@ test('未完成方法可以在我的 SKILL 中恢复，但不会当作已形成�
   const empty = workshopCollections({
     skills: [],
     allEntries: [],
-    designs: [],
     assistants: [{ ...assistant, goal: '' }],
     favorites: [],
     shared: [],

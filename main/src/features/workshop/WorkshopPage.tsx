@@ -12,24 +12,18 @@ import {
   restoreWorkshopSearch,
   workshopCollections,
   workshopTabs,
-  type WorkItem,
   type WorkshopFilters,
   type WorkshopTab,
 } from './workshop-catalog';
 import type { WorkshopProps } from './workshop-types';
 import type { SkillEntry } from '../../../shared/marketplace';
 import './workshop.css';
-import { draftTitle } from '../../../shared/teaching-activity';
 
 const searchKey = 'teaching-method.workshop-filters.v1';
 const emptyCopy = {
   skills: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
-  problems: ['还没有情境题目', '', '设计情境题目'],
-  chains: ['还没有任务链', '', '设计情境作品'],
-  pbl: ['还没有 PBL 项目', '', '设计情境作品'],
-  favorites: ['还没有收藏任何作品', '', '前往教学 SKILL 集市'],
-  showcase: ['还没有展示的作品', '在作品的更多菜单中选择“分享展示”。', '查看我的 SKILL'],
-  assistants: ['还没有教学助手', '', '创建教学 SKILL'],
+  favorites: ['还没有收藏任何 SKILL', '', '前往教学 SKILL 集市'],
+  showcase: ['还没有展示的 SKILL', '在 SKILL 的更多菜单中选择“分享展示”。', '查看我的 SKILL'],
 } as const;
 
 export function WorkshopPage(props: WorkshopProps) {
@@ -86,7 +80,8 @@ export function WorkshopPage(props: WorkshopProps) {
     );
     function save() {
       const [path, query] = window.location.hash.split('?');
-      const current = path === '#/mine' ? 'assistants' : new URLSearchParams(query).get('tab') || 'skills';
+      const requested = new URLSearchParams(query).get('tab');
+      const current = workshopTabs.some(([key]) => key === requested) ? requested : 'skills';
       if ((path === '#/workshop' || path === '#/mine') && current === tab)
         sessionStorage.setItem(key, String(window.scrollY));
     }
@@ -99,20 +94,16 @@ export function WorkshopPage(props: WorkshopProps) {
   const actions: WorkActions = {
     view: (item) => {
       if (item.kind === 'skill') props.onOpenSkill(item.entry.id);
-      else if (item.kind === 'design') props.onPreviewDesign(item.design.id, item.level);
       else props.onOpenAssistant(item.assistant.id);
     },
     edit: (item) => {
       if (item.kind === 'skill') props.onEditSkill(item.entry);
-      else if (item.kind === 'design') props.onOpenDesign(item.design.id, item.level);
     },
-    use: (item) => {
-      if (item.kind === 'skill') props.onUseSkill(item.entry);
-      else if (item.kind === 'design') props.onUseDesign(item.design, item.level);
+    trial: (item) => {
+      if (item.kind === 'skill') props.onTrialSkill(item.entry);
     },
     copy: (item) => {
       if (item.kind === 'skill') props.onCopySkill(item.entry);
-      else if (item.kind === 'design') props.onCopyDesign(item.design.id, item.level);
     },
     favorite: props.onFavorite,
     share: (item) => {
@@ -121,7 +112,7 @@ export function WorkshopPage(props: WorkshopProps) {
         return;
       }
       if (props.onShare(item.id))
-        setMessage(props.shared.includes(item.id) ? '已取消作品展示。' : '已加入当前工作区的作品展示。');
+        setMessage(props.shared.includes(item.id) ? '已取消SKILL 展示。' : '已加入当前工作区的SKILL 展示。');
       else setMessage('展示设置保存失败，请释放本机存储空间后重试。');
     },
     mount: (item, trigger) => {
@@ -136,17 +127,11 @@ export function WorkshopPage(props: WorkshopProps) {
       dialogOrigin.current = trigger;
       setPending({
         name: item.title,
-        description:
-          item.kind === 'design'
-            ? '这份设计关联的情境题目、任务链和项目也会删除。'
-            : item.kind === 'assistant'
-              ? '助手及其挂载的 SKILL 会一起移除。'
-              : item.kind === 'method-draft'
-                ? '这份未完成的教学方法草稿也会移除。'
-                : '仅移除这一项方法，保留助手中的其他 SKILL。',
+        description: item.kind === 'method-draft'
+          ? '这份未完成的教学方法草稿也会移除。'
+          : '仅移除这一项方法，保留其他 SKILL。',
         action: () => {
           if (item.kind === 'skill') return props.onDeleteSkill(item.entry);
-          if (item.kind === 'design') return props.onDeleteDesign(item.design.id);
           return props.onDeleteAssistant(item.assistant.id);
         },
       });
@@ -155,8 +140,7 @@ export function WorkshopPage(props: WorkshopProps) {
   function emptyAction() {
     if (tab === 'favorites') props.onMarket();
     else if (tab === 'showcase') switchTab('skills');
-    else if (tab === 'skills' || tab === 'assistants') props.onCreate();
-    else props.onInquiry();
+    else props.onCreate();
   }
   const select = (key: 'area' | 'grade' | 'subject' | 'sort', name: string, options: [string, string][]) => (
     <label className="workshop-filter-field">
@@ -178,13 +162,10 @@ export function WorkshopPage(props: WorkshopProps) {
     <main className="page-frame market-page workshop-page">
       <header className="workshop-heading">
         <div>
-          <h1>我的作品</h1>
+          <h1>我的 SKILL</h1>
         </div>
         <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} alt="" aria-hidden="true" />
         <div className="workshop-create-actions">
-          <Button variant="outline" onClick={props.onInquiry}>
-            设计情境作品
-          </Button>
           <Button onClick={props.onCreate}>创建教学 SKILL</Button>
         </div>
       </header>
@@ -195,14 +176,14 @@ export function WorkshopPage(props: WorkshopProps) {
           counts={counts}
           onTab={switchTab}
         />
-        <section className="workshop-content" aria-label="作品管理">
+        <section className="workshop-content" aria-label="SKILL 管理">
           <div className="workshop-tools">
             <h2>{label}</h2>
             <label className="workshop-search">
               <Search aria-hidden="true" />
               <input
-                aria-label="搜索我的作品"
-                placeholder="搜索作品名称、内容或标签……"
+                aria-label="搜索我的 SKILL"
+                placeholder="搜索 SKILL 名称、内容或标签……"
                 value={search.query}
                 onChange={(e) => setSearch((current) => ({ ...current, query: e.target.value }))}
               />
@@ -249,7 +230,7 @@ export function WorkshopPage(props: WorkshopProps) {
           </div>
           <div className="workshop-list-info">
             <span aria-live="polite">
-              {items.length} {tab === 'assistants' ? '个助手' : '项作品'}
+              {items.length} 项 SKILL
             </span>
             {hasFilters && (
               <Button variant="ghost" size="sm" onClick={clear}>
@@ -278,7 +259,7 @@ export function WorkshopPage(props: WorkshopProps) {
           </div>
           {!items.length && (
             <EmptyState
-              title={collections[tab].length ? '没有找到符合条件的作品' : emptyCopy[tab][0]}
+              title={collections[tab].length ? '没有找到符合条件的 SKILL' : emptyCopy[tab][0]}
               action={
                 <Button onClick={collections[tab].length ? clear : emptyAction}>
                   {collections[tab].length ? '清除筛选' : emptyCopy[tab][2]}
@@ -288,20 +269,6 @@ export function WorkshopPage(props: WorkshopProps) {
               {collections[tab].length ? '尝试调整关键词或筛选条件。' : emptyCopy[tab][1]}
             </EmptyState>
           )}
-          {tab === 'skills' && !!props.skillApplications?.length && <details className="workshop-method-archive">
-            <summary>SKILL 应用配置</summary>
-            {props.skillApplications.map((draft) => <div key={draft.id}>
-              <span>{draftTitle(draft, props.allEntries)}</span>
-              <Button variant="outline" size="sm" onClick={() => props.onResumeApplication?.(draft.id)}>继续配置</Button>
-            </div>)}
-          </details>}
-          {tab === 'skills' && !!props.methodTrials?.length && <details className="workshop-method-archive">
-            <summary>历史方法试用</summary>
-            {props.methodTrials.map((trial) => <div key={trial.id}>
-              <span>{trial.skill?.skill.name || trial.title}</span>
-              <Button variant="outline" size="sm" onClick={() => props.onOpenMethodTrial?.(trial.id)}>查看试用记录</Button>
-            </div>)}
-          </details>}
         </section>
       </div>
       <WorkshopDialogs

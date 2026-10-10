@@ -1,14 +1,11 @@
 import type { TeachingAssistant } from '../../../shared/assistant';
-import type { ContextualDesign, DesignLevel } from '../../../shared/contextual-design';
-import type { SkillEntry, LocalTeachingTask } from '../../../shared/marketplace';
-import type { TeachingActivityDraft } from '../../../shared/teaching-activity';
+import type { SkillEntry } from '../../../shared/marketplace';
 
 export type WorkshopProps = {
   tab?: string;
   onTab: (tab: string) => void;
   skills: SkillEntry[];
   allEntries: SkillEntry[];
-  designs: ContextualDesign[];
   favorites: string[];
   shared: string[];
   assistants: TeachingAssistant[];
@@ -19,19 +16,9 @@ export type WorkshopProps = {
   onMount: (assistantId: string, entry: SkillEntry) => boolean;
   onFavorite: (id: string) => void;
   onShare: (id: string) => boolean;
-  onOpenDesign: (id: string, level: DesignLevel) => void;
-  onPreviewDesign: (id: string, level: DesignLevel) => void;
-  onUseDesign: (design: ContextualDesign, level: DesignLevel) => void;
-  onUseSkill: (entry: SkillEntry) => void;
-  onCopyDesign: (id: string, level: DesignLevel) => void;
-  onDeleteDesign: (id: string) => boolean;
+  onTrialSkill: (entry: SkillEntry) => void;
   onCreate: () => void;
-  onInquiry: () => void;
   onMarket: () => void;
   onOpenAssistant: (id: string) => void;
   onDeleteAssistant: (id: string) => boolean;
-  methodTrials?: LocalTeachingTask[];
-  skillApplications?: TeachingActivityDraft[];
-  onOpenMethodTrial?: (id: string) => void;
-  onResumeApplication?: (id: string) => void;
 };

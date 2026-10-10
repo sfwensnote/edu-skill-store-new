@@ -28,7 +28,7 @@ export function ReportPage({
     <main className="report-page-new page-frame narrow-frame">
       <button className="back-link" onClick={onBack}>
         <ArrowLeft />
-        返回我的作品
+        返回我的 SKILL
       </button>
       <div className="report-heading">
         <h1>核对摘要</h1>

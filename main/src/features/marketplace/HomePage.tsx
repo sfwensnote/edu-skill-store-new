@@ -1,12 +1,9 @@
 import {
   ArrowRight,
   BookOpen,
-  Box,
   FileCheck2,
-  FileText,
   FolderOpen,
   Lightbulb,
-  Network,
   Store,
   Users,
   type LucideIcon,
@@ -15,13 +12,12 @@ import { Button } from '@/components/ui/button';
 import type { AppRoute } from '@/lib/routes';
 import './home.css';
 
-function DocumentDecoration({ inquiry = false }: { inquiry?: boolean }) {
-  const Icon = inquiry ? Network : BookOpen;
+function DocumentDecoration() {
   return (
     <div className="home-document-art" aria-hidden="true">
       <span className="home-art-back" />
       <span className="home-art-sheet">
-        <Icon />
+        <BookOpen />
         <i />
         <i />
         <i />
@@ -36,7 +32,6 @@ function CoreEntry({
   icon: Icon,
   features,
   action,
-  inquiry = false,
   onOpen,
 }: {
   title: string;
@@ -44,12 +39,11 @@ function CoreEntry({
   icon: LucideIcon;
   features: [LucideIcon, string][];
   action: string;
-  inquiry?: boolean;
   onOpen: () => void;
 }) {
   return (
-    <article className="home-core-card" data-area={inquiry ? 'inquiry' : 'daily'}>
-      <DocumentDecoration inquiry={inquiry} />
+    <article className="home-core-card">
+      <DocumentDecoration />
       <div className="home-core-heading">
         <span className="home-core-icon">
           <Icon aria-hidden="true" />
@@ -91,18 +85,11 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
       route: { page: 'market' },
     },
     {
-      title: '我的作品',
-      description: '编辑与管理已保存的作品。',
-      action: '查看作品',
+      title: '我的 SKILL',
+      description: '编辑与管理自己的 SKILL。',
+      action: '查看 SKILL',
       icon: FolderOpen,
       route: { page: 'workshop', tab: 'skills' },
-    },
-    {
-      title: '教学任务',
-      description: '布置教学任务，查看学生记录。',
-      action: '查看任务',
-      icon: Users,
-      route: { page: 'space' },
     },
   ];
   return (
@@ -111,7 +98,7 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
         <header className="home-hero">
           <div>
             <h1>教学工坊</h1>
-            <p>整理教学方法，设计探究作品。</p>
+            <p>把教学经验整理成 SKILL。</p>
           </div>
           <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} width="420" height="160" alt="" aria-hidden="true" />
         </header>
@@ -127,19 +114,6 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
             ]}
             action="进入教学方法工坊"
             onOpen={() => navigate({ page: 'create', assistantId: crypto.randomUUID() })}
-          />
-          <CoreEntry
-            title="情境探究"
-            description="从教学内容出发，设计学生的探究过程。"
-            icon={Lightbulb}
-            features={[
-              [FileText, '题目情境化'],
-              [Network, '任务链设计'],
-              [Box, 'PBL 项目'],
-            ]}
-            action="开始设计探究作品"
-            inquiry
-            onOpen={() => navigate({ page: 'inquiry' })}
           />
         </section>
         <section className="home-shortcut-grid" aria-label="教学工作空间">

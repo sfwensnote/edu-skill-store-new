@@ -33,7 +33,7 @@
 }
 .workshop-overview {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 26px;
 }
@@ -67,18 +67,6 @@
   width: 32px;
   height: 32px;
   stroke-width: 1.6;
-}
-[data-kind='problems'] > .workshop-type-icon {
-  background: #eef4fc;
-  color: #5687c6;
-}
-[data-kind='chains'] > .workshop-type-icon {
-  background: var(--orange-soft);
-  color: var(--orange);
-}
-[data-kind='pbl'] > .workshop-type-icon {
-  background: #f3effa;
-  color: #8664b8;
 }
 .workshop-stat-info {
   display: flex;

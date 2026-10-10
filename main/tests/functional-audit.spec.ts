@@ -84,7 +84,7 @@ test('中途核对进度保存失败保留当前项，恢复后可继续', async
   await expect(page.locator('.test-case-head h1')).not.toHaveText(title!);
 });
 
-test('探究作品复制失败不新增幽灵副本，不跳转，恢复后可创建副本', async ({ page }) => {
+test('旧探究直接地址复制失败不新增幽灵副本，恢复后可创建副本', async ({ page }) => {
   const design = rentalSampleDesign('functional-design');
   design.contextualProblem = { ...buildContextualProblem(design), confirmed: true };
   design.savedLevels = [1];
@@ -102,16 +102,16 @@ test('探究作品复制失败不新增幽灵副本，不跳转，恢复后可�
         }),
       );
   }, design);
-  await page.goto('/#/workshop?tab=problems');
+  await page.goto('/#/inquiry/functional-design/1');
   await blockStorage(page, 'teaching-method.market-workspace.v1');
-  await page.getByRole('button', { name: /更多操作/ }).click();
-  await page.getByRole('menuitem', { name: '复制', exact: true }).click();
-  await expect(page).toHaveURL(/#\/workshop\?tab=problems$/);
-  await expect(page.locator('.workshop-item')).toHaveCount(1);
+  await page.getByRole('button', { name: '创建副本', exact: true }).click();
+  await expect(page).toHaveURL(/#\/inquiry\/functional-design\/1$/);
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1') || '{}'));
+  expect(stored.designs).toHaveLength(1);
   await restoreStorage(page);
-  await page.getByRole('button', { name: /更多操作/ }).click();
-  await page.getByRole('menuitem', { name: '复制', exact: true }).click();
+  await page.getByRole('button', { name: '创建副本', exact: true }).click();
   await expect(page).toHaveURL(/#\/inquiry\/.*\/1/);
+  await expect(page).not.toHaveURL(/#\/inquiry\/functional-design\/1$/);
 });
 
 test('教师回答保存失败时导航会提示，恢复存储后可保存并离开', async ({ page }) => {

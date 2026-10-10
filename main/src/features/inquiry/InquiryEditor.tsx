@@ -191,7 +191,7 @@ export function InquiryEditor({
       )}
       <footer className="editor-footer">
         <Button variant="outline" onClick={onWorkshop}>
-          返回我的作品
+          返回我的 SKILL
         </Button>
         <div className="inline-actions">
           <Button variant="outline" onClick={() => save()}>

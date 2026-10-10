@@ -37,8 +37,8 @@ test('手机作品页默认只保留一处搜索，筛选可展开并保留有�
   await seed(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/workshop');
-  await expect(page.getByLabel('搜索我的作品')).toHaveCount(1);
-  await expect(page.getByLabel('搜索我的作品')).toBeVisible();
+  await expect(page.getByLabel('搜索我的 SKILL')).toHaveCount(1);
+  await expect(page.getByLabel('搜索我的 SKILL')).toBeVisible();
   await expect(page.getByLabel('作品学段')).toBeHidden();
   await page.getByRole('button', { name: '筛选', exact: true }).click();
   await page.getByLabel('作品学段').selectOption('初中');
@@ -157,14 +157,14 @@ test('离开长列表进入新页面回到顶部，键盘焦点到内容，返�
   await seed(page);
   await page.setViewportSize({ width: 1440, height: 700 });
   await page.goto('/#/workshop');
-  await page.getByLabel('搜索我的作品').fill('反思');
+  await page.getByLabel('搜索我的 SKILL').fill('反思');
   const last = page.locator('.workshop-item').last();
   await last.getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.locator('main')).toBeFocused();
   expect(await page.evaluate(() => scrollY)).toBe(0);
   await expect(page).toHaveTitle(/反思.*教学工坊/);
-  await page.getByRole('button', { name: '返回我的作品', exact: true }).click();
-  await expect(page.getByLabel('搜索我的作品')).toHaveValue('反思');
+  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await expect(page.getByLabel('搜索我的 SKILL')).toHaveValue('反思');
   await page.getByRole('link', { name: '跳到页面内容' }).focus();
   await page.getByRole('link', { name: '跳到页面内容' }).press('Enter');
   await expect(page.locator('main')).toBeFocused();

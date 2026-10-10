@@ -22,12 +22,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { workshopIcons } from './WorkshopNavigation';
-import { workType, type WorkItem, type WorkshopTab } from './workshop-catalog';
+import { type WorkItem, type WorkshopTab } from './workshop-catalog';
 
 export type WorkActions = {
   view: (item: WorkItem) => void;
   edit: (item: WorkItem) => void;
-  use: (item: WorkItem) => void;
+  trial: (item: WorkItem) => void;
   copy: (item: WorkItem) => void;
   favorite: (id: string) => void;
   share: (item: WorkItem) => void;
@@ -48,30 +48,14 @@ export function WorkshopResourceCard({
   actions: WorkActions;
 }) {
   const moreRef = useRef<HTMLButtonElement>(null);
-  const type =
-    item.kind === 'skill' || item.kind === 'method-draft'
-      ? 'skills'
-      : item.kind === 'assistant'
-        ? 'assistants'
-        : item.level === 1
-          ? 'problems'
-          : item.level === 2
-            ? 'chains'
-            : 'pbl';
+  const type = 'skills';
   const Icon = workshopIcons[type];
   const own = item.kind !== 'skill' || Boolean(item.entry.assistantId);
   const updated =
     item.updatedAt && Number.isFinite(Date.parse(item.updatedAt))
       ? new Date(item.updatedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
       : '';
-  const viewLabel =
-    item.kind === 'method-draft'
-      ? '继续梳理'
-      : item.kind === 'assistant'
-        ? '打开助手'
-        : tab === 'showcase'
-          ? '查看作品'
-          : '查看';
+  const viewLabel = item.kind === 'method-draft' ? '继续梳理' : '查看';
   return (
     <article className="workshop-item workshop-resource-card" data-kind={type} data-work-id={item.id}>
       <div className="workshop-type-icon workshop-resource-icon">
@@ -80,21 +64,19 @@ export function WorkshopResourceCard({
       <div className="workshop-resource-body">
         <div className="workshop-resource-labels">
           <span>
-            {item.kind === 'assistant' ? '教学助手' : item.area === 'daily' ? '日常教学' : '情境探究'}
+            {item.kind === 'method-draft' ? '创建草稿' : '教学 SKILL'}
           </span>
-          {item.kind === 'design' && <span>{workType(item)}</span>}
           {shared && <span>展示中</span>}
         </div>
         <h3>
           <button onClick={() => actions.view(item)}>{item.title}</button>
         </h3>
-        <p className="workshop-summary">{item.summary || '继续编辑，补充作品内容。'}</p>
+        <p className="workshop-summary">{item.summary || '继续编辑，补充 SKILL 内容。'}</p>
         <TeachingTagList tags={item.tags} />
         <div className="workshop-resource-meta">
           <span>
             <GraduationCap aria-hidden="true" />
             {item.grade}
-            {item.kind === 'design' && item.design.year ? ` ${item.design.year}` : ''}
           </span>
           <span>
             <BookOpen aria-hidden="true" />
@@ -105,15 +87,6 @@ export function WorkshopResourceCard({
               <Tag aria-hidden="true" />
               {item.detail}
             </span>
-          )}
-          {item.kind === 'design' && item.level === 1 && item.design.knowledgePoint && (
-            <span>
-              <Tag aria-hidden="true" />
-              {item.design.knowledgePoint}
-            </span>
-          )}
-          {item.kind === 'design' && item.level === 2 && item.design.contextType && (
-            <span>{item.design.contextType}</span>
           )}
           <span>
             <Info aria-hidden="true" />
@@ -128,13 +101,13 @@ export function WorkshopResourceCard({
         </Button>
         {item.canUse && (
           <Button
-            title={item.kind === 'skill' ? '选择应用场景并保存 SKILL 配置' : '设置教学任务并打开学生预览'}
-            onClick={() => actions.use(item)}
+            title="在作者工作区试用 SKILL"
+            onClick={() => actions.trial(item)}
           >
-            {item.kind === 'skill' ? '应用 SKILL' : '布置任务'}
+            试用 SKILL
           </Button>
         )}
-        {own && item.kind !== 'assistant' && item.kind !== 'method-draft' && (
+        {own && item.kind !== 'method-draft' && (
           <Button variant="outline" onClick={() => actions.edit(item)}>
             编辑
           </Button>
@@ -152,11 +125,11 @@ export function WorkshopResourceCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {item.kind !== 'assistant' && item.kind !== 'method-draft' && (
+            {item.kind !== 'method-draft' && (
               <DropdownMenuGroup>
                 <DropdownMenuItem onSelect={() => actions.copy(item)}>
                   <Copy />
-                  {own ? '复制' : '复用到我的作品'}
+                  {own ? '复制' : '复用到我的 SKILL'}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => actions.favorite(item.id)}>
                   <Heart fill={favorite ? 'currentColor' : 'none'} />
@@ -178,7 +151,7 @@ export function WorkshopResourceCard({
             )}
             {own && (
               <>
-                {item.kind !== 'assistant' && item.kind !== 'method-draft' && <DropdownMenuSeparator />}
+                {item.kind !== 'method-draft' && <DropdownMenuSeparator />}
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     variant="destructive"

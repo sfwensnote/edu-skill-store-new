@@ -195,7 +195,7 @@ test('SKILL 应用独立选择场景，模拟证据不会启用方法或发布�
   expect(data.tasks).toHaveLength(1);
 });
 
-test('任务与 SKILL 配置分别保存，离开前保护修改，配置在我的作品恢复', async ({ page }) => {
+test('旧任务与 SKILL 配置分别保存，离开保护有效且不混入我的 SKILL', async ({ page }) => {
   await seed(page);
   await page.getByRole('button', { name: '新建任务', exact: true }).click();
   await page.getByRole('button', { name: /选择合适的设备租赁方案.*情境题目/ }).click();
@@ -208,18 +208,16 @@ test('任务与 SKILL 配置分别保存，离开前保护修改，配置在我�
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: '继续编辑', exact: true }).click();
   await expect(page).toHaveURL(beforeExit);
-  await page.getByRole('button', { name: '我的作品', exact: true }).click();
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
   await page.getByRole('button', { name: '保存并继续' }).click();
   await expect(page).toHaveURL(/#\/workshop$/);
-  await page.getByRole('button', { name: '教学任务', exact: true }).click();
+  // 主导航已移除教学任务，这里仅复核旧草稿的直接地址兼容。
+  await page.goto('/#/space');
   await expect(page.locator('.activity-list-item')).toHaveCount(2);
-  await page.getByRole('button', { name: '我的作品', exact: true }).click();
-  await page.getByText('SKILL 应用配置', { exact: true }).click();
-  await page.getByRole('button', { name: '继续配置', exact: true }).click();
-  await expect(page.getByRole('button', { name: /测试教师的反思方法/ })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await expect(page.getByText('SKILL 应用配置', { exact: true })).toHaveCount(0);
+  const data = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1') || '{}'));
+  expect(data.activityDrafts.some((draft: { path: string }) => draft.path === 'skill')).toBe(true);
 });
 
 test('任务列表和工作台适配宽屏、平板与手机，底部操作始终可见', async ({ page }) => {

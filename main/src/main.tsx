@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import RootApp from './RootApp';
+import App from './App';
 import './styles/base.css';
 import './styles/shell-new.css';
 import './styles/library-new.css';
@@ -18,6 +18,6 @@ import './styles/workbench-spaces.css';
 import './styles/interaction.css';
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RootApp />
+    <App />
   </React.StrictMode>,
 );

@@ -29,7 +29,7 @@ export function UsePage({
         role: 'assistant',
         content: skill
           ? `【引导示例】当${skill.trigger}，教师会：${skill.steps?.[0]?.action || skill.behaviorSteps[0]}`
-          : '尚未配置教学方法，请返回我的作品补充。',
+          : '尚未配置教学方法，请返回我的 SKILL补充。',
       },
     ]);
     setValue('');

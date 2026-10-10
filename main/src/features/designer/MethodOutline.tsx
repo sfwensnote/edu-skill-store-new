@@ -57,12 +57,10 @@ export function MethodOutline({
   method,
   onChange,
   updatedSection,
-  tagSuggestions,
 }: {
   method: TeachingMethod;
   onChange: (method: TeachingMethod, field?: string) => void;
   updatedSection: number | null;
-  tagSuggestions?: readonly string[];
 }) {
   const boundaryPrefix = '结束条件：';
   const boundary =
@@ -106,7 +104,7 @@ export function MethodOutline({
         {field('SKILL 名称', 'name', '为你的教学方法起一个名字')}
         {field('SKILL 简介', 'description', '用一句话说明这个方法的用途')}
         <TeachingCategoryField value={method.category} onChange={(category) => onChange({ ...method, category }, 'category')} />
-        <TeachingTagsField value={method.tags} suggestions={tagSuggestions} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
+        <TeachingTagsField value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
       </StepSection>
       <StepSection number={2} title="教学目标框架" updated={updatedSection === 2}>
         {field('想解决的问题', 'problem')}

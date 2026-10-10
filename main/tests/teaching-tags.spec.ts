@@ -36,9 +36,8 @@ test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和�
     await page.getByRole('button', { name: '确认并继续' }).click();
   await page.getByRole('button', { name: '确认并完成' }).click();
   await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
-  await page.getByRole('button', { name: '教学任务', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '还没有教学任务' })).toBeVisible();
-  await expect(page.locator('.activity-list-item')).toHaveCount(0);
+  const tasks = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1') || '{}').tasks || []);
+  expect(tasks).toHaveLength(0);
 });
 
 test('情境探究的分类和标签可恢复，手机表单不横向溢出', async ({ page }) => {
@@ -62,7 +61,7 @@ test('情境探究的分类和标签可恢复，手机表单不横向溢出', as
   await expect(page.getByRole('button', { name: '移除标签 一次函数应用' })).toBeVisible();
 });
 
-test('旧方法体验归档到我的作品，保留回答，不计入教学任务', async ({ page }) => {
+test('旧方法体验保留资料，不混入我的 SKILL 或教学任务', async ({ page }) => {
   const trial = { id: 'old-method-trial', title: '旧方法体验', kind: 'skill', level: 1, skill: marketSkills[0], instructions: '体验方法', feedback: '旧提示',
     submissions: [{ answers: { 回答: '我还没有发现错误' }, submittedAt: '2026-10-09T00:00:00.000Z', feedback: '旧提示' }], createdAt: '2026-10-09T00:00:00.000Z' };
   await page.addInitScript((task) => {
@@ -71,11 +70,11 @@ test('旧方法体验归档到我的作品，保留回答，不计入教学任�
   await page.goto('/#/space');
   await expect(page.getByRole('heading', { name: '还没有教学任务' })).toBeVisible();
   await expect(page.getByText('旧方法体验', { exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '我的作品', exact: true }).click();
-  await page.getByText('历史方法试用', { exact: true }).click();
-  await page.getByRole('button', { name: '查看试用记录', exact: true }).click();
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await expect(page.getByText('历史方法试用', { exact: true })).toHaveCount(0);
+  await page.goto('/#/task/old-method-trial');
   await expect(page.getByText('我还没有发现错误', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '提交学习记录' })).toHaveCount(0);
-  await page.getByRole('button', { name: '返回我的作品', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
   await expect(page).toHaveURL(/#\/workshop/);
 });

@@ -190,7 +190,7 @@ export function StudentPreviewPage({
         {!checked ? <Button onClick={onContinue}>先核对教学方法</Button> : <>
           {!shared && activeSkill && <Button variant="outline" onClick={() => onShare(activeSkill.id)}>分享到集市</Button>}
           {shared && <span className="preview-shared-status">已在集市展示</span>}
-          <Button onClick={onDone}>完成，返回我的作品</Button>
+          <Button onClick={onDone}>完成，返回我的 SKILL</Button>
         </>}
       </footer>
       {checked && !shared && <p className="preview-share-scope">分享当前方法，仅在本机工作区可见。</p>}

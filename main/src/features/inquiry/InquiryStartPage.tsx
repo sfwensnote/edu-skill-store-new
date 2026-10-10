@@ -204,7 +204,7 @@ export function InquiryStartPage({
             ))}
             {!designs.length && <p className="subtle">暂无草稿</p>}
             <Button variant="ghost" onClick={() => navigate({ page: 'workshop', tab: 'problems' })}>
-              查看我的作品
+              查看我的 SKILL
               <ArrowRight />
             </Button>
           </section>

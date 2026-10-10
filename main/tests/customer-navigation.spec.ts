@@ -52,7 +52,7 @@ test('方法详情返回原分类，集市返回保留搜索，失效链接有�
   await page.goto('/#/workshop?tab=skills');
   await page.locator('.workshop-item').first().getByRole('button', { name: '查看', exact: true }).click();
   await page.reload();
-  await page.getByRole('button', { name: '返回我的作品', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
   await expect(page).toHaveURL(/workshop\?tab=skills$/);
   await page.getByRole('button', { name: '教学 SKILL 集市', exact: true }).click();
   await page.getByLabel('搜索 SKILL').fill('反思');
@@ -61,8 +61,8 @@ test('方法详情返回原分类，集市返回保留搜索，失效链接有�
   await expect(page.getByLabel('搜索 SKILL')).toHaveValue('反思');
   await page.goto('/#/inquiry/deleted-design/3');
   await expect(page.getByRole('heading', { name: '没有找到这项内容' })).toBeVisible();
-  await page.getByRole('button', { name: '返回我的作品', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '我的作品', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
 });
 
 test('客户展示页面使用统一配色，没有开发说明，桌面与手机导航均可用', async ({ page }) => {
@@ -77,11 +77,8 @@ test('客户展示页面使用统一配色，没有开发说明，桌面与手�
   expect(color).toBe('rgb(255, 255, 255)');
   await page.screenshot({ path: 'docs/assets/客户演示首页.png', fullPage: true });
   await page.getByRole('button', { name: '创建', exact: true }).click();
-  await expect(page.getByRole('dialog')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await page.screenshot({ path: 'docs/assets/创建入口弹窗.png', animations: 'disabled' });
-  await page.getByRole('button', { name: '设计探究作品', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '设计探究作品' })).toBeVisible();
-  await page.screenshot({ path: 'docs/assets/客户演示情境探究.png', fullPage: true });
+  await expect(page).toHaveURL(/#\/create\//);
+  await expect(page.getByRole('heading', { name: '创建教学方法' })).toBeVisible();
   for (const path of [
     'home',
     'daily',

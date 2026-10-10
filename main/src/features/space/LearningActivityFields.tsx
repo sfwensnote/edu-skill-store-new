@@ -151,7 +151,7 @@ export function LearningActivityFields({
             title="还没有可布置的学习作品"
             action={
               <Button variant="outline" onClick={onWorkshop}>
-                前往我的作品
+                前往我的 SKILL
               </Button>
             }
           >

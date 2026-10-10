@@ -51,7 +51,7 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.getByRole('button', { name: '发送学生问题' }).click();
   await expect(page.locator('.student-message').last()).toContainText('请学生标出不确定的一步');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('review-method:1');
-  await expect(page.getByRole('button', { name: '完成，返回我的作品' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '完成，返回我的 SKILL' })).toBeVisible();
   await page.getByText('核对记录', { exact: true }).click();
   await expect(page.getByText('v3.0 · 教师已核对方法内容')).toBeVisible();
   await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toBeVisible();
@@ -106,8 +106,8 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   await page.screenshot({ path: 'docs/assets/简化后-方法详情-手机.png', fullPage: true, animations: 'disabled', scale: 'css' });
   await page.getByRole('button', { name: '预览方法', exact: true }).click();
   await expect(page.getByLabel('预览教学情况')).toHaveValue('method-two:0');
-  await expect(page.getByRole('button', { name: '我的作品', exact: true })).toHaveAttribute('aria-current', 'page');
-  await page.getByRole('button', { name: '完成，返回我的作品' }).click();
+  await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('button', { name: '完成，返回我的 SKILL' }).click();
   await expect(page).toHaveURL(/workshop\?tab=skills$/);
   await page.goto('/#/assistant/multi-review/student-preview?from=method&case=missing:0');
   await expect(page.getByRole('heading', { name: '没有找到这项方法' })).toBeVisible();

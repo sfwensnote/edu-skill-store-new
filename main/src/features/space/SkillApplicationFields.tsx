@@ -93,7 +93,7 @@ export function SkillApplicationFields({
         </div>
         {!ownedIds.length && !entry && (
           <EmptyState title="还没有可配置的教学 SKILL">
-            先在我的作品中创建方法，或将集市方法复用到自己的作品。
+            先在我的 SKILL中创建方法，或将集市方法复用到自己的作品。
           </EmptyState>
         )}
         {entry && (

@@ -249,22 +249,22 @@ export default function App() {
       )}
       {(route.page === 'workshop' || route.page === 'mine') && (
         <WorkshopPage
-          tab={route.page === 'mine' ? 'assistants' : route.tab}
+          tab={route.page === 'mine' ? 'skills' : route.tab}
           onTab={(tab) => navigate({ page: 'workshop', tab })}
           skills={personalSkills}
           allEntries={allSkills}
-          designs={market.designs}
           favorites={market.favorites}
           shared={market.sharedSkillIds}
           assistants={platform.assistants}
-          onUseSkill={(entry) =>
-            navigate({
-              page: 'space',
-              selection: `skill:${entry.id}`,
-              returnTo: routeHash(route),
-            })
-          }
-          onUseDesign={useDesign}
+          onTrialSkill={(entry) => {
+            if (!entry.assistantId) { reuseSkill(entry); return; }
+            const assistant = platform.getAssistant(entry.assistantId);
+            if (!assistant || !isMethodReviewed(assistant) || !platform.isSkillIncluded(assistant.id, entry.skill.id)) {
+              navigate({ page: 'test', assistantId: entry.assistantId });
+              return;
+            }
+            navigate({ page: 'trial-preview', assistantId: entry.assistantId, caseId: `${entry.skill.id}:0`, from: 'method' });
+          }}
           onEditSkill={editSkill}
           onOpenSkill={(skillId) => navigate({ page: 'skill-detail', skillId })}
           onCopySkill={reuseSkill}
@@ -272,29 +272,10 @@ export default function App() {
           onMount={platform.mountSkill}
           onFavorite={market.toggleFavorite}
           onShare={market.toggleShare}
-          onOpenDesign={(designId, level) => navigate({ page: 'inquiry-editor', designId, level })}
-          onPreviewDesign={(designId, level) =>
-            navigate({ page: 'inquiry-editor', designId, level, view: 'preview' })
-          }
-          onCopyDesign={(sourceId, level) => {
-            const id = market.copyDesign(sourceId);
-            if (id)
-              navigate({
-                page: 'inquiry-editor',
-                designId: id,
-                level,
-              });
-          }}
-          onDeleteDesign={market.removeDesign}
           onCreate={() => navigate({ page: 'create', assistantId: crypto.randomUUID() })}
-          onInquiry={() => navigate({ page: 'inquiry' })}
           onMarket={() => navigate({ page: 'market' })}
           onOpenAssistant={openMine}
           onDeleteAssistant={platform.removeAssistant}
-          methodTrials={market.tasks.filter((task) => task.kind === 'skill')}
-          skillApplications={market.activityDrafts.filter((draft) => draft.path === 'skill')}
-          onOpenMethodTrial={(taskId) => navigate({ page: 'task-preview', taskId })}
-          onResumeApplication={(draftId) => navigate({ page: 'space', draftId })}
         />
       )}
       {route.page === 'space' && (
@@ -351,7 +332,7 @@ export default function App() {
         (route.page === 'inquiry-editor' && !design)) && (
         <main className="page-frame not-found">
           <h1>没有找到这项内容</h1>
-          <button onClick={() => navigate({ page: 'workshop' })}>返回我的作品</button>
+          <button onClick={() => navigate({ page: 'workshop' })}>返回我的 SKILL</button>
         </main>
       )}
       {route.page === 'library' && (
@@ -477,7 +458,7 @@ export default function App() {
         />
       )}
       {route.page === 'trial-preview' && current && previewSkillId && !current.skills.some((skill) => skill.id === previewSkillId) &&
-        <main className="page-frame not-found"><h1>没有找到这项方法</h1><button onClick={() => goTo({ page: 'workshop', tab: 'skills' })}>返回我的作品</button></main>}
+        <main className="page-frame not-found"><h1>没有找到这项方法</h1><button onClick={() => goTo({ page: 'workshop', tab: 'skills' })}>返回我的 SKILL</button></main>}
       {route.page === 'use' && (current || publicAssistant) && (
         <UsePage
           assistant={(current || publicAssistant)!}
@@ -502,7 +483,7 @@ export default function App() {
             : current) && (
           <main className="not-found page-frame">
             <h1>没有找到这个助手</h1>
-            <button onClick={() => navigate({ page: 'workshop' })}>返回我的作品</button>
+            <button onClick={() => navigate({ page: 'workshop' })}>返回我的 SKILL</button>
           </main>
         )}
     </div>

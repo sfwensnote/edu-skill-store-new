@@ -107,7 +107,7 @@ test('主要页面在四种屏宽无横向溢出，工作区操作与学习内�
     ['inquiry/ui-inquiry/3', 'PBL项目工作区'],
     ['market', 'SKILL集市'],
     ['skill/sample-reflect', 'SKILL详情'],
-    ['workshop', '我的作品'],
+    ['workshop', '我的 SKILL'],
     ['assistant/assistant-demo-active/test', '检测与试用'],
     ['space', '教学任务'],
     ['task/ui-task', '学生学习预览'],

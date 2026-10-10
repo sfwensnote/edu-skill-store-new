@@ -142,7 +142,7 @@ test('从详情配置另一项资源时不继承原活动的草稿，返回保�
   assert.deepEqual(resumed, draft);
 });
 
-test('方法详情按来源高亮集市、我的作品或教学任务，直接详情链接默认归入集市', () => {
+test('方法详情按来源高亮集市、我的 SKILL或教学任务，直接详情链接默认归入集市', () => {
   for (const source of [
     { page: 'market' as const },
     { page: 'workshop' as const, tab: 'skills' },
