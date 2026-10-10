@@ -337,12 +337,46 @@
   border-bottom: 1px solid var(--line);
   font-size: 14px;
 }
-.skill-preview-chat {
-  max-height: min(320px, 40svh);
-  overflow-y: auto;
+.skill-trial-dialogue {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+  margin-bottom: 16px;
+}
+.skill-experience.skill-case-trial {
+  position: static;
+}
+.skill-case-trial > .subtle {
+  margin-top: 8px;
+}
+.skill-trial-title {
+  font-size: 14px;
+  margin: 20px 0 8px;
+}
+.skill-trial-material {
+  padding: 12px;
+  background: var(--muted);
+  border-radius: 6px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.skill-trial-dialogue p {
+  margin-top: 8px;
+  line-height: 1.8;
+}
+.skill-trial-choices {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
   margin-bottom: 12px;
+}
+.skill-trial-choices [data-slot='button'] {
+  justify-content: flex-start;
+  text-align: left;
+}
+.skill-trial-empty,
+.skill-trial-end {
+  padding-block: 16px;
 }
 @media (max-width: 1100px) {
   .detail-grid > .skill-experience { order: -1; }

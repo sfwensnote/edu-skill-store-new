@@ -46,8 +46,7 @@ test('集市添加不创建可编辑副本；分类、刷新、试用与移除�
   await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
   await expect(page.getByText('方法示例', { exact: true })).toHaveCount(0);
-  await page.getByLabel('学生输入', { exact: true }).fill('我不知道下一步怎么做');
-  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await expect(page.locator('.experience-turn')).toHaveCount(2);
   expect((await stored(page)).owners).toEqual(before);
   await page.reload();
@@ -82,8 +81,7 @@ test('集市及添加项没有改编或创建副本入口，试用不改变源�
   const before = await stored(page);
   await firstRow(page).getByRole('button', { name: '查看与试用', exact: true }).click();
   await expect(page.getByRole('button', { name: /改编|创建方法副本|编辑我的方法/ })).toHaveCount(0);
-  await page.getByLabel('学生输入', { exact: true }).fill('我不知道哪里出错了');
-  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await expect(page.getByRole('log')).toContainText('模型回复');
   expect((await stored(page)).owners).toEqual(before.owners);
   await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();

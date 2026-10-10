@@ -67,8 +67,7 @@ test('旧 PBL 标签不出现在我的 SKILL 和试用详情，来源资料与�
   await expect(page.locator('main')).not.toContainText(/PBL|情境探究|任务链设计|项目式学习/);
   await expect(page.locator('.detail-heading')).toContainText('未分类');
   await expect(page.locator('.detail-heading')).not.toContainText(/PBL|任务链设计|项目式学习/);
-  await page.getByLabel('学生输入', { exact: true }).fill('我不知道怎么说明依据');
-  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await expect(page.getByRole('log')).toContainText('模型回复');
   expect(await page.evaluate(() => localStorage.getItem('teaching-method.market-workspace.v1'))).toBe(workspace);
 });

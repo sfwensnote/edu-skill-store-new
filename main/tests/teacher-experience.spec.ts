@@ -14,7 +14,7 @@ async function noDemoLabels(page: Page) {
   await expect(page.locator('main')).not.toContainText(/demo|演示|预置|示例/i);
 }
 
-test('教师初学者：空的个人工作区，试用与添加各自独立，手机长输入不溢出', async ({ page }, info) => {
+test('教师初学者：空的个人工作区，具体案例试用与添加各自独立，手机不溢出', async ({ page }, info) => {
   const errors: string[] = [], requests: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('request', (request) => { if (request.url().includes('/api/')) requests.push(request.url()); });
@@ -25,11 +25,10 @@ test('教师初学者：空的个人工作区，试用与添加各自独立，�
   await page.goto('/#/market');
   await noDemoLabels(page);
   await page.locator('.market-resource-card').first().getByRole('button', { name: '查看与试用', exact: true }).click();
-  await expect(page.getByText(/当前 SKILL：/)).toBeVisible();
+  await expect(page.getByRole('log')).toContainText('我算出 x=6');
   await noDemoLabels(page);
-  await page.getByLabel('学生输入', { exact: true }).fill('我答错了，能先帮我看看我的思路吗？');
-  await page.getByRole('button', { name: '发送', exact: true }).click();
-  await expect(page.locator('.experience-turn').last()).toContainText('请把你目前的做法和理由写出来');
+  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
+  await expect(page.locator('.experience-turn').last()).toContainText('你是怎样得到 x=6 的');
   await noDemoLabels(page);
   expect(await page.evaluate((key) => localStorage.getItem(key), ownersKey)).toBeNull();
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -37,15 +36,13 @@ test('教师初学者：空的个人工作区，试用与添加各自独立，�
   await page.setViewportSize({ width: 1440, height: 500 });
   await expect(page.locator('.skill-experience')).toHaveCSS('position', 'static');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByLabel('学生输入', { exact: true }).fill('a'.repeat(2000));
-  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await page.getByRole('button', { name: '我写成了 2x=9+3，再算出 x=6。', exact: true }).click();
   await noOverflow(page);
   const previewTop = await page.locator('.skill-experience').evaluate((node) => node.getBoundingClientRect().top + scrollY);
   const methodTop = await page.locator('.method-detail').evaluate((node) => node.getBoundingClientRect().top + scrollY);
   expect(previewTop).toBeLessThan(methodTop);
-  await page.getByRole('button', { name: '重新开始', exact: true }).click();
-  await page.getByLabel('学生输入', { exact: true }).fill('我算错了，不知道从哪一步检查。');
-  await page.getByRole('button', { name: '发送', exact: true }).click();
+  await page.getByRole('button', { name: '重新试用', exact: true }).click();
+  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath('market-preview-mobile.png'), fullPage: true });
   await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();

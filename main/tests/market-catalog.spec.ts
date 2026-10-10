@@ -50,7 +50,7 @@ test('集市组合筛选、分类计数、收藏持久化及详情返回可用',
   await personal.getByRole('button', { name: /^我收藏的/ }).click();
   await expect(personal.getByRole('button', { name: /^我收藏的/ })).toContainText('1');
   await rows.getByRole('button', { name: '查看与试用', exact: true }).click();
-  await expect(page.getByText(/当前 SKILL：/)).toBeVisible();
+  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toContainText('预计使用 3 小时');
   await page.reload();
   await page.getByRole('button', { name: '返回集市', exact: true }).click();
   await expect(rows).toHaveCount(1);
