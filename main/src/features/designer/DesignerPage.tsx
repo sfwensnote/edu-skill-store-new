@@ -102,9 +102,9 @@ function restore(assistant: TeachingAssistant, skillId?: string, sourceTags?: st
     grade: assistant.grade,
     subject: assistant.subject,
     teachingScene: method.category || '',
-    stage: selected ? 'method' : 'idea',
+    stage: selected && !assistant.adaptation ? 'method' : 'idea',
     method,
-    questionIndex: selected ? 6 : 0,
+    questionIndex: selected && !assistant.adaptation ? 6 : 0,
     editingSkillId: selected?.id,
   };
 }
@@ -159,7 +159,7 @@ export function DesignerPage({
       status: 'DRAFT',
       isPublic: false,
       name: assistant.name || `${next.grade}${next.subject}教学助手`,
-      goal: next.method.expectedOutcome || next.originalIdea,
+      goal: next.stage === 'idea' ? next.originalIdea : next.method.expectedOutcome || next.originalIdea,
       grade: next.grade,
       subject: next.subject,
       activity: next.teachingScene || '教学实践',

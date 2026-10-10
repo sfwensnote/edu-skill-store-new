@@ -14,7 +14,10 @@ export function SkillDetailPage({
   favorite,
   onBack,
   onFavorite,
-  onReuse,
+  onAdapt,
+  onCopy,
+  onAdd,
+  added,
   onEdit,
   backLabel,
   onUse,
@@ -25,7 +28,10 @@ export function SkillDetailPage({
   favorite: boolean;
   onBack: () => void;
   onFavorite: () => void;
-  onReuse: () => void;
+  onAdapt: () => void;
+  onCopy: () => void;
+  onAdd: () => void;
+  added: boolean;
   onEdit?: () => void;
   backLabel: string;
   onUse: () => void;
@@ -51,20 +57,20 @@ export function SkillDetailPage({
             {entry.creator} · {entry.grade} · {entry.subject} · {teachingCategoryOf(entry.skill, entry.scene, entry.area)} · {entry.version}
           </p>
           <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example)} />
-          {entry.demo && <span className="demo-label">方法示例</span>}
-          <small>{entry.validation}</small>
+          <small>{entry.demo ? '待验证' : entry.validation}</small>
         </div>
         <div className="inline-actions">
           {applicationContext ? <Button onClick={onUse}>继续配置</Button> : onPreview ?
             <Button onClick={() => onPreview()}>{entry.validation === '教师已核对' ? '预览方法' : '核对方法'}</Button> :
-            <Button onClick={onReuse}>复用到我的 SKILL<ArrowRight /></Button>}
+            <Button disabled={added} onClick={onAdd}>{added ? '已添加' : '添加到我的 SKILL'}<ArrowRight /></Button>}
+          {!entry.assistantId && <Button variant="outline" onClick={onAdapt}>改编 SKILL</Button>}
           {onEdit && <Button variant="outline" onClick={onEdit}>编辑我的方法</Button>}
           {entry.assistantId ? <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="更多方法操作"><MoreHorizontal /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={onFavorite}>{favorite ? '取消收藏' : '收藏'}</DropdownMenuItem>
               <DropdownMenuItem onSelect={onUse}>应用 SKILL</DropdownMenuItem>
-              <DropdownMenuItem onSelect={onReuse}>创建方法副本</DropdownMenuItem>
+              <DropdownMenuItem onSelect={onCopy}>创建方法副本</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu> :
           <Button variant="outline" onClick={onFavorite}>

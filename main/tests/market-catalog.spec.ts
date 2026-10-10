@@ -13,7 +13,7 @@ test('集市组合筛选、分类计数、板块同步、收藏持久化及详�
   await expect(rows).toHaveCount(5);
   await expect(personal.getByRole('button', { name: /^全部方法/ })).toContainText('5');
   await expect(categories.getByRole('button', { name: /^课堂提问/ })).toContainText('0');
-  await expect(page.getByText('方法示例', { exact: true })).toHaveCount(5);
+  await expect(page.getByText('方法示例', { exact: true })).toHaveCount(0);
   await expect(personal.getByRole('button', { name: /^我收藏的/ })).toContainText('0');
   await personal.getByRole('button', { name: /^我收藏的/ }).click();
   await expect(page.getByRole('heading', { name: '还没有收藏的教学方法' })).toBeVisible();
@@ -53,7 +53,7 @@ test('集市组合筛选、分类计数、板块同步、收藏持久化及详�
   await rows.getByRole('button', { name: '收藏费用比较中的信息提取与论证', exact: true }).click();
   await personal.getByRole('button', { name: /^我收藏的/ }).click();
   await expect(personal.getByRole('button', { name: /^我收藏的/ })).toContainText('1');
-  await rows.getByRole('button', { name: '查看与体验', exact: true }).click();
+  await rows.getByRole('button', { name: '查看与试用', exact: true }).click();
   await expect(page.getByText('固定引导示例，不判断真实触发条件。')).toBeVisible();
   await page.reload();
   await page.getByRole('button', { name: '返回集市', exact: true }).click();

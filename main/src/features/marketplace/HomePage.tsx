@@ -49,11 +49,11 @@ function CoreEntry({
           <Icon aria-hidden="true" />
         </span>
         <div>
-          <h2>{title}</h2>
+          {title && <h2>{title}</h2>}
           <p>{description}</p>
         </div>
       </div>
-      <ul className="home-capabilities" aria-label={`${title}支持的功能`}>
+      <ul className="home-capabilities" aria-label={`${title || '教学方法工坊'}支持的功能`}>
         {features.map(([FeatureIcon, label]) => (
           <li key={label}>
             <FeatureIcon aria-hidden="true" />
@@ -104,7 +104,7 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
         </header>
         <section className="home-core-grid" aria-label="核心教学入口">
           <CoreEntry
-            title="日常教学"
+            title=""
             description="把课堂做法整理成可复用的方法。"
             icon={BookOpen}
             features={[

@@ -64,7 +64,7 @@ export function WorkshopResourceCard({
       <div className="workshop-resource-body">
         <div className="workshop-resource-labels">
           <span>
-            {item.kind === 'method-draft' ? '创建草稿' : '教学 SKILL'}
+            {item.kind === 'method-draft' ? '创建草稿' : item.entry.addedFrom ? '从集市添加' : '教学 SKILL'}
           </span>
           {shared && <span>展示中</span>}
         </div>
@@ -101,7 +101,7 @@ export function WorkshopResourceCard({
         </Button>
         {item.canUse && (
           <Button
-            title="在作者工作区试用 SKILL"
+            title="试用 SKILL"
             onClick={() => actions.trial(item)}
           >
             试用 SKILL
@@ -129,7 +129,7 @@ export function WorkshopResourceCard({
               <DropdownMenuGroup>
                 <DropdownMenuItem onSelect={() => actions.copy(item)}>
                   <Copy />
-                  {own ? '复制' : '复用到我的 SKILL'}
+                  {own ? '复制' : '改编 SKILL'}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => actions.favorite(item.id)}>
                   <Heart fill={favorite ? 'currentColor' : 'none'} />
@@ -141,7 +141,7 @@ export function WorkshopResourceCard({
                     {shared ? '取消展示' : '分享展示'}
                   </DropdownMenuItem>
                 )}
-                {item.kind === 'skill' && (
+                {own && item.kind === 'skill' && (
                   <DropdownMenuItem onSelect={() => actions.mount(item, moreRef.current)}>
                     <Link />
                     加入助手配置
@@ -149,17 +149,17 @@ export function WorkshopResourceCard({
                 )}
               </DropdownMenuGroup>
             )}
-            {own && (
+            {(own || (item.kind === 'skill' && item.entry.addedFrom)) && (
               <>
                 {item.kind !== 'method-draft' && <DropdownMenuSeparator />}
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     variant="destructive"
-                    aria-label={`删除${item.title}`}
+                    aria-label={own ? `删除${item.title}` : '从我的 SKILL 移除'}
                     onSelect={() => actions.remove(item, moreRef.current)}
                   >
                     <Trash2 />
-                    删除
+                    {own ? '删除' : '从我的 SKILL 移除'}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </>

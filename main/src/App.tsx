@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { LibraryPage } from '@/features/library/LibraryPage';
 import { LibraryDetailPage } from '@/features/library/LibraryDetailPage';
@@ -27,6 +27,7 @@ import {
 import { HomePage, DailyPage } from '@/features/marketplace/LandingPages';
 import { MarketPage } from '@/features/marketplace/MarketPage';
 import { SkillDetailPage } from '@/features/marketplace/MarketPages';
+import { AdaptSkillDialog } from '@/features/marketplace/AdaptSkillDialog';
 import { WorkshopPage } from '@/features/workshop/WorkshopPage';
 import { InquiryStartPage } from '@/features/inquiry/InquiryStartPage';
 import { outcomeTab, isOutcomeReady } from '../shared/inquiry-workflow';
@@ -44,13 +45,15 @@ export default function App() {
   usePageFocus(route);
   const platform = useDemoPlatform();
   const market = useMarketWorkspace();
+  const [adaptingSkill, setAdaptingSkill] = useState<SkillEntry | null>(null);
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
   const personalSkills = assistantSkillEntries(platform.assistants).map((entry) =>
     entry.assistantId && !platform.isSkillIncluded(entry.assistantId, entry.skill.id)
       ? { ...entry, validation: '待核对' as const } : entry);
-  const allSkills = [...personalSkills, ...marketSkills];
+  const allSkills = [...personalSkills, ...marketSkills, ...market.addedSkills];
+  const addedIds = [...personalSkills.map((entry) => entry.id), ...market.addedSkills.map((entry) => entry.addedFrom!.id)];
   const visibleMarketSkills = [
     ...marketSkills,
     ...personalSkills.filter((e) => market.sharedSkillIds.includes(e.id) &&
@@ -106,8 +109,8 @@ export default function App() {
         skillId: entry.skill.id,
       });
   }
-  function reuseSkill(entry: SkillEntry) {
-    const copy = platform.reuseSkill(entry);
+  function copySkill(entry: SkillEntry) {
+    const copy = platform.copySkill(entry);
     if (copy) navigate({ page: 'create', ...copy });
   }
   function shareReviewedMethod(id: string, skillId?: string) {
@@ -185,6 +188,8 @@ export default function App() {
         <MarketPage
           entries={visibleMarketSkills}
           favorites={market.favorites}
+          addedIds={addedIds}
+          onAdd={market.addSkill}
           onOpen={(skillId) => navigate({ page: 'skill-detail', skillId })}
           onFavorite={market.toggleFavorite}
         />
@@ -199,7 +204,10 @@ export default function App() {
           onBack={() => back({ page: 'market' })}
           onUse={() => applySkill(selectedSkill)}
           onFavorite={() => market.toggleFavorite(selectedSkill.id)}
-          onReuse={() => reuseSkill(selectedSkill)}
+          onAdapt={() => setAdaptingSkill(selectedSkill)}
+          onCopy={() => copySkill(selectedSkill)}
+          onAdd={() => market.addSkill(selectedSkill)}
+          added={Boolean(selectedSkill.addedFrom) || addedIds.includes(selectedSkill.id)}
           onEdit={selectedSkill.assistantId ? () => editSkill(selectedSkill) : undefined}
           applicationContext={returnRoute(route, { page: 'market' }).page === 'space'}
           onPreview={selectedSkill.assistantId ? (index) => {
@@ -252,12 +260,12 @@ export default function App() {
           tab={route.page === 'mine' ? 'skills' : route.tab}
           onTab={(tab) => navigate({ page: 'workshop', tab })}
           skills={personalSkills}
-          allEntries={allSkills}
+          addedSkills={market.addedSkills}
           favorites={market.favorites}
           shared={market.sharedSkillIds}
           assistants={platform.assistants}
           onTrialSkill={(entry) => {
-            if (!entry.assistantId) { reuseSkill(entry); return; }
+            if (!entry.assistantId) { navigate({ page: 'skill-detail', skillId: entry.id }); return; }
             const assistant = platform.getAssistant(entry.assistantId);
             if (!assistant || !isMethodReviewed(assistant) || !platform.isSkillIncluded(assistant.id, entry.skill.id)) {
               navigate({ page: 'test', assistantId: entry.assistantId });
@@ -267,8 +275,9 @@ export default function App() {
           }}
           onEditSkill={editSkill}
           onOpenSkill={(skillId) => navigate({ page: 'skill-detail', skillId })}
-          onCopySkill={reuseSkill}
-          onDeleteSkill={(e) => Boolean(e.assistantId && platform.removeSkill(e.assistantId, e.skill.id))}
+          onCopySkill={copySkill}
+          onAdaptSkill={setAdaptingSkill}
+          onDeleteSkill={(e) => e.addedFrom ? market.removeAddedSkill(e.id) : Boolean(e.assistantId && platform.removeSkill(e.assistantId, e.skill.id))}
           onMount={platform.mountSkill}
           onFavorite={market.toggleFavorite}
           onShare={market.toggleShare}
@@ -278,6 +287,15 @@ export default function App() {
           onDeleteAssistant={platform.removeAssistant}
         />
       )}
+      {adaptingSkill && <AdaptSkillDialog key={`adapt:${adaptingSkill.id}`} entry={adaptingSkill}
+        onClose={() => setAdaptingSkill(null)}
+        onAdapt={(requirements) => {
+          const copy = platform.copySkill(adaptingSkill, requirements);
+          if (!copy) return false;
+          setAdaptingSkill(null);
+          navigate({ page: 'create', ...copy });
+          return true;
+        }} />}
       {route.page === 'space' && (
         <UsageSpace
           key={route.draftId || route.selection || 'teaching-activities'}

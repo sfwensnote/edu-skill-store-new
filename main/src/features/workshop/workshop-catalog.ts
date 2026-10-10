@@ -3,9 +3,9 @@ import type { SkillEntry } from '../../../shared/marketplace';
 import { teachingTagsOf } from '../../../shared/teaching-tags';
 
 export const workshopTabs = [
-  ['skills', '全部 SKILL'],
-  ['favorites', '我的收藏'],
-  ['showcase', 'SKILL 展示'],
+  ['skills', '全部'],
+  ['created', '我创建的'],
+  ['added', '从集市添加'],
 ] as const;
 export type WorkshopTab = (typeof workshopTabs)[number][0];
 type WorkInfo = {
@@ -78,9 +78,9 @@ export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): W
     grade: entry.grade,
     subject: entry.subject,
     area: entry.area,
-    createdAt: owner?.createdAt,
-    updatedAt: owner?.updatedAt,
-    status: entry.validation,
+    createdAt: entry.addedFrom?.addedAt || owner?.createdAt,
+    updatedAt: entry.addedFrom?.addedAt || owner?.updatedAt,
+    status: entry.demo ? '待验证' : entry.validation,
     detail: entry.version,
     canUse: Boolean(
       entry.skill.name.trim() &&
@@ -92,18 +92,15 @@ export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): W
 }
 export function workshopCollections({
   skills,
-  allEntries,
+  addedSkills,
   assistants,
-  favorites,
-  shared,
 }: {
   skills: SkillEntry[];
-  allEntries: SkillEntry[];
+  addedSkills: SkillEntry[];
   assistants: TeachingAssistant[];
-  favorites: string[];
-  shared: string[];
 }): Record<WorkshopTab, WorkItem[]> {
   const personal = skills.map((e) => skillWork(e, assistants));
+  const added = addedSkills.map((e) => skillWork(e, assistants));
   const methodDrafts: WorkItem[] = assistants
     .filter((assistant) => assistant.status === 'DRAFT' && !assistant.skills.length && assistant.goal.trim())
     .map((assistant) => ({
@@ -126,9 +123,9 @@ export function workshopCollections({
       canUse: false,
     }));
   return {
-    skills: [...personal, ...methodDrafts],
-    favorites: allEntries.filter((e) => favorites.includes(e.id)).map((e) => skillWork(e, assistants)),
-    showcase: personal.filter((item) => shared.includes(item.id)),
+    skills: [...personal, ...methodDrafts, ...added],
+    created: [...personal, ...methodDrafts],
+    added,
   };
 }
 export function matchesWork(item: WorkItem, query: string): boolean {

@@ -300,7 +300,7 @@ export function useDemoPlatform() {
     return updateAssistant(id, { isPublic: true }, true);
   }
 
-  function reuseSkill(entry: SkillEntry) {
+  function copySkill(entry: SkillEntry, requirements?: string) {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const skill = { ...structuredClone(entry.skill), id: crypto.randomUUID() };
@@ -310,14 +310,17 @@ export function useDemoPlatform() {
           id,
           userId: 'demo-teacher',
           name: `${skill.name}助手`,
-          goal: skill.purpose,
+          goal: requirements?.trim() || skill.purpose,
           grade: entry.grade,
           subject: entry.subject,
           activity: entry.scene,
           status: 'DRAFT',
           isPublic: false,
           skills: [skill],
-          skillSources: { [skill.id]: `复用自“${entry.skill.name}”（${entry.creator}）。${entry.source}` },
+          skillSources: { [skill.id]: `${requirements ? '改编' : '复制'}自“${entry.skill.name}”（${entry.creator}，${entry.version}）。${entry.source}` },
+          ...(requirements ? { adaptation: {
+            sourceId: entry.addedFrom?.id || entry.id, sourceVersion: entry.version, requirements: requirements.trim(),
+          } } : {}),
           area: entry.area,
           revision: 1,
           createdAt: now,
@@ -384,7 +387,7 @@ export function useDemoPlatform() {
     toggleSkill,
     removeAssistant,
     publishAssistant,
-    reuseSkill,
+    copySkill,
     mountSkill,
     removeSkill,
   };

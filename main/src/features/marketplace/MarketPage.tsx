@@ -35,12 +35,16 @@ const scrollKey = 'teaching-method.market-scroll.v1';
 export function MarketPage({
   entries,
   favorites,
+  addedIds,
   onOpen,
+  onAdd,
   onFavorite,
 }: {
   entries: SkillEntry[];
   favorites: string[];
+  addedIds: string[];
   onOpen: (id: string) => void;
+  onAdd: (entry: SkillEntry) => boolean;
   onFavorite: (id: string) => void;
 }) {
   const [filters, setFilters] = useState(() => restoreCatalogFilters(sessionStorage.getItem(filterKey)));
@@ -212,7 +216,6 @@ export function MarketPage({
                       <h2>
                         <button onClick={() => onOpen(entry.id)}>{entry.skill.name}</button>
                       </h2>
-                      {entry.demo && <span className="catalog-status">方法示例</span>}
                     </div>
                     <p className="skill-practice">{entry.example}</p>
                     <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example).filter((tag) => tag !== category)} />
@@ -250,8 +253,11 @@ export function MarketPage({
                       <Heart fill={favorite ? 'currentColor' : 'none'} />
                     </Button>
                     <Button variant="outline" onClick={() => onOpen(entry.id)}>
-                      查看与体验
+                      查看与试用
                       <ArrowRight data-icon="inline-end" />
+                    </Button>
+                    <Button disabled={addedIds.includes(entry.id)} onClick={() => onAdd(entry)}>
+                      {addedIds.includes(entry.id) ? '已添加' : '添加到我的 SKILL'}
                     </Button>
                   </div>
                 </article>

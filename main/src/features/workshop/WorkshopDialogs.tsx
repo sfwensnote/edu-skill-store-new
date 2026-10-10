@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import type { SkillEntry } from '../../../shared/marketplace';
 import type { TeachingAssistant } from '../../../shared/assistant';
 
-export type PendingRemoval = { name: string; description: string; action: () => boolean };
+export type PendingRemoval = { name: string; description: string; action: () => boolean; removalOnly?: boolean };
 export function WorkshopDialogs({
   pending,
   onPending,
@@ -46,9 +46,9 @@ export function WorkshopDialogs({
           }}
         >
           <DialogHeader>
-            <DialogTitle>删除这项内容？</DialogTitle>
+            <DialogTitle>{pending?.removalOnly ? '从我的 SKILL 移除？' : '删除这项内容？'}</DialogTitle>
             <DialogDescription>
-              “{pending?.name}”将被删除。{pending?.description}已经布置的任务快照会保留。
+              “{pending?.name}”将被{pending?.removalOnly ? '移除' : '删除'}。{pending?.description}
             </DialogDescription>
           </DialogHeader>
           {error && <p role="alert">{error}</p>}
@@ -63,12 +63,13 @@ export function WorkshopDialogs({
                   setError('删除未保存，作品仍保留。请释放本机存储空间后重试。');
                   return;
                 }
+                const removalOnly = pending.removalOnly;
                 setError('');
                 onPending(null);
-                onMessage('已删除');
+                onMessage(removalOnly ? '已从我的 SKILL 移除' : '已删除');
               }}
             >
-              确认删除
+              {pending?.removalOnly ? '确认移除' : '确认删除'}
             </Button>
           </div>
         </DialogContent>

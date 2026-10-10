@@ -6,6 +6,8 @@ import {
 } from '../../shared/contextual-design';
 import {
   parseMarketWorkspace,
+  addMarketSkill,
+  type SkillEntry,
   type LocalTeachingTask,
   type TaskSubmission,
   type MarketWorkspace,
@@ -127,6 +129,18 @@ export function useMarketWorkspace() {
       true,
     );
   }
+  function addSkill(entry: SkillEntry) {
+    const current = stateRef.current;
+    const addedSkills = addMarketSkill(current.addedSkills, entry, new Date().toISOString());
+    if (addedSkills === current.addedSkills) return true;
+    return commit({ ...current, addedSkills }, true, '添加未保存，请释放本机存储空间后重试。');
+  }
+  function removeAddedSkill(id: string) {
+    return update((current) => ({
+      ...current,
+      addedSkills: current.addedSkills.filter((entry) => entry.id !== id),
+    }), true);
+  }
   function toggleShare(id: string) {
     return update(
       (current) => ({
@@ -189,6 +203,8 @@ export function useMarketWorkspace() {
     copyDesign,
     removeDesign,
     toggleFavorite,
+    addSkill,
+    removeAddedSkill,
     toggleShare,
     shareMany,
     removeShares,

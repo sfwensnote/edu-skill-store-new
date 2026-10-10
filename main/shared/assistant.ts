@@ -44,6 +44,9 @@ export const assistantSchema = z.object({
   sourceDesignId: z.string().optional(),
   skillAreas: z.record(z.string(), z.enum(['daily', 'inquiry'])).optional(),
   skillSources: z.record(z.string(), z.string()).optional(),
+  adaptation: z.object({
+    sourceId: z.string(), sourceVersion: z.string(), requirements: text(500),
+  }).optional(),
 });
 export type TeachingAssistant = z.infer<typeof assistantSchema>;
 

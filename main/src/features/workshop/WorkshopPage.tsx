@@ -22,8 +22,8 @@ import './workshop.css';
 const searchKey = 'teaching-method.workshop-filters.v1';
 const emptyCopy = {
   skills: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
-  favorites: ['还没有收藏任何 SKILL', '', '前往教学 SKILL 集市'],
-  showcase: ['还没有展示的 SKILL', '在 SKILL 的更多菜单中选择“分享展示”。', '查看我的 SKILL'],
+  created: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
+  added: ['还没有从集市添加 SKILL', '', '前往教学 SKILL 集市'],
 } as const;
 
 export function WorkshopPage(props: WorkshopProps) {
@@ -103,7 +103,10 @@ export function WorkshopPage(props: WorkshopProps) {
       if (item.kind === 'skill') props.onTrialSkill(item.entry);
     },
     copy: (item) => {
-      if (item.kind === 'skill') props.onCopySkill(item.entry);
+      if (item.kind === 'skill') {
+        if (item.entry.assistantId) props.onCopySkill(item.entry);
+        else props.onAdaptSkill(item.entry);
+      }
     },
     favorite: props.onFavorite,
     share: (item) => {
@@ -127,7 +130,10 @@ export function WorkshopPage(props: WorkshopProps) {
       dialogOrigin.current = trigger;
       setPending({
         name: item.title,
-        description: item.kind === 'method-draft'
+        removalOnly: item.kind === 'skill' && Boolean(item.entry.addedFrom),
+        description: item.kind === 'skill' && item.entry.addedFrom
+          ? '只从我的 SKILL 中移除，集市原版保持不变。'
+          : item.kind === 'method-draft'
           ? '这份未完成的教学方法草稿也会移除。'
           : '仅移除这一项方法，保留其他 SKILL。',
         action: () => {
@@ -138,8 +144,7 @@ export function WorkshopPage(props: WorkshopProps) {
     },
   };
   function emptyAction() {
-    if (tab === 'favorites') props.onMarket();
-    else if (tab === 'showcase') switchTab('skills');
+    if (tab === 'added') props.onMarket();
     else props.onCreate();
   }
   const select = (key: 'area' | 'grade' | 'subject' | 'sort', name: string, options: [string, string][]) => (
@@ -238,7 +243,6 @@ export function WorkshopPage(props: WorkshopProps) {
                 清除筛选
               </Button>
             )}
-            {tab === 'showcase' && <span>展示仅在当前工作区可见</span>}
           </div>
           {message && (
             <p role="status" className="status-message">

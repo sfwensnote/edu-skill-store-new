@@ -11,7 +11,29 @@ import {
   contextualMarkdown,
   sampleOriginal,
 } from '../shared/contextual-design';
-import { assistantSkillEntries, parseMarketWorkspace } from '../shared/marketplace';
+import { assistantSkillEntries, parseMarketWorkspace, addMarketSkill } from '../shared/marketplace';
+import { marketSkills } from '../src/data/marketplace';
+
+test('添加保留独立来源快照，重复添加不覆盖版本、不取得编辑权限', () => {
+  const source = structuredClone(assistantSkillEntries(initialMine)[0]);
+  const added = addMarketSkill([], source, '2026-10-10T08:00:00Z');
+  assert.equal(added[0].assistantId, undefined);
+  assert.equal(added[0].addedFrom?.id, source.id);
+  assert.deepEqual(added[0].skill, source.skill);
+  source.skill.name = '来源后续修改';
+  assert.notEqual(added[0].skill.name, source.skill.name);
+  assert.equal(addMarketSkill(added, source, '2026-10-11T08:00:00Z'), added);
+});
+test('集市存储兼容旧记录，过滤坏快照、去重并去掉注入的所有权字段', () => {
+  assert.deepEqual(parseMarketWorkspace(JSON.stringify({ version: 1 })).addedSkills, []);
+  const snapshot = addMarketSkill([], marketSkills[0], '2026-10-10T08:00:00Z')[0];
+  const restored = parseMarketWorkspace(JSON.stringify({ version: 1,
+    addedSkills: [snapshot, snapshot, { ...snapshot, assistantId: 'owned' },
+      { ...snapshot, skill: null }, { ...snapshot, id: 'personal:forged' }],
+  }));
+  assert.equal(restored.addedSkills.length, 1);
+  assert.equal(restored.addedSkills[0].assistantId, undefined);
+});
 import { packageTeachingMethod, upsertMethodSkill, type TeachingMethod } from '../shared/teaching-method';
 import { initialMine } from '../src/data/platform';
 

@@ -1,10 +1,10 @@
-import { ChevronRight, FileCheck2, Heart, Images } from 'lucide-react';
+import { ChevronRight, FileCheck2, FolderPen, Store } from 'lucide-react';
 import { workshopTabs, type WorkshopTab, type WorkItem } from './workshop-catalog';
 
 export const workshopIcons = {
   skills: FileCheck2,
-  favorites: Heart,
-  showcase: Images,
+  created: FolderPen,
+  added: Store,
 };
 export function WorkshopOverview({
   collections,

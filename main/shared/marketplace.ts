@@ -1,4 +1,5 @@
-import type { EducationalSkill, TeachingAssistant } from './assistant';
+import { z } from 'zod';
+import { skillSchema, type EducationalSkill, type TeachingAssistant } from './assistant';
 import type { ContextualDesign, DesignLevel } from './contextual-design';
 import { isActivityDraft, type LearningSettings, type TeachingActivityDraft } from './teaching-activity';
 import { isStoredDesign, isStoredTask } from './workspace-storage';
@@ -18,7 +19,35 @@ export type SkillEntry = {
   source: string;
   demo: boolean;
   assistantId?: string;
+  addedFrom?: { id: string; addedAt: string };
 };
+const addedSkillSchema = z.object({
+  id: z.string().min(1),
+  skill: skillSchema,
+  creator: z.string(), grade: z.string(), subject: z.string(),
+  area: z.enum(['daily', 'inquiry']), scene: z.string(), version: z.string(),
+  validation: z.string(), example: z.string(), source: z.string(), demo: z.boolean(),
+  addedFrom: z.object({ id: z.string().min(1), addedAt: z.string().datetime() }),
+}).refine((entry) => entry.id === `added:${entry.addedFrom.id}`);
+
+// 添加保留来源版本的快照，不授予编辑、核对或发布权限。
+export function addMarketSkill(current: SkillEntry[], source: SkillEntry, addedAt: string): SkillEntry[] {
+  const sourceId = source.addedFrom?.id || source.id;
+  if (current.some((entry) => entry.addedFrom?.id === sourceId)) return current;
+  const snapshot = addedSkillSchema.parse({
+    ...structuredClone(source), id: `added:${sourceId}`, addedFrom: { id: sourceId, addedAt },
+  });
+  return [snapshot, ...current];
+}
+function restoreAddedSkills(value: unknown): SkillEntry[] {
+  const entries = new Map<string, SkillEntry>();
+  if (!Array.isArray(value)) return [];
+  for (const item of value) {
+    const parsed = addedSkillSchema.safeParse(item);
+    if (parsed.success) entries.set(parsed.data.addedFrom.id, parsed.data);
+  }
+  return [...entries.values()];
+}
 export type TaskSubmission = { answers: Record<string, string>; submittedAt: string; feedback: string };
 export type LocalTeachingTask = {
   id: string;
@@ -40,6 +69,7 @@ export type MarketWorkspace = {
   designs: ContextualDesign[];
   favorites: string[];
   sharedSkillIds: string[];
+  addedSkills: SkillEntry[];
   tasks: LocalTeachingTask[];
   activityDrafts: TeachingActivityDraft[];
 };
@@ -81,6 +111,7 @@ export function parseMarketWorkspace(raw: string | null): MarketWorkspace {
     designs: [],
     favorites: [],
     sharedSkillIds: [],
+    addedSkills: [],
     tasks: [],
     activityDrafts: [],
   };
@@ -90,6 +121,7 @@ export function parseMarketWorkspace(raw: string | null): MarketWorkspace {
     if (data.version !== 1) return empty;
     return {
       ...empty,
+      addedSkills: restoreAddedSkills(data.addedSkills),
       designs: Array.isArray(data.designs) ? data.designs.filter(isStoredDesign) : [],
       favorites: Array.isArray(data.favorites)
         ? data.favorites.filter((x: unknown) => typeof x === 'string')

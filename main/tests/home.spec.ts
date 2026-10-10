@@ -11,6 +11,8 @@ test('首页只保留 SKILL 入口，创建直接进入方法编辑，导航保�
   await expect(main.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
   await expect(main).not.toContainText(/作品概览|\d+\s*(个|项)|完成率|使用次数/);
   await expect(page.locator('.home-core-card')).toHaveCount(1);
+  await expect(main.getByRole('heading', { name: '日常教学', exact: true })).toHaveCount(0);
+  await expect(page.locator('.home-core-card')).toContainText('把课堂做法整理成可复用的方法。');
   await expect(page.locator('.home-shortcut')).toHaveCount(2);
   await expect(main.getByRole('list')).toHaveCount(1);
   await expect(main).not.toContainText(/PBL|情境探究|设计探究|教学任务|教学活动/);

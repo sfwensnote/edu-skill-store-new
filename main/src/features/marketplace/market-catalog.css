@@ -313,6 +313,8 @@
   align-items: center;
   flex: none;
   gap: 8px;
+  flex-wrap: wrap;
+  max-width: 340px;
   color: var(--primary);
 }
 .market-catalog .catalog-resource-actions [data-variant='outline'] {
@@ -420,6 +422,7 @@
   .catalog-resource-actions {
     grid-column: 1 / -1;
     justify-content: flex-end;
+    max-width: none;
   }
   .market-filter-dialog .market-categories nav button,
   .market-filter-dialog .catalog-tags button {

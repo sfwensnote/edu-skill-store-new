@@ -64,7 +64,7 @@ async function seedWorks(page: Page) {
 test('数量来自实际作品，组合筛选在详情返回和刷新后保留，草稿不冒充可用任务', async ({ page }) => {
   await seedWorks(page);
   const stats = page.locator('.workshop-overview');
-  await expect(stats.getByRole('button', { name: '查看全部 SKILL', exact: true })).toContainText('6');
+  await expect(stats.getByRole('button', { name: '查看全部', exact: true })).toContainText('6');
   await page.getByLabel('搜索我的 SKILL').fill('反思');
   await page.getByLabel('作品学段').selectOption('高中');
   await page.getByLabel('作品学科').selectOption('英语');
@@ -90,33 +90,25 @@ test('数量来自实际作品，组合筛选在详情返回和刷新后保留�
   await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
 });
 
-test('收藏和展示跨分类同步，更多菜单支持键盘关闭及独立复制', async ({ page }) => {
+test('创建分类的展示设置和收藏保留，更多菜单支持键盘关闭及独立复制', async ({ page }) => {
   await seedWorks(page);
   const source = page.locator('[data-work-id="personal:assistant-demo-active:reflect"]');
   const more = source.getByRole('button', { name: /更多操作/ });
   await more.press('Enter');
   await expect(page.getByRole('menu')).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu')).toHaveCount(0);
   await expect(more).toBeFocused();
   await more.click();
   await page.getByRole('menuitem', { name: '收藏', exact: true }).click();
   await more.click();
   await page.getByRole('menuitem', { name: '分享展示', exact: true }).click();
-  await page.getByRole('button', { name: 'SKILL 展示', exact: true }).click();
-  await expect(page.locator('.workshop-item')).toHaveCount(1);
-  await expect(page.getByText('展示仅在当前工作区可见')).toBeVisible();
-  await page.getByRole('button', { name: /更多操作/ }).click();
+  await page.getByRole('button', { name: '我创建的', exact: true }).click();
+  await expect(page.locator('.workshop-item')).toHaveCount(6);
+  await expect(source).toContainText('展示中');
+  await more.click();
+  await expect(page.getByRole('menuitem', { name: '取消收藏', exact: true })).toBeVisible();
   await page.getByRole('menuitem', { name: '取消展示', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '还没有展示的 SKILL' })).toBeVisible();
-  await page.getByRole('button', { name: '我的收藏', exact: true }).click();
-  await expect(page.locator('.workshop-item')).toHaveCount(1);
-  await page.getByRole('button', { name: /更多操作/ }).click();
-  await page.getByRole('menuitem', { name: '取消收藏', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '还没有收藏任何 SKILL' })).toBeVisible();
-  await page.getByRole('button', { name: '前往教学 SKILL 集市', exact: true }).click();
-  await expect(page).toHaveURL(/#\/market$/);
-  await page.goto('/#/workshop?tab=skills');
+  await expect(source).not.toContainText('展示中');
   await more.click();
   await page.getByRole('menuitem', { name: '复制', exact: true }).click();
   await expect(page).toHaveURL(/#\/create\//);
@@ -141,10 +133,10 @@ test('旧 PBL 分类退回 SKILL，旧项目、任务与收藏不被清空或展
   await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await expect(page.locator('main')).not.toContainText(/PBL|我的情境题目|我的任务链|我的助手|应用配置|历史方法试用/);
-  await page.getByRole('button', { name: '我的收藏', exact: true }).click();
+  await page.getByRole('button', { name: '从集市添加', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(0);
-  await page.getByRole('button', { name: 'SKILL 展示', exact: true }).click();
-  await expect(page.locator('.workshop-item')).toHaveCount(0);
+  await page.getByRole('button', { name: '我创建的', exact: true }).click();
+  await expect(page.locator('.workshop-item')).toHaveCount(6);
   const workspace = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1') || '{}'));
   expect(workspace.designs).toHaveLength(2);
   expect(workspace.tasks[0].design.id).toBe('workshop-lesson');
@@ -176,6 +168,6 @@ test('作品页在桌面、平板和手机无溢出，手机分类及白色菜�
   const box = await menu.boundingBox();
   expect(box && box.x >= 0 && box.x + box.width <= 390).toBe(true);
   await page.keyboard.press('Escape');
-  await page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).selectOption('favorites');
-  await page.screenshot({ path: 'docs/assets/我的作品-PBL手机.png', fullPage: true, animations: 'disabled' });
+  await page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).selectOption('added');
+  await page.screenshot({ path: 'docs/assets/我的SKILL集市添加手机.png', fullPage: true, animations: 'disabled' });
 });
