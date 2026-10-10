@@ -113,7 +113,7 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
             <h1>教学工坊</h1>
             <p>整理教学方法，设计探究作品。</p>
           </div>
-          <img src="/workshop-folders.svg" width="420" height="160" alt="" aria-hidden="true" />
+          <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} width="420" height="160" alt="" aria-hidden="true" />
         </header>
         <section className="home-core-grid" aria-label="核心教学入口">
           <CoreEntry

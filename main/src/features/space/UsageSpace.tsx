@@ -286,7 +286,7 @@ export function UsageSpace({
         <div>
           <h1>教学任务</h1>
         </div>
-        <img src="/workshop-folders.svg" alt="" aria-hidden="true" />
+        <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} alt="" aria-hidden="true" />
       </header>
       {message && <p role="status" className="activity-notice">{message}</p>}
         <ActivityList

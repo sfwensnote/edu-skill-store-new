@@ -93,7 +93,7 @@ export function MarketPage({
         <div>
           <h1>教学 SKILL 集市</h1>
         </div>
-        <img src="/market-learning.svg" alt="" aria-hidden="true" />
+        <img src={`${import.meta.env.BASE_URL}market-learning.svg`} alt="" aria-hidden="true" />
       </header>
       <div className="catalog-filters">
         <label className="catalog-search">

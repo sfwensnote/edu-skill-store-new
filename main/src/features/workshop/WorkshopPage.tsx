@@ -180,7 +180,7 @@ export function WorkshopPage(props: WorkshopProps) {
         <div>
           <h1>我的作品</h1>
         </div>
-        <img src="/workshop-folders.svg" alt="" aria-hidden="true" />
+        <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} alt="" aria-hidden="true" />
         <div className="workshop-create-actions">
           <Button variant="outline" onClick={props.onInquiry}>
             设计情境作品

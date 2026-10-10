@@ -19,7 +19,17 @@ npm run dev
 
 目标仓库：[edu-skill-store-with-pbl](https://github.com/sfwensnote/edu-skill-store-with-pbl)。代码、依赖锁进入版本管理；数据库、密钥、浏览器备份及本机依赖不上传。
 
-## GitHub Actions 发布
+## GitHub Actions 网站部署
+
+网站地址：[教学工坊](https://sfwensnote.github.io/edu-skill-store-with-pbl/#/home)。
+
+[Pages 部署工作流](https://github.com/sfwensnote/edu-skill-store-with-pbl/actions/workflows/pages.yml) 在推送 `main` 时安装锁定依赖、运行测试、检查类型并构建，只将 `main/dist` 上传到 GitHub Pages。也可在 Actions 页面手动运行。
+
+仓库首次部署需在 Settings → Pages → Build and deployment 中将 Source 设置为 **GitHub Actions**。部署成功后可直接访问网站；后续推送 `main` 自动更新。项目使用哈希路由，图片与脚本按仓库子路径加载。
+
+Pages 托管教师演示前端，作品仍保存在访问者的浏览器；原有 Express、SQLite、认证及模型服务不在 Pages 运行。没有真实模型调用、学生账户或跨设备数据同步，也不会上传本机教师作品与数据库。
+
+## GitHub Release 下载包
 
 [发布工作流](https://github.com/sfwensnote/edu-skill-store-with-pbl/actions/workflows/release.yml) 在推送 `v*` 标签时验证版本、安装锁定依赖、运行单元与集成测试、检查类型并构建，随后创建 [GitHub Release](https://github.com/sfwensnote/edu-skill-store-with-pbl/releases)。也可在 Actions 页面手动选择已存在的版本标签运行。
 

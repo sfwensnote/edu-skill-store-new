@@ -1,0 +1,64 @@
+name: 部署教学工坊到 GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 验证并构建网站
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: main
+    steps:
+      - name: 获取源码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: main/package-lock.json
+
+      - name: 按锁文件安装依赖
+        run: npm ci
+
+      - name: 运行单元与集成测试
+        run: npm test
+
+      - name: 检查类型并按仓库子路径构建
+        run: npm run build -- --base "/${GITHUB_REPOSITORY#*/}/"
+
+      - name: 上传静态网站产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: main/dist
+
+  deploy:
+    name: 发布到 GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 检查 Pages 配置
+        uses: actions/configure-pages@v5
+
+      - name: 部署静态网站
+        id: deployment
+        uses: actions/deploy-pages@v5

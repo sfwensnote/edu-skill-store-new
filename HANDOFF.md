@@ -4,7 +4,11 @@
 
 ## 当前状态
 
-项目名称：教学工坊。应用位于 main/。最新已完成工作是前端流程简化与三轮审查、Mac／Windows 迁移准备；没有删除或重构应用代码。
+项目名称：教学工坊。应用位于 main/。前端流程简化与三轮审查、Mac／Windows 迁移准备已完成。2026-10-10 用户进一步授权使用 GitHub Actions 部署前端到 GitHub Pages。
+
+Pages 工作流为 .github/workflows/pages.yml，推送 main 或手动运行时验证、构建并部署 main/dist；首次需在仓库 Settings → Pages 将 Source 设置为 GitHub Actions。生产构建使用 /edu-skill-store-with-pbl/ 子路径，页面图片跟随 Vite BASE_URL。网站预期地址：https://sfwensnote.github.io/edu-skill-store-with-pbl/#/home 。实际部署结果以 Actions 记录为准。
+
+GitHub Pages 只发布演示前端，不托管 Express、SQLite、模型接口或教师本机作品。另有标签触发的 .github/workflows/release.yml 分发下载包；v0.1.0 下载版本已发布，网站部署与下载版本是独立流程。
 
 目标仓库：https://github.com/sfwensnote/edu-skill-store-with-pbl 。
 
