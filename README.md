@@ -17,4 +17,12 @@ npm run dev
 - [完整迁移文件清单](MIGRATION_FILES.txt)
 - [应用详细说明](main/README.md)
 
-目标仓库：[edu-skill-store-with-pbl](https://github.com/sfwensnote/edu-skill-store-with-pbl)。2026-10-10 用户已批准首次提交和推送，分支为 main；实际上传状态以 Git 记录为准。代码、依赖锁进入版本管理；数据库、密钥、浏览器备份及本机依赖不上传。
+目标仓库：[edu-skill-store-with-pbl](https://github.com/sfwensnote/edu-skill-store-with-pbl)。代码、依赖锁进入版本管理；数据库、密钥、浏览器备份及本机依赖不上传。
+
+## GitHub Actions 发布
+
+[发布工作流](https://github.com/sfwensnote/edu-skill-store-with-pbl/actions/workflows/release.yml) 在推送 `v*` 标签时验证版本、安装锁定依赖、运行单元与集成测试、检查类型并构建，随后创建 [GitHub Release](https://github.com/sfwensnote/edu-skill-store-with-pbl/releases)。也可在 Actions 页面手动选择已存在的版本标签运行。
+
+下载包包含源码和前端生产构建，附 SHA-256 校验文件；安装依赖后从 `main/` 启动。每次发布需先更新 `main/package.json` 与锁文件中的版本，并准备 `.github/release-notes/v版本号.md`，然后推送对应标签。已发布版本不覆盖，修订使用新版本号。
+
+当前版本为教师本地演示工作台：数据保存在浏览器，尚未接入真实模型、学生账户或跨设备同步。发布源码和下载包不会同步教师作品。完整功能与实现边界见 [产品说明](main/PRODUCT.md)。

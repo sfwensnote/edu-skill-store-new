@@ -1,0 +1,85 @@
+name: 发布教学工坊
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 已推送的版本标签，例如 v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: 验证、构建并发布
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: main
+    steps:
+      - name: 获取版本源码
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: 核对版本与发布说明
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          test "$RELEASE_TAG" = "v$version"
+          git rev-parse --verify "refs/tags/$RELEASE_TAG"
+          test -f "../.github/release-notes/$RELEASE_TAG.md"
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: main/package-lock.json
+
+      - name: 按锁文件安装依赖
+        run: npm ci
+
+      - name: 运行单元与集成测试
+        run: npm test
+
+      - name: 检查类型并构建前端
+        run: npm run build
+
+      - name: 打包源码与前端构建产物
+        run: |
+          set -euo pipefail
+          package_name="teaching-workshop-$RELEASE_TAG"
+          package_dir="$RUNNER_TEMP/$package_name"
+          mkdir -p "$package_dir" "$RUNNER_TEMP/release-assets"
+          git -C .. archive HEAD | tar -x -C "$package_dir"
+          cp -R dist "$package_dir/main/dist"
+          tar -czf "$RUNNER_TEMP/release-assets/$package_name.tar.gz" -C "$RUNNER_TEMP" "$package_name"
+          cd "$RUNNER_TEMP/release-assets"
+          sha256sum "$package_name.tar.gz" > SHA256SUMS.txt
+
+      - name: 使用 GitHub 原生功能发布版本
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            "$RUNNER_TEMP/release-assets/teaching-workshop-$RELEASE_TAG.tar.gz" \
+            "$RUNNER_TEMP/release-assets/SHA256SUMS.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "教学工坊 $RELEASE_TAG" \
+            --notes-file "../.github/release-notes/$RELEASE_TAG.md"
