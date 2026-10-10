@@ -56,13 +56,13 @@ export function ReportPage({
       </section>
       <footer className="report-publish">
           <div>
-            <h2>{shared && checked ? '方法已在集市展示' : '分享到教学 SKILL 集市'}</h2>
+            <h2>{shared && checked ? '方法已发布到集市' : '发布到教学 SKILL 集市'}</h2>
           </div>
           <div className="inline-actions">
             <Button variant="outline" onClick={onEdit}>修改方法</Button>
-            {!checked ? <Button onClick={onCheck}>去核对方法</Button> : shared ?
+            {!checked ? <Button onClick={onCheck}>方法检验</Button> : shared ?
               <Button onClick={onMarket}>查看集市</Button> : onPublish &&
-              <Button onClick={onPublish}><Share2 data-icon="inline-start" />分享到集市</Button>}
+              <Button onClick={onPublish}><Share2 data-icon="inline-start" />发布到集市</Button>}
           </div>
       </footer>
     </main>

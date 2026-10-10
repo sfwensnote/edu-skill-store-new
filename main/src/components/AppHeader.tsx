@@ -26,14 +26,14 @@ export function AppHeader({ route, onNavigate, applicationDraftIds = [] }: {
           <span>教学工坊</span>
         </button>
         <nav className="header-nav" aria-label="主要导航">
-          {(['home', 'market', 'workshop'] as const).map((page, i) => (
+          {(['home', 'market', 'workshop', 'companions'] as const).map((page, i) => (
             <button
               key={page}
               className={active === page ? 'active' : ''}
               aria-current={active === page ? 'page' : undefined}
               onClick={() => onNavigate({ page })}
             >
-              {['首页', '教学 SKILL 集市', '我的 SKILL'][i]}
+              {['首页', '教学 SKILL 集市', '我的 SKILL', '我的学伴'][i]}
             </button>
           ))}
         </nav>

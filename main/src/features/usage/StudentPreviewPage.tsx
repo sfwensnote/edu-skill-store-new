@@ -204,8 +204,8 @@ export function StudentPreviewPage({
       </details>
       <footer className="preview-next-step">
         {!checked ? <Button onClick={onContinue}>先核对教学方法</Button> : <>
-          {!shared && activeSkill && <Button variant="outline" onClick={() => onShare(activeSkill.id)}>分享到集市</Button>}
-          {shared && <span className="preview-shared-status">已在集市展示</span>}
+          {!shared && activeSkill && <Button variant="outline" onClick={() => onShare(activeSkill.id)}>发布到集市</Button>}
+          {shared && <span className="preview-shared-status">已发布到集市</span>}
           <Button onClick={onDone}>完成，返回我的 SKILL</Button>
         </>}
       </footer>

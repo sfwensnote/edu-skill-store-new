@@ -17,7 +17,6 @@ import {
   type WorkshopTab,
 } from './workshop-catalog';
 import type { WorkshopProps } from './workshop-types';
-import type { SkillEntry } from '../../../shared/marketplace';
 import './workshop.css';
 
 const searchKey = 'teaching-method.workshop-filters.v1';
@@ -46,8 +45,6 @@ export function WorkshopPage(props: WorkshopProps) {
     query: '',
   });
   const [pending, setPending] = useState<PendingRemoval | null>(null);
-  const [mount, setMount] = useState<SkillEntry | null>(null);
-  const [target, setTarget] = useState('');
   const [message, setMessage] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const dialogOrigin = useRef<HTMLButtonElement | null>(null);
@@ -105,23 +102,8 @@ export function WorkshopPage(props: WorkshopProps) {
       if (item.kind === 'skill' && item.entry.assistantId) props.onCopySkill(item.entry);
     },
     favorite: props.onFavorite,
-    share: (item) => {
-      if (item.kind === 'skill' && !props.shared.includes(item.id) && item.entry.validation !== '教师已核对' && item.entry.assistantId) {
-        props.onOpenAssistant(item.entry.assistantId);
-        return;
-      }
-      if (props.onShare(item.id))
-        setMessage(props.shared.includes(item.id) ? '已取消SKILL 展示。' : '已加入当前工作区的SKILL 展示。');
-      else setMessage('展示设置保存失败，请释放存储空间后重试。');
-    },
-    mount: (item, trigger) => {
-      if (item.kind !== 'skill') return;
-      dialogOrigin.current = trigger;
-      setMount(item.entry);
-      setTarget(
-        props.assistants.find((a) => a.id !== item.entry.assistantId && a.skills.length < 8)?.id || '',
-      );
-    },
+    share: (item) => { if (item.kind === 'skill') props.onShare(item.entry); },
+    mount: (item) => { if (item.kind === 'skill') props.onMount(item.entry); },
     remove: (item, trigger) => {
       dialogOrigin.current = trigger;
       setPending({
@@ -271,12 +253,6 @@ export function WorkshopPage(props: WorkshopProps) {
         }}
         pending={pending}
         onPending={setPending}
-        mount={mount}
-        onMountEntry={setMount}
-        assistants={props.assistants}
-        target={target}
-        onTarget={setTarget}
-        onMount={props.onMount}
         onMessage={setMessage}
       />
     </main>

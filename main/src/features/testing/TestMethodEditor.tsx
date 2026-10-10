@@ -35,7 +35,7 @@ export function TestMethodEditor({ skill, onClose, onSave }: {
       <DialogContent className="test-method-editor">
         <DialogHeader>
           <DialogTitle>{discard ? '保留本次修改？' : `修改方法：${skill.name}`}</DialogTitle>
-          <DialogDescription>{discard ? '尚有未保存内容。' : '保存后需重新核对，原确认与分享状态会撤销。'}</DialogDescription>
+          <DialogDescription>{discard ? '尚有未保存内容。' : '保存后需重新核对，原确认与发布状态会撤销。'}</DialogDescription>
         </DialogHeader>
         {discard ? <div className="test-editor-actions">
           <Button variant="outline" onClick={() => setDiscard(false)}>继续修改</Button>

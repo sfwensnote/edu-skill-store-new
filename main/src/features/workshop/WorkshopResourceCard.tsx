@@ -7,7 +7,6 @@ import {
   Info,
   Link,
   MoreHorizontal,
-  Share2,
   Tag,
   Trash2,
 } from 'lucide-react';
@@ -66,7 +65,7 @@ export function WorkshopResourceCard({
           <span>
             {item.kind === 'method-draft' ? '创建草稿' : item.entry.addedFrom ? '从集市添加' : '教学 SKILL'}
           </span>
-          {shared && <span>展示中</span>}
+          {shared && <span>已发布</span>}
         </div>
         <h3>
           <button onClick={() => actions.view(item)}>{item.title}</button>
@@ -112,6 +111,7 @@ export function WorkshopResourceCard({
             编辑
           </Button>
         )}
+        {own && item.kind === 'skill' && <Button variant="outline" onClick={() => actions.share(item)}>{shared ? '管理发布' : '发布到集市'}</Button>}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -135,16 +135,10 @@ export function WorkshopResourceCard({
                   <Heart fill={favorite ? 'currentColor' : 'none'} />
                   {favorite ? '取消收藏' : '收藏'}
                 </DropdownMenuItem>
-                {own && (
-                  <DropdownMenuItem onSelect={() => actions.share(item)}>
-                    <Share2 />
-                    {shared ? '取消展示' : '分享展示'}
-                  </DropdownMenuItem>
-                )}
-                {own && item.kind === 'skill' && (
+                {item.kind === 'skill' && (
                   <DropdownMenuItem onSelect={() => actions.mount(item, moreRef.current)}>
                     <Link />
-                    加入助手配置
+                    挂载到学伴
                   </DropdownMenuItem>
                 )}
               </DropdownMenuGroup>

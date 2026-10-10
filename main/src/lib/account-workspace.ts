@@ -11,7 +11,7 @@ export function accountWorkspaceKey(accountId: string, key: string) {
   return accountId === primaryTeacherId ? key : `teaching-method.account:${accountId}:${key}`;
 }
 function isWorkspaceKey(key: string) {
-  return key === ownersStorageKey || key === marketWorkspaceKey || key === 'teaching-assistant.excluded-skills.v1' ||
+  return key === 'teaching-method.companions.v1' || key === ownersStorageKey || key === marketWorkspaceKey || key === 'teaching-assistant.excluded-skills.v1' ||
     key.startsWith(`${ownersStorageKey}.recovery:`) || key.startsWith('teaching-assistant.method-draft.v1:') ||
     key.startsWith('teaching-assistant.check-progress:');
 }

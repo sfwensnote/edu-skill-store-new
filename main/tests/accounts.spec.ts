@@ -32,7 +32,7 @@ async function createAndPublish(page: Page) {
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
   await page.getByRole('button', { name: '确认并完成', exact: true }).click();
   await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
-  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
 }
 test('教师登录校验密码，刷新后身份保留，菜单没有管理员入口', async ({ page }, info) => {
@@ -66,7 +66,7 @@ test('教师完整创建并发布，另一教师只读添加；退出和刷新�
   await page.getByRole('button', { name: '教学 SKILL 集市', exact: true }).click();
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
   await page.getByRole('button', { name: '查看与试用', exact: true }).click();
-  await expect(page.getByRole('button', { name: /编辑|复制|分享到集市/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /编辑|复制|发布到集市/ })).toHaveCount(0);
   await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
   await page.goto('/#/workshop?tab=added');
   await expect(page.locator('.workshop-item')).toHaveCount(1);

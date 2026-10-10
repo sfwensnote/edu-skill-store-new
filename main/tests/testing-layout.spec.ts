@@ -60,7 +60,7 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await expect(page.getByRole('heading', { name: '教学方法核对完成' })).toBeVisible();
   await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
-  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   await expect(page.locator('.market-resource-card')).toContainText('任意学科');
   await page.getByRole('button', { name: '查看与试用', exact: true }).click();
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);

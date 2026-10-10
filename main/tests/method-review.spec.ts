@@ -59,8 +59,8 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.getByText('核对记录', { exact: true }).click();
   await expect(page.locator('.preview-review-record')).toContainText('教师已核对方法内容');
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
-  await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   await expect(page).toHaveURL(/#\/market/);
   await expect(page.locator('.market-resource-card').filter({ hasText: '错误后反思引导' })).toHaveCount(2);
   await page.goto('/#/assistant/review-flow/logs');
@@ -92,7 +92,7 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   await page.getByLabel('以学生身份输入').fill('我不知道依据在哪里');
   await page.getByRole('button', { name: '发送学生问题' }).click();
   await expect(page.locator('.student-message').last()).toContainText('你的判断依据是什么');
-  await page.getByRole('button', { name: '分享到集市', exact: true }).click();
+  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   const workspace = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!));
   expect(workspace.sharedSkillIds).toEqual(['personal:multi-review:method-two']);
   expect(workspace.tasks).toHaveLength(0);
@@ -109,7 +109,7 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   )).toBe(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'docs/assets/简化后-方法详情-手机.png', fullPage: true, animations: 'disabled', scale: 'css' });
-  await page.getByRole('button', { name: '预览方法', exact: true }).click();
+  await page.getByRole('button', { name: '试用 SKILL', exact: true }).click();
   await expect(page.getByLabel('预览教学情况')).toHaveValue('method-two:0');
   await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
   await page.getByRole('button', { name: '完成，返回我的 SKILL' }).click();
@@ -119,45 +119,37 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   await expect(page.locator('.student-chat')).toHaveCount(0);
 });
 
-test('未采用的方法只能预览，重新形成后加入核对，保存失败不冒充已加入', async ({ page }) => {
+test('未采用方法直接进入检验，加入失败时保留预览与原状态', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('teaching-assistant.excluded-skills.v1', JSON.stringify({ 'review-flow': ['review-method'] }));
+    if (!localStorage.getItem('exclusion-seeded')) {
+      localStorage.setItem('teaching-assistant.excluded-skills.v1', JSON.stringify({ 'review-flow': ['review-method'] }));
+      localStorage.setItem('exclusion-seeded', 'true');
+    }
   });
   await page.goto('/#/assistant/review-flow/student-preview?from=method&case=review-method:1');
-  await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '先核对教学方法', exact: true }).click();
-  await expect(page).toHaveURL(/create\/review-flow\?skill=review-method/);
-  await editMethodField(page, '结束条件', '学生能独立解释正确解题思路后结束');
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-  await expect(page).toHaveURL(/assistant\/review-flow\/test/);
-  const excluded = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!));
-  expect(excluded['review-flow']).toEqual([]);
-  await expect(page.locator('.test-case-head')).toContainText('情况 1');
-  await page.goto('/#/create/review-flow?skill=review-method');
-  await page.reload();
+  await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toHaveCount(0);
   await page.evaluate(() => {
     const write = Storage.prototype.setItem;
+    (window as unknown as { restoreWrite: () => void }).restoreWrite = () => { Storage.prototype.setItem = write; };
     Storage.prototype.setItem = function (key, value) {
-      if (key === 'teaching-assistant.excluded-skills.v1')
-        throw new DOMException('quota', 'QuotaExceededError');
+      if (key === 'teaching-assistant.excluded-skills.v1') throw new DOMException('quota', 'QuotaExceededError');
       write.call(this, key, value);
     };
   });
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-  await expect(page).toHaveURL(/create\/review-flow\?skill=review-method/);
-  await expect(page.getByText('方法已整理，核对流程未能保存，请释放存储空间后重试。')).toBeVisible();
-  const stored = await page.evaluate(() => ({
-    excluded: JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!),
-    assistant: JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2')!)[0],
-  }));
-  expect(stored.excluded['review-flow']).toEqual(['review-method']);
-  expect(stored.assistant.status).toBe('DRAFT');
+  await page.getByRole('button', { name: '先核对教学方法', exact: true }).click();
+  await expect(page).toHaveURL(/student-preview/);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!)['review-flow'])).toEqual(['review-method']);
+  await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
+  await page.getByRole('button', { name: '先核对教学方法', exact: true }).click();
+  await expect(page).toHaveURL(/assistant\/review-flow\/test/);
+  await expect(page.locator('.test-case-head')).toContainText('情况 1');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!)['review-flow'])).toEqual([]);
 });
 
 test('修改可以放弃，未核对版本不能分享，保存失败不替换原方法', async ({ page }) => {
   await page.goto('/#/assistant/review-flow/report');
-  await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '去核对方法' }).click();
+  await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '方法检验' }).click();
   await page.getByRole('button', { name: '修改当前方法' }).click();
   const editor = page.getByRole('dialog');
   await editor.getByRole('button', { name: '编辑做法 1' }).click();

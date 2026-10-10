@@ -8,12 +8,10 @@ import {
   parseMarketWorkspace,
   addMarketSkill,
   type SkillEntry,
-  type LocalTeachingTask,
   type TaskSubmission,
   type MarketWorkspace,
 } from '../../shared/marketplace';
 import { outcomeIssue } from '../../shared/inquiry-workflow';
-import type { TeachingActivityDraft } from '../../shared/teaching-activity';
 import type { WorkspaceStorage } from '@/lib/account-workspace';
 
 export const marketStorageKey = 'teaching-method.market-workspace.v1';
@@ -142,17 +140,6 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
       addedSkills: current.addedSkills.filter((entry) => entry.id !== id),
     }), true);
   }
-  function toggleShare(id: string) {
-    return update(
-      (current) => ({
-        ...current,
-        sharedSkillIds: current.sharedSkillIds.includes(id)
-          ? current.sharedSkillIds.filter((x) => x !== id)
-          : [...current.sharedSkillIds, id],
-      }),
-      true,
-    );
-  }
   function shareMany(ids: string[]) {
     return update(
       (current) => ({
@@ -164,19 +151,6 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
   }
   function removeShares(ids: string[]) {
     return update((current) => ({ ...current, sharedSkillIds: current.sharedSkillIds.filter((id) => !ids.includes(id)) }), true);
-  }
-  function saveActivityDraft(draft: TeachingActivityDraft, task?: LocalTeachingTask) {
-    const current = stateRef.current;
-    const next = {
-      ...current,
-      activityDrafts: [structuredClone(draft), ...current.activityDrafts.filter((d) => d.id !== draft.id)],
-      tasks: task
-        ? [structuredClone(task), ...current.tasks.filter((t) => t.id !== task.id)]
-        : draft.path === 'learning'
-          ? current.tasks.filter((t) => t.id !== draft.id || t.submissions.length > 0)
-          : current.tasks,
-    };
-    return commit(next, true, '草稿保存失败，请释放存储空间后重试。当前修改仍保留在页面中。');
   }
   function submitTask(id: string, submission: TaskSubmission) {
     const current = stateRef.current;
@@ -206,10 +180,8 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
     toggleFavorite,
     addSkill,
     removeAddedSkill,
-    toggleShare,
     shareMany,
     removeShares,
-    saveActivityDraft,
     submitTask,
   };
 }

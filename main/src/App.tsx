@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { LibraryPage } from '@/features/library/LibraryPage';
 import { LibraryDetailPage } from '@/features/library/LibraryDetailPage';
@@ -22,7 +22,6 @@ import {
   returnRoute,
   returnLabel,
   navigationRoute,
-  activeNavigationPage,
   type AppRoute,
 } from '@/lib/routes';
 import { HomePage, DailyPage } from '@/features/marketplace/LandingPages';
@@ -30,9 +29,8 @@ import { MarketPage } from '@/features/marketplace/MarketPage';
 import { SkillDetailPage } from '@/features/marketplace/MarketPages';
 import { WorkshopPage } from '@/features/workshop/WorkshopPage';
 import { InquiryStartPage } from '@/features/inquiry/InquiryStartPage';
-import { outcomeTab, isOutcomeReady } from '../shared/inquiry-workflow';
+import { outcomeTab } from '../shared/inquiry-workflow';
 import { InquiryEditor } from '@/features/inquiry/InquiryEditor';
-import { UsageSpace } from '@/features/space/UsageSpace';
 import { TaskPreview } from '@/features/space/TaskPreview';
 import { useMarketWorkspace } from '@/hooks/useMarketWorkspace';
 import { marketSkills } from '@/data/marketplace';
@@ -41,6 +39,12 @@ import type { ContextualDesign } from '../shared/contextual-design';
 import { isMethodReviewed } from '../shared/method-review';
 import { AccountProvider, useAccount } from '@/features/accounts/AccountProvider';
 import { readPublishedSkills } from '@/lib/account-workspace';
+import { useCompanions } from '@/features/companions/useCompanions';
+import { CompanionsPage, CompanionDetail } from '@/features/companions/CompanionPages';
+import { CompanionEditor } from '@/features/companions/CompanionEditor';
+import { MountSkillDialog } from '@/features/companions/MountSkillDialog';
+import { PublishSkillDialog } from '@/features/workshop/PublishSkillDialog';
+import { newCompanion, type LearningCompanion } from '../shared/learning-companion';
 
 export default function App() {
   return <AccountProvider><SkillWorkspace /></AccountProvider>;
@@ -51,6 +55,9 @@ function SkillWorkspace() {
   usePageFocus(route);
   const platform = useDemoPlatform(storage, account.id);
   const market = useMarketWorkspace(storage);
+  const companions = useCompanions(storage);
+  const [publishing, setPublishing] = useState<SkillEntry | null>(null);
+  const [mounting, setMounting] = useState<SkillEntry | null>(null);
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
@@ -89,18 +96,6 @@ function SkillWorkspace() {
   function back(fallback: AppRoute) {
     goTo(returnRoute(readRoute(), fallback));
   }
-  function useDesign(source: ContextualDesign, level: 1 | 2 | 3) {
-    if (!isOutcomeReady(source, level)) {
-      navigate({ page: 'inquiry-editor', designId: source.id, level });
-      return;
-    }
-    navigate({
-      page: 'space',
-      selection: `design:${source.id}:${level}`,
-      returnTo: routeHash(route),
-    });
-  }
-
   function openMine(id: string) {
     const assistant = platform.getAssistant(id);
     if (!assistant) return;
@@ -129,15 +124,18 @@ function SkillWorkspace() {
     if (entries.length && market.shareMany(entries.map((entry) => entry.id)))
       navigate({ page: 'market' });
   }
-  function applySkill(entry: SkillEntry) {
-    const source = returnRoute(route, { page: 'market' });
-    const saved =
-      source.page === 'space' ? market.activityDrafts.find((d) => d.id === source.draftId) : undefined;
-    if (saved?.path === 'skill' && saved.skillId === entry.id) {
-      goTo(source);
-      return;
-    }
-    navigate({ page: 'space', selection: `skill:${entry.id}`, returnTo: routeHash(route) });
+  function checkSkill(entry: SkillEntry) {
+    const assistant = entry.assistantId ? platform.getAssistant(entry.assistantId) : undefined;
+    if (!assistant) return;
+    const included = platform.isSkillIncluded(assistant.id, entry.skill.id);
+    if (!included && !platform.toggleSkill(assistant.id, entry.skill.id)) return;
+    if ((!included || !isMethodReviewed(assistant)) && !platform.setStatus(assistant.id, 'GENERATED')) return;
+    setPublishing(null);
+    navigate({ page: 'test', assistantId: assistant.id });
+  }
+  function openCompanion(value: LearningCompanion) {
+    setMounting(null);
+    navigate({ page: value.status === 'draft' ? 'companion-edit' : 'companion-detail', companionId: value.id });
   }
   function organizeGuidance(source: ContextualDesign) {
     const id = crypto.randomUUID();
@@ -172,23 +170,18 @@ function SkillWorkspace() {
   const publicAssistant = routeAssistantId
     ? publicLibrary.find((item) => item.id === routeAssistantId)
     : undefined;
-  const applicationDraftIds = market.activityDrafts
-    .filter((draft) => draft.path === 'skill')
-    .map((draft) => draft.id);
-  const methodApplicationSource = route.page === 'skill-detail' &&
-    returnRoute(route, { page: 'market' }).page === 'space' &&
-    activeNavigationPage(route, applicationDraftIds) === 'workshop';
+  const mySkills = [...personalSkills, ...market.addedSkills];
+  const selectedCompanion = 'companionId' in route ? companions.items.find(item => item.id === route.companionId) : undefined;
 
   return (
     <div className="application">
       <AppHeader
         route={route}
         onNavigate={navigate}
-        applicationDraftIds={applicationDraftIds}
       />
-      {(market.storageError || platform.storageError || catalogError) && (
+      {(market.storageError || platform.storageError || companions.error || catalogError) && (
         <p className="storage-alert" role="alert">
-          {market.storageError || platform.storageError || catalogError}
+          {market.storageError || platform.storageError || companions.error || catalogError}
         </p>
       )}
       {route.page === 'home' && <HomePage navigate={navigate} />}
@@ -211,23 +204,23 @@ function SkillWorkspace() {
           key={selectedSkill.id}
           entry={selectedSkill}
           favorite={market.favorites.includes(selectedSkill.id)}
-          backLabel={methodApplicationSource
-            ? '返回 SKILL 配置' : returnLabel(route, { page: 'market' })}
+          backLabel={returnLabel(route, { page: 'market' })}
           onBack={() => back({ page: 'market' })}
-          onUse={() => applySkill(selectedSkill)}
+          onUse={() => setMounting(selectedSkill)}
           onFavorite={() => market.toggleFavorite(selectedSkill.id)}
           onCopy={() => copySkill(selectedSkill)}
           onAdd={() => market.addSkill(selectedSkill)}
           added={Boolean(selectedSkill.addedFrom) || addedIds.includes(selectedSkill.id)}
           onEdit={selectedSkill.assistantId ? () => editSkill(selectedSkill) : undefined}
-          applicationContext={returnRoute(route, { page: 'market' }).page === 'space'}
+          canMount={mySkills.some(entry => entry.id === selectedSkill.id)}
+          onCheck={selectedSkill.assistantId ? () => checkSkill(selectedSkill) : undefined}
+          onPublish={selectedSkill.assistantId ? () => setPublishing(selectedSkill) : undefined}
+          shared={market.sharedSkillIds.includes(selectedSkill.id)}
           onPreview={selectedSkill.assistantId ? (index) => {
             const assistant = platform.getAssistant(selectedSkill.assistantId!);
             if (!assistant) return;
-            if (index === undefined && !platform.isSkillIncluded(assistant.id, selectedSkill.skill.id))
-              editSkill(selectedSkill);
-            else if (index === undefined && !isMethodReviewed(assistant))
-              navigate({ page: 'test', assistantId: assistant.id });
+            if (index === undefined && (!platform.isSkillIncluded(assistant.id, selectedSkill.skill.id) || !isMethodReviewed(assistant)))
+              checkSkill(selectedSkill);
             else navigate({ page: 'trial-preview', assistantId: assistant.id, from: 'method', caseId: `${selectedSkill.skill.id}:${index || 0}` });
           } : undefined}
         />
@@ -279,7 +272,7 @@ function SkillWorkspace() {
             if (!entry.assistantId) { navigate({ page: 'skill-detail', skillId: entry.id }); return; }
             const assistant = platform.getAssistant(entry.assistantId);
             if (!assistant || !isMethodReviewed(assistant) || !platform.isSkillIncluded(assistant.id, entry.skill.id)) {
-              navigate({ page: 'test', assistantId: entry.assistantId });
+              checkSkill(entry);
               return;
             }
             navigate({ page: 'trial-preview', assistantId: entry.assistantId, caseId: `${entry.skill.id}:0`, from: 'method' });
@@ -288,55 +281,37 @@ function SkillWorkspace() {
           onOpenSkill={(skillId) => navigate({ page: 'skill-detail', skillId })}
           onCopySkill={copySkill}
           onDeleteSkill={(e) => e.addedFrom ? market.removeAddedSkill(e.id) : Boolean(e.assistantId && platform.removeSkill(e.assistantId, e.skill.id))}
-          onMount={platform.mountSkill}
+          onMount={setMounting}
           onFavorite={market.toggleFavorite}
-          onShare={market.toggleShare}
+          onShare={setPublishing}
           onCreate={() => navigate({ page: 'create', assistantId: crypto.randomUUID() })}
           onMarket={() => navigate({ page: 'market' })}
           onOpenAssistant={openMine}
           onDeleteAssistant={platform.removeAssistant}
         />
       )}
-      {route.page === 'space' && (
-        <UsageSpace
-          key={route.draftId || route.selection || 'teaching-activities'}
-          initialSelection={route.selection}
-          initialDraftId={route.draftId}
-          backLabel={returnLabel(route, { page: 'home' })}
-          onBack={() => back({ page: 'workshop', tab: 'skills' })}
-          onWorkshop={() => navigate({ page: 'workshop' })}
-          onDesign={(designId, level) => navigate({ page: 'inquiry-editor', designId, level })}
-          skills={allSkills}
-          ownedSkillIds={personalSkills.map((e) => e.id)}
-          designs={market.designs}
-          tasks={market.tasks}
-          drafts={market.activityDrafts}
-          onSaveDraft={market.saveActivityDraft}
-          onPreview={(taskId, draftId) =>
-            navigate({
-              page: 'task-preview',
-              taskId,
-              returnTo: draftId ? routeHash({ page: 'space', draftId, returnTo: route.returnTo }) : undefined,
-            })
-          }
-          onSkill={(skillId, draftId) =>
-            navigate({
-              page: 'skill-detail',
-              skillId,
-              returnTo: draftId ? routeHash({ page: 'space', draftId, returnTo: route.returnTo }) : undefined,
-            })
-          }
-          onAdjust={(entry, draftId) =>
-            entry.assistantId &&
-            navigate({
-              page: 'create',
-              assistantId: entry.assistantId,
-              skillId: entry.skill.id,
-              returnTo: draftId ? routeHash({ page: 'space', draftId, returnTo: route.returnTo }) : undefined,
-            })
-          }
-        />
-      )}
+      {(route.page === 'companions' || route.page === 'space') && <CompanionsPage items={companions.items} skills={mySkills}
+        onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion} />}
+      {route.page === 'companion-edit' && <CompanionEditor key={route.companionId}
+        initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={mySkills} onSave={companions.save}
+        onBack={() => goTo({ page: 'companions' })} onSkills={() => navigate({ page: 'workshop' })}
+        onDone={() => goTo({ page: 'companion-detail', companionId: route.companionId })} />}
+      {route.page === 'companion-detail' && (selectedCompanion ? <CompanionDetail value={selectedCompanion} skills={mySkills}
+        onBack={() => goTo({ page: 'companions' })} onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })} /> :
+        <main className="page-frame not-found"><h1>没有找到这个学伴</h1><button onClick={() => goTo({ page: 'companions' })}>返回我的学伴</button></main>)}
+      {mounting && <MountSkillDialog key={mounting.id} entry={mounting} items={companions.items} onSave={companions.save}
+        onClose={() => setMounting(null)} onOpen={openCompanion} onCreate={() => {
+          navigate({ page: 'companion-edit', companionId: crypto.randomUUID(), skillId: mounting.id }); setMounting(null);
+        }} />}
+      {publishing && <PublishSkillDialog key={publishing.id} entry={publishing} shared={market.sharedSkillIds.includes(publishing.id)}
+        checked={Boolean(publishing.assistantId && platform.getAssistant(publishing.assistantId) && isMethodReviewed(platform.getAssistant(publishing.assistantId)!) && platform.isSkillIncluded(publishing.assistantId, publishing.skill.id))}
+        onClose={() => setPublishing(null)} onCheck={() => checkSkill(publishing)}
+        onPublish={() => {
+          const assistant = publishing.assistantId ? platform.getAssistant(publishing.assistantId) : undefined;
+          return Boolean(assistant && isMethodReviewed(assistant) && platform.isSkillIncluded(assistant.id, publishing.skill.id) && market.shareMany([publishing.id]));
+        }}
+        onWithdraw={() => market.removeShares([publishing.id])}
+        onMarket={() => { setPublishing(null); navigate({ page: 'market' }); }} />}
       {route.page === 'task-preview' && task?.kind === 'skill' && <MethodTrialRecord task={task} onBack={() => back({ page: 'workshop', tab: 'skills' })} />}
       {route.page === 'task-preview' && task?.kind === 'design' && (
         <TaskPreview
@@ -473,8 +448,10 @@ function SkillWorkspace() {
           onDone={() => goTo({ page: 'workshop', tab: 'skills' })}
           onShare={(skillId) => shareReviewedMethod(current.id, skillId)}
           sharedSkillIds={personalSkills.filter((entry) => entry.assistantId === current.id && market.sharedSkillIds.includes(entry.id)).map((entry) => entry.skill.id)}
-          onContinue={() => goTo({ page: previewSkillId && !platform.isSkillIncluded(current.id, previewSkillId) ? 'create' : 'test', assistantId: current.id,
-            ...(previewSkillId ? { skillId: previewSkillId } : {}), returnTo: routeHash(route) })}
+          onContinue={() => {
+            const entry = personalSkills.find(item => item.assistantId === current.id && (!previewSkillId || item.skill.id === previewSkillId));
+            if (entry) checkSkill(entry);
+          }}
         />
       )}
       {route.page === 'trial-preview' && current && missingPreviewCase &&

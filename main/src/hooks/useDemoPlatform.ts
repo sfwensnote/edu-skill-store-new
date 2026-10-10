@@ -249,26 +249,6 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
     );
     return saved ? { assistantId: id, skillId: skill.id } : null;
   }
-  function mountSkill(assistantId: string, entry: SkillEntry) {
-    const assistant = getAssistant(assistantId);
-    if (!assistant || assistant.skills.length >= 8) return false;
-    const skillId = crypto.randomUUID();
-    return updateAssistant(
-      assistantId,
-      {
-        skills: [...assistant.skills, { ...structuredClone(entry.skill), id: skillId }],
-        skillAreas: { ...assistant.skillAreas, [skillId]: entry.area },
-        skillSources: {
-          ...assistant.skillSources,
-          [skillId]: `挂载自“${entry.skill.name}”（${entry.creator}）。${entry.source}`,
-        },
-        status: 'DRAFT',
-        isPublic: false,
-        revision: (assistant.revision || 1) + 1,
-      },
-      true,
-    );
-  }
   function removeSkill(assistantId: string, skillId: string) {
     const assistant = getAssistant(assistantId);
     if (!assistant) return false;
@@ -302,7 +282,6 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
     toggleSkill,
     removeAssistant,
     copySkill,
-    mountSkill,
     removeSkill,
   };
 }

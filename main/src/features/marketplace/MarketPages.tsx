@@ -19,7 +19,10 @@ export function SkillDetailPage({
   backLabel,
   onUse,
   onPreview,
-  applicationContext = false,
+  onCheck,
+  onPublish,
+  shared = false,
+  canMount = false,
 }: {
   entry: SkillEntry;
   favorite: boolean;
@@ -32,7 +35,10 @@ export function SkillDetailPage({
   backLabel: string;
   onUse: () => void;
   onPreview?: (index?: number) => void;
-  applicationContext?: boolean;
+  onCheck?: () => void;
+  onPublish?: () => void;
+  shared?: boolean;
+  canMount?: boolean;
 }) {
   const source = skillSourceText(entry);
   return (
@@ -52,15 +58,16 @@ export function SkillDetailPage({
           <small>{skillValidationLabel(entry)}</small>
         </div>
         <div className="inline-actions">
-          {applicationContext ? <Button onClick={onUse}>继续配置</Button> : onPreview ?
-            <Button onClick={() => onPreview()}>{entry.validation === '教师已核对' ? '预览方法' : '核对方法'}</Button> :
+          {onCheck && <Button onClick={onCheck}>方法检验</Button>}
+          {onPreview ? <Button variant="outline" onClick={() => onPreview()}>试用 SKILL</Button> :
             <Button disabled={added} onClick={onAdd}>{added ? '已添加' : '添加到我的 SKILL'}<ArrowRight /></Button>}
+          {onPublish && <Button variant="outline" onClick={onPublish}>{shared ? '管理发布' : '发布到集市'}</Button>}
+          {canMount && <Button variant="outline" onClick={onUse}>挂载到学伴</Button>}
           {onEdit && <Button variant="outline" onClick={onEdit}>编辑我的方法</Button>}
           {entry.assistantId ? <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="更多方法操作"><MoreHorizontal /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={onFavorite}>{favorite ? '取消收藏' : '收藏'}</DropdownMenuItem>
-              <DropdownMenuItem onSelect={onUse}>应用 SKILL</DropdownMenuItem>
               <DropdownMenuItem onSelect={onCopy}>创建方法副本</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu> :

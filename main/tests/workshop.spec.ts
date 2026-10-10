@@ -90,7 +90,7 @@ test('数量来自实际作品，组合筛选在详情返回和刷新后保留�
   await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
 });
 
-test('创建分类的展示设置和收藏保留，更多菜单支持键盘关闭及独立复制', async ({ page }) => {
+test('创建分类的发布管理和收藏保留，更多菜单支持键盘关闭及独立复制', async ({ page }) => {
   await seedWorks(page);
   const source = page.locator('[data-work-id="personal:assistant-demo-active:reflect"]');
   const more = source.getByRole('button', { name: /更多操作/ });
@@ -100,15 +100,18 @@ test('创建分类的展示设置和收藏保留，更多菜单支持键盘关�
   await expect(more).toBeFocused();
   await more.click();
   await page.getByRole('menuitem', { name: '收藏', exact: true }).click();
-  await more.click();
-  await page.getByRole('menuitem', { name: '分享展示', exact: true }).click();
+  await source.getByRole('button', { name: '发布到集市', exact: true }).click();
+  await page.getByRole('button', { name: '确认发布', exact: true }).click();
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
   await page.getByRole('button', { name: '我创建的', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(6);
-  await expect(source).toContainText('展示中');
+  await expect(source).toContainText('已发布');
   await more.click();
   await expect(page.getByRole('menuitem', { name: '取消收藏', exact: true })).toBeVisible();
-  await page.getByRole('menuitem', { name: '取消展示', exact: true }).click();
-  await expect(source).not.toContainText('展示中');
+  await page.keyboard.press('Escape');
+  await source.getByRole('button', { name: '管理发布', exact: true }).click();
+  await page.getByRole('button', { name: '从集市撤下', exact: true }).click();
+  await expect(source).not.toContainText('已发布');
   await more.click();
   await page.getByRole('menuitem', { name: '复制', exact: true }).click();
   await expect(page).toHaveURL(/#\/create\//);
