@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PencilLine, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StepSection } from '@/components/Workbench';
-import type { TeachingMethod } from '../../../shared/teaching-method';
+import { boundaryPrefix, type TeachingMethod } from '../../../shared/teaching-method';
 import { TeachingCategoryField, TeachingTagsField } from '@/components/TeachingTagsField';
 
 function EditableText({
@@ -12,12 +12,14 @@ function EditableText({
   onChange,
   placeholder = '待补充',
   maxLength = 500,
+  required = true,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   maxLength?: number;
+  required?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   return (
@@ -25,6 +27,8 @@ function EditableText({
       {editing ? (
         <Textarea
           aria-label={label}
+          required={required}
+          aria-invalid={required && !value.trim()}
           autoFocus
           value={value}
           maxLength={maxLength}
@@ -62,7 +66,6 @@ export function MethodOutline({
   onChange: (method: TeachingMethod, field?: string) => void;
   updatedSection: number | null;
 }) {
-  const boundaryPrefix = '结束条件：';
   const boundary =
     method.principles.find((item) => item.startsWith(boundaryPrefix))?.slice(boundaryPrefix.length) || '';
   const field = (
@@ -71,7 +74,7 @@ export function MethodOutline({
     placeholder?: string,
   ) => (
     <div className="outline-field">
-      <h4>{label}</h4>
+      <h4>{label}<span className="required-mark" aria-hidden="true"> *</span></h4>
       <EditableText
         label={label}
         value={method[key] || ''}
@@ -104,7 +107,7 @@ export function MethodOutline({
         {field('SKILL 名称', 'name', '为你的教学方法起一个名字')}
         {field('SKILL 简介', 'description', '用一句话说明这个方法的用途')}
         <TeachingCategoryField value={method.category} onChange={(category) => onChange({ ...method, category }, 'category')} />
-        <TeachingTagsField value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
+        <TeachingTagsField required value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
       </StepSection>
       <StepSection number={2} title="教学目标框架" updated={updatedSection === 2}>
         {field('想解决的问题', 'problem')}
@@ -134,7 +137,7 @@ export function MethodOutline({
                 )}
               </div>
               <div className="outline-field">
-                <h4>{index === 0 ? '当学生……' : '如果学生……'}</h4>
+                <h4>{index === 0 ? '当学生……' : '如果学生……'}<span className="required-mark" aria-hidden="true"> *</span></h4>
                 <EditableText
                   label={`情况 ${index + 1}`}
                   value={step.condition}
@@ -142,7 +145,7 @@ export function MethodOutline({
                 />
               </div>
               <div className="outline-field">
-                <h4>我会……</h4>
+                <h4>我会……<span className="required-mark" aria-hidden="true"> *</span></h4>
                 <EditableText
                   label={`做法 ${index + 1}`}
                   value={step.action}
@@ -169,13 +172,15 @@ export function MethodOutline({
         </Button>
         {method.teachingSteps.length >= 8 && <p className="subtle">已达八种情况，可合并相近做法后再补充。</p>}
       </StepSection>
-      <StepSection number={4} title="我的原则" updated={updatedSection === 4}>
+      <StepSection number={4} title="我的原则（选填）" updated={updatedSection === 4}>
         {method.principles.some((item) => !item.startsWith(boundaryPrefix)) ? (
-          method.principles.map((principle, index) =>
-            principle.startsWith(boundaryPrefix) ? null : (
+          method.principles.map((principle, index) => ({ principle, index }))
+            .filter(({ principle }) => !principle.startsWith(boundaryPrefix))
+            .map(({ principle, index }, principleIndex) => (
               <div className="outline-principle" key={index}>
                 <EditableText
-                  label={`原则 ${index + 1}`}
+                  label={`原则 ${principleIndex + 1}`}
+                  required={false}
                   value={principle}
                   onChange={(value) =>
                     onChange(
@@ -190,7 +195,7 @@ export function MethodOutline({
                 <Button
                   variant="ghost"
                   size="icon-xs"
-                  aria-label={`删除原则 ${index + 1}`}
+                  aria-label={`删除原则 ${principleIndex + 1}`}
                   onClick={() =>
                     onChange(
                       { ...method, principles: method.principles.filter((_, i) => i !== index) },
@@ -220,12 +225,12 @@ export function MethodOutline({
       </StepSection>
       <StepSection number={5} title="结束与转交">
         <div className="outline-field">
-          <h4>结束条件</h4>
+          <h4>结束条件<span className="required-mark" aria-hidden="true"> *</span></h4>
           <EditableText
             label="结束条件"
             maxLength={500 - boundaryPrefix.length}
             value={boundary}
-            placeholder="在什么情况下结束引导或转交教师（选填）"
+            placeholder="在什么情况下结束引导或转交教师"
             onChange={(value) =>
               onChange(
                 {

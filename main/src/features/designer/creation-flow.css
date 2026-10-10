@@ -472,6 +472,9 @@
   font-size: 13px;
   margin-top: 6px;
 }
+.field-error-space {
+  min-height: 26px;
+}
 .creation-preview {
   max-width: 1100px;
   padding: 32px;

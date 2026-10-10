@@ -1,3 +1,6 @@
+.required-mark {
+  color: var(--red);
+}
 .teaching-scene-field {
   display: flex;
   flex-direction: column;

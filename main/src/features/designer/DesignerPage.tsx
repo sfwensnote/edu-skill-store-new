@@ -189,7 +189,6 @@ export function DesignerPage({
     const skill = packageTeachingMethod(
       draft.method,
       draft.editingSkillId || `method-${assistant.id}`,
-      draft.teachingScene,
     );
     if (!save({ ...draft, stage: 'method', editingSkillId: skill.id })) return;
     const saved = onUpdate({

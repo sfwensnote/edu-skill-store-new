@@ -172,6 +172,12 @@ export function GuidedMethodPage({
                 >
                   填入参考回答
                 </button>
+                {question.id === 'principle' && (
+                  <Button type="button" variant="ghost" onClick={() => {
+                    onChange({ ...draft, questionIndex: draft.questionIndex + 1, pendingAnswer: undefined });
+                    setError('');
+                  }}>跳过</Button>
+                )}
                 <Button type="button" aria-label="提交" disabled={!answer.trim()} onClick={submitAnswer}>
                   提交并继续
                   <ArrowRight data-icon="inline-end" />
@@ -283,11 +289,7 @@ export function GuidedMethodPage({
               status={
                 <>
                   <strong>
-                    {question
-                      ? `已回答 ${draft.questionIndex} / ${mockQuestions.length} 问`
-                      : methodError(method)
-                        ? '待补全关键内容'
-                        : '关键内容已完整'}
+                    {methodError(method) || '必填内容已完整'}
                   </strong>
                 </>
               }

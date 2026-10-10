@@ -1,3 +1,4 @@
+import { completeTeachingMethod } from './fixtures/teaching-method';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialMine } from '../src/data/platform';
@@ -16,7 +17,7 @@ test('空或不完整的方法不能以旧状态冒充已核对', () => {
 test('核对中修改方法只替换目标 SKILL，升级版本并撤销旧确认', () => {
   const assistant = { ...structuredClone(initialMine[0]), revision: 4, isPublic: true };
   const skill = assistant.skills[0];
-  const method = { ...methodFromSkill(skill), teachingSteps: [{ condition: '回顾后仍未发现问题', action: '提醒检查具体步骤' }] };
+  const method = completeTeachingMethod({ ...methodFromSkill(skill), category: '错因辅导', tags: ['错因辅导'], teachingSteps: [{ condition: '回顾后仍未发现问题', action: '提醒检查具体步骤' }] });
   const next = reviseReviewedMethod(assistant, skill.id, method);
   assert.equal(next.revision, 5);
   assert.equal(next.status, 'GENERATED');
@@ -34,7 +35,7 @@ test('第二次介入的示例进入独立预览情况，不被第一步替代',
   draft.method = prepareMethod(demoIdea, draft.method);
   for (const question of mockQuestions) draft = recordAnswer(draft, question.example);
   const assistant = { ...initialMine[0], skills: [initialMine[0].skills[0]] };
-  const updated = reviseReviewedMethod(assistant, assistant.skills[0].id, draft.method);
+  const updated = reviseReviewedMethod(assistant, assistant.skills[0].id, completeTeachingMethod({ ...draft.method, tags: ['错因辅导'] }));
   const cases = methodPreviewCases(updated.skills);
   assert.equal(cases.length, 2);
   assert.equal(cases[1].condition, mockQuestions[3].example);

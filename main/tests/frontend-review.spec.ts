@@ -129,6 +129,7 @@ test('长内容弹窗在低屏高可滚动，Escape 关闭后恢复焦点', asyn
 test('教学方法字段遵循各自限制，探究表单隐藏无意义的常驻字数', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/#/create/frontend-field-limits');
+  await page.getByRole('checkbox', { name: '标签 错因辅导', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
   await page.getByRole('button', { name: '编辑SKILL 名称', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'SKILL 名称', exact: true })).toHaveAttribute(

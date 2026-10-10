@@ -1,3 +1,4 @@
+import { completeTeachingMethod } from './fixtures/teaching-method';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { packageTeachingMethod, methodFromSkill } from '../shared/teaching-method';
@@ -10,7 +11,7 @@ import { skillSchema } from '../shared/assistant';
 import { marketSkills } from './fixtures/marketplace';
 
 test('教师选择的场景和自定义标签在 SKILL 封装与重新编辑时保留', () => {
-  const method = {
+  const method = completeTeachingMethod({
     problem: '学生求解方程时停滞',
     expectedOutcome: '能解释每一步变形',
     trigger: '学生不能说明下一步操作时',
@@ -18,13 +19,13 @@ test('教师选择的场景和自定义标签在 SKILL 封装与重新编辑时�
     principles: ['不直接给答案'],
     category: '智能练习' as const,
     tags: ['一元一次方程', '七年级'],
-  };
+  });
   const skill = packageTeachingMethod(method, 'tagged');
   assert.deepEqual(skill.tags, method.tags);
   assert.equal(skill.category, method.category);
   assert.deepEqual(methodFromSkill(skill).tags, method.tags);
   skill.tags!.push('副本标签');
-  assert.equal(method.tags.length, 2);
+  assert.equal(method.tags!.length, 2);
 });
 
 test('集市使用教师选择而不是文本猜测，标签能搜索、筛选且显式清空后不复活', () => {

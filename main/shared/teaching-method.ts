@@ -1,5 +1,7 @@
 import type { EducationalSkill } from './assistant';
-import { normalizeTeachingTags, type TeachingCategory } from './teaching-tags';
+import { isTeachingCategory, normalizeTeachingTags, visibleTeachingTags, type TeachingCategory } from './teaching-tags';
+
+export const boundaryPrefix = '结束条件：';
 
 export type TeachingMethod = {
   name?: string;
@@ -163,7 +165,10 @@ export function methodFromSkill(skill: EducationalSkill): TeachingMethod {
 }
 
 export function methodError(method: TeachingMethod): string {
-  if (method.category === null) return '请选择教学分类，再确认方法。';
+  if (!method.name?.trim()) return '请填写 SKILL 名称。';
+  if (!method.description?.trim()) return '请填写 SKILL 简介。';
+  if (!isTeachingCategory(method.category)) return '请选择教学分类。';
+  if (!visibleTeachingTags(method.tags).length) return '请至少添加一个标签。';
   if (
     !method.problem.trim() ||
     !method.expectedOutcome.trim() ||
@@ -174,9 +179,12 @@ export function methodError(method: TeachingMethod): string {
     return '请补全教学方法中标记为“待补充”的内容。';
   }
   if (method.teachingSteps.length > 8) return '一项 SKILL 最多包含 8 种情况，请合并相近情况后再确认。';
+  if (!method.principles.some((item) => item.startsWith(boundaryPrefix) && item.slice(boundaryPrefix.length).trim()))
+    return '请填写结束条件。';
   const principles = method.principles.filter((item) => item.trim());
   if (principles.length > 8) return '一项 SKILL 最多保留 8 条原则，请合并相近原则后再确认。';
   if ((method.name?.trim().length || 0) > 80) return '请将 SKILL 名称缩短至 80 字以内。';
+  if ((method.description?.trim().length || 0) > 800) return '请将 SKILL 简介缩短至 800 字以内。';
   if ([method.problem, method.expectedOutcome, method.trigger].some((item) => item.trim().length > 800))
     return '请将问题、学习目标和开始条件分别缩短至 800 字以内。';
   if (
@@ -187,18 +195,13 @@ export function methodError(method: TeachingMethod): string {
   return '';
 }
 
-export function packageTeachingMethod(method: TeachingMethod, id: string, scene = ''): EducationalSkill {
+export function packageTeachingMethod(method: TeachingMethod, id: string): EducationalSkill {
   const error = methodError(method);
   if (error) throw new Error(error);
-  const description =
-    method.description?.trim() ||
-    `触发：${method.trigger}；做法：${method.teachingSteps[0].action}；目标：${method.expectedOutcome}`.slice(
-      0,
-      300,
-    );
+  const description = method.description!.trim();
   return {
     id,
-    name: method.name?.trim() || `${scene.trim() || method.problem.slice(0, 24)} · 教学引导`.slice(0, 80),
+    name: method.name!.trim(),
     description,
     category: method.category || null,
     tags: normalizeTeachingTags(method.tags),

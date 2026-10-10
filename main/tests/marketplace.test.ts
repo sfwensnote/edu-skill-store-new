@@ -1,3 +1,4 @@
+import { completeTeachingMethod } from './fixtures/teaching-method';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -102,17 +103,17 @@ test('作品副本可独立修改，导出涵盖原题、任务链和项目而�
     assert.ok(md.includes(section));
   assert.equal('skill' in d, false);
 });
-test('SKILL 来自教师条件做法与原则，名称随场景变化，编辑不丢失其他 SKILL', () => {
-  const m: TeachingMethod = {
+test('SKILL 来自教师条件做法与原则，名称与简介使用教师填写的内容，编辑不丢失其他 SKILL', () => {
+  const m: TeachingMethod = completeTeachingMethod({
     problem: '学生阅读时找不到证据',
     expectedOutcome: '能用原文支持观点',
     trigger: '观点缺少依据时',
     teachingSteps: [{ condition: '观点缺少依据时', action: '请他标出支持观点的句子' }],
     principles: ['不直接替学生找答案'],
-  };
-  const reading = packageTeachingMethod(m, 'reading', '阅读证据提取');
+  });
+  const reading = packageTeachingMethod({ ...m, name: '阅读证据提取', description: '帮助学生用原文支持观点' }, 'reading');
   assert.ok(reading.name.includes('阅读证据提取'));
-  assert.ok(reading.summary.includes(m.teachingSteps[0].action));
+  assert.equal(reading.summary, '帮助学生用原文支持观点');
   const custom = packageTeachingMethod({ ...m, name: '教师命名', description: '教师简介' }, 'reading');
   assert.equal(custom.name, '教师命名');
   assert.equal(custom.summary, '教师简介');

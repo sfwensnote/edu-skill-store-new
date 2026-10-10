@@ -23,11 +23,13 @@ export function MethodTextField({ errorMessage, submitted, onBlur, ...props }: P
           onBlur?.(event);
         }}
       />
-      {invalid && (
-        <p className="field-error" id={`${props.id}-error`} role="alert">
-          {errorMessage || '请填写此项。'}
-        </p>
-      )}
+      <div className="field-error-space">
+        {invalid && (
+          <p className="field-error" id={`${props.id}-error`} role="alert">
+            {errorMessage || '请填写此项。'}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

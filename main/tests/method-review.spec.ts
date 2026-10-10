@@ -1,3 +1,4 @@
+import { editMethodField } from './fixtures/method-form';
 import { test, expect } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 
@@ -31,6 +32,7 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   const editor = page.getByRole('dialog');
   await editor.getByRole('button', { name: '编辑做法 2' }).click();
   await editor.getByRole('textbox', { name: '做法 2', exact: true }).fill('请学生标出不确定的一步，再提供一个针对性提示。');
+  await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
   await expect(editor).toBeHidden();
   await expect(page.locator('.testing-title')).toContainText('v3.0');
@@ -122,6 +124,7 @@ test('未采用的方法只能预览，重新形成后加入核对，保存失�
   await expect(page.getByRole('button', { name: '分享到集市', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '先核对教学方法', exact: true }).click();
   await expect(page).toHaveURL(/create\/review-flow\?skill=review-method/);
+  await editMethodField(page, '结束条件', '学生能独立解释正确解题思路后结束');
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
   await expect(page).toHaveURL(/assistant\/review-flow\/test/);
   const excluded = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!));
@@ -163,6 +166,7 @@ test('修改可以放弃，未核对版本不能分享，保存失败不替换�
   await editor.getByRole('button', { name: '编辑做法 1' }).click();
   await editor.getByLabel('做法 1', { exact: true }).fill('存储失败时的修改');
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new DOMException('quota', 'QuotaExceededError'); }; });
+  await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
   await expect(editor.getByRole('alert')).toContainText('修改未保存');
   await expect(page.locator('.testing-title')).toContainText('v2.0');

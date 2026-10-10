@@ -1,3 +1,4 @@
+import { fillMethodDetails } from './fixtures/method-form';
 import { test, expect } from './demo-workspace-fixture';
 import { mockQuestions } from '../shared/teaching-method';
 import { teachingCategories } from '../shared/teaching-tags';
@@ -30,6 +31,7 @@ test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和�
     await page.getByLabel('你的回答').fill(question.example);
     await page.getByRole('button', { name: '提交', exact: true }).click();
   }
+  await fillMethodDetails(page, '一元一次方程自查', '引导学生独立检查变形步骤', '学生能说明每一步变形后结束');
   await page.getByRole('button', { name: '这就是我的教学方法' }).click();
   await expect(page).toHaveURL(/tag-metadata\/test/);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]').find((assistant: { id: string }) => assistant.id === 'tag-metadata'));

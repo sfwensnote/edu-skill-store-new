@@ -13,7 +13,7 @@ export function TeachingCategoryField({ value, onChange }: {
 }) {
   return (
     <label className="teaching-scene-field">
-      教学分类
+      <span>教学分类<span className="required-mark" aria-hidden="true"> *</span></span>
       <select aria-label="教学分类" required value={isTeachingCategory(value) ? value : ''}
         onChange={(event) => onChange((event.target.value || null) as TeachingCategory | null)}>
         <option value="">请选择教学分类</option>
@@ -23,9 +23,10 @@ export function TeachingCategoryField({ value, onChange }: {
   );
 }
 
-export function TeachingTagsField({ value, onChange }: {
+export function TeachingTagsField({ value, onChange, required = false }: {
   value?: string[];
   onChange: (tags: string[]) => void;
+  required?: boolean;
 }) {
   const id = useId();
   const tags = visibleTeachingTags(value);
@@ -56,10 +57,10 @@ export function TeachingTagsField({ value, onChange }: {
   }
   return (
     <fieldset className="teaching-tags-field">
-      <legend>标签（可选）</legend>
+      <legend>{required ? <>标签<span className="required-mark" aria-hidden="true"> *</span></> : '标签（可选）'}</legend>
       <div className="teaching-tag-input">
         <input aria-label="自定义标签" placeholder="例如：一元一次方程，回车添加"
-          value={input} maxLength={120} aria-invalid={!!error}
+          value={input} maxLength={120} required={required && !tags.length} aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : `${id}-hint`}
           onChange={(event) => { setInput(event.target.value); setError(''); }}
           onKeyDown={(event) => {
@@ -70,7 +71,7 @@ export function TeachingTagsField({ value, onChange }: {
           }} />
         <Button type="button" variant="outline" disabled={!input.trim()} onClick={add}>添加</Button>
       </div>
-      <small id={`${id}-hint`}>可自定义知识点或选下方标签，最多 {maxTeachingTags} 个。</small>
+      <small id={`${id}-hint`}>{required ? `至少添加或选择一个标签，最多 ${maxTeachingTags} 个。` : `可自定义知识点或选下方标签，最多 ${maxTeachingTags} 个。`}</small>
       {tags.length > 0 && (
         <div className="teaching-selected-tags" aria-label="已选标签">
           {tags.map((tag) => (

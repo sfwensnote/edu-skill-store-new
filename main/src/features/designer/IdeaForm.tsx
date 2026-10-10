@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { demoIdea, type CreationDraft } from '../../../shared/teaching-method';
 import { MethodTextField } from './MethodTextField';
 import { TeachingCategoryField, TeachingTagsField } from '@/components/TeachingTagsField';
+import { isTeachingCategory, visibleTeachingTags } from '../../../shared/teaching-tags';
 
 export function IdeaForm({
   draft,
@@ -13,16 +14,18 @@ export function IdeaForm({
   onChange: (draft: CreationDraft) => void;
   onContinue: () => void;
 }) {
+  const complete = !!draft.originalIdea.trim() && !!draft.grade.trim() && !!draft.subject.trim()
+    && isTeachingCategory(draft.method.category) && visibleTeachingTags(draft.method.tags).length > 0;
   return (
     <form
       className="idea-form creation-panel"
       onSubmit={(event) => {
         event.preventDefault();
-        if (draft.originalIdea.trim() && draft.method.category) onContinue();
+        if (complete) onContinue();
       }}
     >
       <header>
-        <h2>说说你的教学想法</h2>
+        <h2>说说你的教学想法<span className="required-mark" aria-hidden="true"> *</span></h2>
       </header>
       {!draft.originalIdea && (
         <Button
@@ -64,16 +67,17 @@ export function IdeaForm({
       </label>
       <div className="idea-context">
         <label>
-          学段
-          <select value={draft.grade} onChange={(event) => onChange({ ...draft, grade: event.target.value })}>
+          <span>学段<span className="required-mark" aria-hidden="true"> *</span></span>
+          <select required value={draft.grade} onChange={(event) => onChange({ ...draft, grade: event.target.value })}>
             {['小学', '初中', '高中', '大学'].map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
         </label>
         <label>
-          学科
+          <span>学科<span className="required-mark" aria-hidden="true"> *</span></span>
           <select
+            required
             value={draft.subject}
             onChange={(event) => onChange({ ...draft, subject: event.target.value })}
           >
@@ -100,10 +104,10 @@ export function IdeaForm({
         <TeachingCategoryField value={draft.method.category}
           onChange={(category) => onChange({ ...draft, teachingScene: category || '', method: { ...draft.method, category } })} />
       </div>
-      <TeachingTagsField value={draft.method.tags}
+      <TeachingTagsField required value={draft.method.tags}
         onChange={(tags) => onChange({ ...draft, method: { ...draft.method, tags } })} />
       <footer className="creation-footer">
-        <Button size="lg" type="submit" disabled={!draft.originalIdea.trim() || !draft.method.category}>
+        <Button size="lg" type="submit" disabled={!complete}>
           继续
           <ArrowRight data-icon="inline-end" />
         </Button>

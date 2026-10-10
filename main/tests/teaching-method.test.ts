@@ -1,3 +1,4 @@
+import { completeTeachingMethod } from './fixtures/teaching-method';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -14,6 +15,30 @@ import {
 } from '../shared/teaching-method';
 import { skillSchema } from '../shared/assistant';
 import { createTestCases } from '../src/features/testing/testData';
+
+test('只有我的原则可以留空，其余字段缺失或只有空格时不能形成 SKILL', () => {
+  const method = completeTeachingMethod();
+  assert.equal(methodError(method), '');
+  assert.equal(packageTeachingMethod(method, 'no-principles').constraints.length, 1);
+  for (const field of ['name', 'description', 'problem', 'expectedOutcome', 'trigger'] as const) {
+    const incomplete = { ...method, [field]: '  ' };
+    assert.ok(methodError(incomplete), field);
+    assert.throws(() => packageTeachingMethod(incomplete, 'incomplete'), Error, field);
+  }
+  for (const incomplete of [
+    { ...method, name: undefined }, { ...method, description: undefined },
+    { ...method, category: undefined }, { ...method, category: null },
+    { ...method, category: '项目式学习' as const },
+    { ...method, tags: [] }, { ...method, tags: ['PBL'] },
+    { ...method, principles: [] }, { ...method, principles: ['结束条件：  '] },
+    { ...method, teachingSteps: [] },
+    { ...method, teachingSteps: [{ condition: ' ', action: '做法' }] },
+    { ...method, teachingSteps: [{ condition: '情况', action: ' ' }] },
+  ]) {
+    assert.ok(methodError(incomplete));
+    assert.throws(() => packageTeachingMethod(incomplete, 'incomplete'));
+  }
+});
 
 test('初步想法只整理问题，不生成教学步骤或 SKILL', () => {
   const draft = defaultCreationDraft();
@@ -50,6 +75,8 @@ test('六轮回答逐步形成方法，条件可以先于做法出现', () => {
   draft = recordAnswer(draft, mockQuestions[5].example);
   assert.equal(draft.questionIndex, 6);
   assert.equal(draft.conversation.length, 6);
+  assert.ok(methodError(draft.method));
+  draft.method = completeTeachingMethod({ ...draft.method, tags: ['错因辅导'] });
   assert.equal(methodError(draft.method), '');
   assert.deepEqual(packageTeachingMethod(draft.method, 'skill').steps, draft.method.teachingSteps);
 });
@@ -69,13 +96,13 @@ test('右侧教师修改后的内容优先于后续问答，SKILL 忠实使用�
   draft = recordAnswer(draft, mockQuestions[1].example);
   assert.equal(draft.method.trigger, '教师直接修改的触发条件');
   assert.equal(draft.conversation[1].answer, mockQuestions[1].example);
-  const method: TeachingMethod = {
+  const method: TeachingMethod = completeTeachingMethod({
     problem: '问题',
     expectedOutcome: '目标',
     trigger: '触发条件',
     teachingSteps: [{ condition: '情况', action: '做法' }],
     principles: ['不能直接给答案'],
-  };
+  });
   const skill = packageTeachingMethod(method, 'skill');
   assert.equal(skill.purpose, method.expectedOutcome);
   assert.equal(skill.trigger, method.trigger);
@@ -87,13 +114,13 @@ test('右侧教师修改后的内容优先于后续问答，SKILL 忠实使用�
 });
 
 test('缺少触发条件或存在未完成的补充步骤时不能确认', () => {
-  const method: TeachingMethod = {
+  const method: TeachingMethod = completeTeachingMethod({
     problem: '问题',
     expectedOutcome: '目标',
     trigger: '',
     teachingSteps: [{ condition: '情况', action: '做法' }],
     principles: [],
-  };
+  });
   assert.ok(methodError(method));
   method.trigger = '开始情况';
   assert.equal(methodError(method), '');
@@ -103,13 +130,13 @@ test('缺少触发条件或存在未完成的补充步骤时不能确认', () =>
 });
 
 test('既有技能恢复和 Mock 检测沿用教师的条件与做法', () => {
-  const method: TeachingMethod = {
+  const method: TeachingMethod = completeTeachingMethod({
     problem: '阅读时遗漏证据',
     expectedOutcome: '找到原文依据',
     trigger: '学生说不出依据',
     teachingSteps: [{ condition: '学生说不出依据', action: '请他标出支持观点的句子' }],
     principles: [],
-  };
+  });
   const skill = packageTeachingMethod(method, 'reading');
   const restored = methodFromSkill(skill);
   assert.equal(restored.expectedOutcome, method.expectedOutcome);
@@ -123,30 +150,30 @@ test('既有技能恢复和 Mock 检测沿用教师的条件与做法', () => {
 });
 
 test('封装后重新编辑保留教师的问题，长条件与长做法仍符合 SKILL 格式', () => {
-  const method: TeachingMethod = {
+  const method: TeachingMethod = completeTeachingMethod({
     problem: '学生把结论当成证据',
     expectedOutcome: '能找到原文依据',
     trigger: '学生无法指出依据',
     teachingSteps: [{ condition: '情'.repeat(400), action: '法'.repeat(400) }],
     principles: ['不代替学生找依据'],
-  };
+  });
   const skill = packageTeachingMethod(method, 'reading-audit');
   assert.equal(methodFromSkill(skill).problem, method.problem);
   assert.equal(skillSchema.safeParse(skill).success, true);
 });
 
 test('方法容量与封装格式一致，不能形成超出八步或八条原则的 SKILL', () => {
-  const method: TeachingMethod = {
+  const method: TeachingMethod = completeTeachingMethod({
     problem: '问题',
     expectedOutcome: '目标',
     trigger: '触发条件',
     teachingSteps: Array.from({ length: 9 }, () => ({ condition: '情况', action: '做法' })),
     principles: [],
-  };
-  assert.ok(methodError(method));
+  });
+  assert.match(methodError(method), /最多包含 8 种情况/);
   method.teachingSteps = [{ condition: '情况', action: '做法' }];
-  method.principles = Array.from({ length: 9 }, (_, index) => `原则 ${index + 1}`);
-  assert.ok(methodError(method));
+  method.principles = [...Array.from({ length: 8 }, (_, index) => `原则 ${index + 1}`), '结束条件：学生完成自查时结束'];
+  assert.match(methodError(method), /最多保留 8 条原则/);
 });
 
 test('教师已手动整理的原则不会被示例回答悄悄追加', () => {

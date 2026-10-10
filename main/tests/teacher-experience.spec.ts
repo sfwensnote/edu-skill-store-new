@@ -1,3 +1,4 @@
+import { fillMethodDetails, editMethodField } from './fixtures/method-form';
 import { test, expect, type Page } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 import { defaultCreationDraft, methodFromSkill } from '../shared/teaching-method';
@@ -62,8 +63,9 @@ test('资深教师：直接编辑语文方法，不回答六问也能检测、�
   await page.getByLabel('教学想法').fill('学生阅读时只有判断没有证据，我会先追问原文依据。');
   await page.getByRole('combobox', { name: '学科', exact: true }).selectOption('语文');
   await page.getByLabel('教学分类', { exact: true }).selectOption('课堂提问');
+  await page.getByRole('checkbox', { name: '标签 课堂提问', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['希望学生达到', '用原文支持自己的判断'],
+  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['SKILL 简介', '引导学生用原文支持阅读判断'], ['结束条件', '学生能独立解释原文依据时结束'], ['希望学生达到', '用原文支持自己的判断'],
     ['什么时候开始', '学生只表达观点没有依据']]) await edit(page, label, value);
   await page.getByRole('button', { name: '补充一种情况和做法', exact: true }).click();
   await edit(page, '情况 1', '学生只表达观点'); await edit(page, '做法 1', '追问原文依据');
@@ -97,6 +99,7 @@ test('职前教师：按自己的备课想法完成六问，不混入数学答�
   await page.getByLabel('教学想法').fill('我准备试讲朗读课，让学生比较不同停顿的含义。');
   await page.getByRole('combobox', { name: '学科', exact: true }).selectOption('语文');
   await page.getByLabel('教学分类', { exact: true }).selectOption('知识讲解');
+  await page.getByRole('checkbox', { name: '标签 知识讲解', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
   await expect(page.getByLabel('你的回答')).toHaveValue('');
   for (const answer of ['理解停顿对句意的影响', '学生朗读时在不合适的位置停顿', '让学生标出停顿位置',
@@ -104,6 +107,7 @@ test('职前教师：按自己的备课想法完成六问，不混入数学答�
     await page.getByLabel('你的回答').fill(answer);
     await page.getByRole('button', { name: '提交', exact: true }).click();
   }
+  await fillMethodDetails(page, '朗读停顿比较', '让学生理解不同停顿对句意的影响', '学生能比较两种停顿并解释句意时结束');
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
   await expect(page.locator('.simulation-line.assistant')).toContainText('停顿');
   await expect(page.locator('main')).not.toContainText(/3x|方程|100%|触发率|全部通过/);
@@ -135,6 +139,7 @@ test('保存边界：检测修改遇到草稿缓存写入失败，旧输入保�
   }, key);
   await page.getByRole('button', { name: '修改当前方法', exact: true }).click();
   await edit(page, '做法 1', '请学生指出原文证据');
+  await editMethodField(page.getByRole('dialog'), '结束条件', '学生能独立回顾并解释思路后结束');
   await page.getByRole('button', { name: '保存并重新核对', exact: true }).click();
   expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(before);
   await page.goto('/#/create/cache-audit?skill=reflect');

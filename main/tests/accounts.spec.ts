@@ -18,8 +18,9 @@ async function createAndPublish(page: Page) {
   await page.getByRole('button', { name: '创建', exact: true }).click();
   await page.getByLabel('教学想法').fill('学生阅读时只有判断，没有引用原文。');
   await page.getByLabel('教学分类', { exact: true }).selectOption('课堂提问');
+  await page.getByRole('checkbox', { name: '标签 证据追问', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['希望学生达到', '用原文支持判断'], ['什么时候开始', '学生只表达观点']]) {
+  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['SKILL 简介', '引导学生引用原文支持观点'], ['结束条件', '学生能说明证据如何支持判断后结束'], ['希望学生达到', '用原文支持判断'], ['什么时候开始', '学生只表达观点']]) {
     await page.getByRole('button', { name: `编辑${label}`, exact: true }).click();
     await page.getByRole('textbox', { name: label, exact: true }).fill(value);
   }
