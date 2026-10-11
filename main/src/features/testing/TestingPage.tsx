@@ -37,40 +37,52 @@ export function TestingPage({
     assistant.activity,
     assistant.revision,
   ]);
-  const [completed, setCompleted] = useState(() => {
-    const preset = assistant.id.startsWith('assistant-demo-') && !assistant.revision;
-    if (!preset && ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status)) return cases.length;
-    try {
-      const saved = JSON.parse(storage.getItem(progressKey) || 'null');
-      if (saved?.signature === signature && Number.isInteger(saved.completed))
-        return Math.max(0, Math.min(saved.completed, Math.max(0, cases.length - 1)));
-    } catch {
-      /* 无有效进度时从第一项开始。 */
-    }
-    return 0;
+  const [review, setReview] = useState(() => {
+    const reviewed = !assistant.id.startsWith('assistant-demo-') || Boolean(assistant.revision);
+    const finished = reviewed && ['TESTED', 'TRIAL', 'ACTIVE'].includes(assistant.status);
+    let saved: { signature?: string; completed?: number; cursor?: number } | null = null;
+    try { saved = JSON.parse(storage.getItem(progressKey) || 'null'); } catch { /* 忽略无效缓存。 */ }
+    const valid = saved?.signature === signature && Number.isInteger(saved.completed);
+    const completed = finished ? cases.length : valid
+      ? Math.max(0, Math.min(saved!.completed!, Math.max(0, cases.length - 1))) : 0;
+    // 浏览位置与已确认数量分开；返回查看不会撤销确认。
+    const cursor = valid && saved!.completed === completed && Number.isInteger(saved!.cursor)
+      ? Math.max(0, Math.min(saved!.cursor!, completed)) : completed;
+    return { completed, cursor };
   });
+  const { completed, cursor } = review;
   const [error, setError] = useState('');
   const [editingSkillId, setEditingSkillId] = useState<string>();
   const editingSkill = assistant.skills.find((skill) => skill.id === editingSkillId);
-  const done = completed >= cases.length;
-  const current = cases[Math.min(completed, cases.length - 1)];
+  const done = cursor >= cases.length;
+  const current = cases[Math.min(cursor, cases.length - 1)];
+  function savePosition(next: typeof review) {
+    try { storage.setItem(progressKey, JSON.stringify({ signature, ...next })); return true; }
+    catch { return false; }
+  }
+  function previous() {
+    if (cursor === 0) { onAdjust(); return; }
+    const next = { completed, cursor: cursor - 1 };
+    if (!savePosition(next)) {
+      setError('浏览位置未保存，请释放存储空间后重试。');
+      return;
+    }
+    setError(''); setReview(next);
+  }
   function confirmCurrent() {
     if (done) return;
-    const next = completed + 1;
-    if (next === cases.length && !onComplete()) {
+    const next = { completed: Math.max(completed, cursor + 1), cursor: cursor + 1 };
+    const finishing = completed < cases.length && next.completed === cases.length;
+    if (finishing && !onComplete()) {
       setError('核对结果未保存，请释放存储空间后重新确认。');
       return;
     }
-    try {
-      storage.setItem(progressKey, JSON.stringify({ signature, completed: next }));
-    } catch {
-      if (next < cases.length) {
-        setError('核对进度未保存，请释放存储空间后重新确认。');
-        return;
-      }
+    // 最后一项的正式确认已保存在方法状态中，缓存失败不撤销该确认。
+    if (!savePosition(next) && !finishing) {
+      setError('核对进度未保存，请释放存储空间后重新确认。');
+      return;
     }
-    setError('');
-    setCompleted(next);
+    setError(''); setReview(next);
   }
   if (!assistant.skills.length || !cases.length || assistant.status === 'DRAFT') {
     return (
@@ -90,7 +102,7 @@ export function TestingPage({
           </button>
           <div className="testing-title">
             <h1><span>{assistant.name}</span>{' '}<span>方法检验</span></h1>
-            <i className={done ? 'done' : ''}>{done ? '核对完成' : '待核对'}</i>
+            <i className={completed >= cases.length ? 'done' : ''}>{completed >= cases.length ? '核对完成' : '待核对'}</i>
           </div>
           <div className="testing-progress">
             <span aria-live="polite">已核对 {completed} / {cases.length}</span>
@@ -135,6 +147,7 @@ export function TestingPage({
                 ))}
               </div>
               <div className="complete-actions">
+                <Button variant="outline" size="lg" onClick={previous}>返回上一步</Button>
                 <Button variant="outline" size="lg" onClick={onAdjust}>
                   返回调整
                 </Button>
@@ -151,8 +164,9 @@ export function TestingPage({
           ) : (
             <TestCaseRecord
               testCase={current}
-              index={completed}
+              index={cursor}
               total={cases.length}
+              onPrevious={previous}
               onConfirm={confirmCurrent}
               onEdit={() => setEditingSkillId(current.skillId)}
             />

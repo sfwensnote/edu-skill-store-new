@@ -48,6 +48,9 @@ test('草稿方法从详情检验，发布入口不会误入编辑；可发布�
 test('命名、选方法、填写任务、上传材料，普通活动创建后刷新保留且不增加 SKILL', async ({ page }, info) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await create(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: info.outputPath('task-elements-desktop.png'), fullPage: true });
   await page.getByLabel('上传教学材料').setInputFiles({ name: '课堂记录.txt', mimeType: 'text/plain', buffer: Buffer.from('学生把移项后的符号写错了。') });
   await expect(page.locator('.companion-files')).toContainText('课堂记录.txt');
   await page.reload();

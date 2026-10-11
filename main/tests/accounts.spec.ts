@@ -35,12 +35,14 @@ async function createAndPublish(page: Page) {
   await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
 }
-test('教师登录校验密码，刷新后身份保留，菜单没有管理员入口', async ({ page }, info) => {
-  await page.goto('/#/home');
+test('教师从旧链接登录进入首页，刷新后身份保留，菜单没有管理员入口', async ({ page }, info) => {
+  await page.goto('/#/workshop');
   await expect(page.getByRole('heading', { name: '登录教学工坊' })).toBeVisible();
   await login(page, 'teacher', 'wrong123');
   await expect(page.getByRole('alert')).toContainText('账号或密码不正确');
+  await expect(page).toHaveURL(/#\/workshop$/);
   await login(page);
+  await expect(page).toHaveURL(/#\/home$/);
   await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
   await page.reload();
   await expect(page.getByRole('button', { name: '打开账号菜单' })).toHaveAttribute('title', '教师（教师）');
@@ -121,6 +123,8 @@ test('首个教师保留上一版清理后已有方法，注册账号没有继�
     localStorage.setItem('legacy-account-fixture', 'done');
   }, { marker: skillResetKey, owners: initialMine.slice(0, 1) });
   await page.goto('/#/workshop'); await login(page);
+  await expect(page).toHaveURL(/#\/home$/);
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
   await expect(page.locator('.workshop-item')).not.toHaveCount(0);
   await logout(page); await page.getByRole('button', { name: '注册教师账号', exact: true }).click();
   await page.getByLabel('姓名', { exact: true }).fill('新教师');
@@ -148,4 +152,16 @@ test('登录、注册和管理员菜单在手机可操作且无横向溢出', as
   await page.getByRole('menuitem', { name: '账号管理' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+
+test('管理员从学伴旧链接登录先进入首页，已登录刷新保留当前页', async ({ page }) => {
+  await page.goto('/#/companions');
+  await login(page, 'admin', 'admin123');
+  await expect(page).toHaveURL(/#\/home$/);
+  await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '我的学伴', exact: true }).click();
+  await page.reload();
+  await expect(page).toHaveURL(/#\/companions$/);
+  await expect(page.getByRole('heading', { name: '我的学伴', exact: true })).toBeVisible();
 });

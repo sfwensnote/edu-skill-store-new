@@ -9,8 +9,20 @@
 .companion-editor > section, .companion-activity > section { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line); }
 .companion-page .form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .companion-page input:not([type='checkbox']):not([type='file']) { border: 1px solid var(--line); border-radius: 7px; background: var(--card); min-height: 44px; padding: 10px 12px; width: 100%; }
-.companion-task-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.companion-wide { grid-column: 1 / -1; }
+.companion-task-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.companion-element-row { display: grid; grid-template-columns: 144px minmax(0, 1fr); margin: 0; border-top: 1px solid var(--line); }
+.companion-element-row:first-child { border-top: 0; }
+.companion-element-row > span { padding: 22px 18px; background: var(--blue-faint); border-right: 1px solid var(--line); font-size: 14px; font-weight: 550; }
+.companion-element-row > div { padding: 10px 14px; min-width: 0; }
+.companion-task-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.companion-task-meta label { display: grid; gap: 4px; padding: 12px 16px; min-width: 0; border-right: 1px solid var(--line); }
+.companion-task-meta label:last-child { border-right: 0; }
+.companion-task-meta label > span { padding-left: 10px; color: var(--ink-2); font-size: 13px; }
+.companion-page .companion-task-table input.companion-element-control,
+.companion-page .companion-task-table textarea.companion-element-control { border: 1px solid transparent; border-radius: 5px; background: transparent; padding: 10px; width: 100%; min-height: 42px; font-size: 15px; line-height: 1.7; box-shadow: none; }
+.companion-page .companion-task-table .companion-element-control:hover { background: var(--muted); }
+.companion-page .companion-task-table .companion-element-control:focus { border-color: var(--blue); background: var(--card); outline: 2px solid var(--blue-soft); outline-offset: 1px; }
+.companion-page .companion-task-name input { font-weight: 600; }
 .companion-skill-list { display: grid; gap: 12px; margin-top: 20px; }
 .companion-skill-option { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
 .companion-skill-option:has(input:checked) { background: var(--blue-faint); border-color: var(--blue); }
@@ -39,7 +51,13 @@
 @media (max-width: 760px) {
   .companion-page h1 { font-size: 28px; }
   .companion-editor, .companion-activity { padding: 20px 16px; }
-  .companion-task-fields { grid-template-columns: 1fr; }
+  .companion-element-row { grid-template-columns: 1fr; }
+  .companion-element-row > span { padding: 12px 14px 4px; background: var(--card); border-right: 0; }
+  .companion-element-row > div { padding: 2px 6px 10px; }
+  .companion-task-meta { grid-template-columns: 1fr; }
+  .companion-task-meta label { grid-template-columns: 90px minmax(0, 1fr); align-items: center; padding: 8px 6px; border-right: 0; border-top: 1px solid var(--line-soft); }
+  .companion-task-meta label:first-child { border-top: 0; }
+  .companion-task-meta label > span { padding-left: 8px; }
   .companion-steps { gap: 20px; font-size: 14px; }
   .companion-card { flex-wrap: wrap; padding: 20px; }
   .companion-task-summary > div { grid-template-columns: 1fr; gap: 6px; }

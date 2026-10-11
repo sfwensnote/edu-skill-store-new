@@ -8,11 +8,22 @@ export function TaskElements({ task, design, onTask, onDesign }: {
 }) {
   return <>
     <section><h2>教学任务要素表</h2>
-      <div className="companion-task-fields">{taskFields.map(([key, label], index) => <label className={`form-field ${index > 3 ? 'companion-wide' : ''}`} key={key}>
-        <span>{label}</span>
-        {index < 4 ? <input required value={task[key]} onChange={event => onTask({ ...task, [key]: event.target.value })} /> :
-          <Textarea required value={task[key]} onChange={event => onTask({ ...task, [key]: event.target.value })} />}
-      </label>)}</div>
+      <div className="companion-task-table">
+        <label className="companion-element-row companion-task-name">
+          <span>教学任务名称</span>
+          <div><input className="companion-element-control" required value={task.title} onChange={event => onTask({ ...task, title: event.target.value })} /></div>
+        </label>
+        <div className="companion-task-meta">
+          {taskFields.slice(1, 4).map(([key, label]) => <label key={key}>
+            <span>{label}</span>
+            <input className="companion-element-control" required value={task[key]} onChange={event => onTask({ ...task, [key]: event.target.value })} />
+          </label>)}
+        </div>
+        {taskFields.slice(4).map(([key, label]) => <label className="companion-element-row" key={key}>
+          <span>{label}</span>
+          <div><Textarea className="companion-element-control" minRows={2} required value={task[key]} onChange={event => onTask({ ...task, [key]: event.target.value })} /></div>
+        </label>)}
+      </div>
     </section>
     <section className="companion-options"><h2>活动设计 <small>选填</small></h2>
       <div className="inline-actions">

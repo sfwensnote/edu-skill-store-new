@@ -3,6 +3,7 @@ import { accountSessionKey, identity, loginAccount, readAccounts, readAccountSes
   setTeacherDisabled, type AccountIdentity } from '../../../shared/local-accounts';
 import { accountWorkspace, ownersStorageKey, type WorkspaceStorage } from '@/lib/account-workspace';
 import { LoginPage } from './LoginPage';
+import { goTo } from '@/lib/routes';
 import './accounts.css';
 
 type AccountContextValue = {
@@ -53,10 +54,14 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   }, [accountId]);
   if (!session.account || !storage) return <LoginPage initialError={session.error} onLogin={async (login, password) => {
     const account = await loginAccount(localStorage, sessionStorage, { login, password });
-    failedKeys.current.clear(); setSession({ account, error: '' });
+    failedKeys.current.clear();
+    goTo({ page: 'home' }, true);
+    setSession({ account, error: '' });
   }} onRegister={async (name, login, password) => {
     const account = await registerTeacher(localStorage, sessionStorage, { name, login, password });
-    failedKeys.current.clear(); setSession({ account, error: '' });
+    failedKeys.current.clear();
+    goTo({ page: 'home' }, true);
+    setSession({ account, error: '' });
   }} />;
   let accounts: AccountIdentity[] = [];
   try { if (session.account.role === 'admin') accounts = readAccounts(localStorage).map(identity); } catch { /* 管理面板在读取失败时提供重试。 */ }
