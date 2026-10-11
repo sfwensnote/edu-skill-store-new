@@ -1,7 +1,7 @@
 .testing-page { min-height: calc(100dvh - var(--header-height)); background: var(--canvas); }
 .testing-toolbar { border-bottom: 1px solid var(--line); background: var(--card); }
 .testing-toolbar-inner { display: flex; flex-direction: column; align-items: stretch; gap: 16px; padding-block: 24px; }
-.testing-toolbar-inner .back-link { align-self: flex-start; }
+.testing-toolbar-inner .testing-previous { align-self: flex-start; }
 .testing-title { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
 .testing-title h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; min-width: 0; font-size: 28px; line-height: 1.4; overflow-wrap: anywhere; }
 .testing-title h1 span:first-child { font-size: 22px; }
@@ -37,7 +37,6 @@
 .check-list p svg { width: 16px; color: var(--green); }
 .check-list .attention-note { margin-top: 12px; padding: 10px 12px; border-radius: 6px; color: var(--orange); background: var(--orange-soft); }
 .case-confirmation { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: var(--space-section); padding: 17px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--blue-faint); }
-.case-confirmation .test-previous { margin-right: auto; }
 .case-confirmation > div { display: flex; flex-direction: column; }
 .case-confirmation strong { font-size: 14px; }
 .case-confirmation span { color: var(--ink-2); font-size: var(--text-caption); }

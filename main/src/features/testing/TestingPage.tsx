@@ -10,21 +10,17 @@ import { useAccount } from '@/features/accounts/AccountProvider';
 
 export function TestingPage({
   assistant,
-  onBack,
   onComplete,
   onStartTrial,
   onCreated,
   onAdjust,
-  backLabel,
   onSaveMethod,
 }: {
   assistant: TeachingAssistant;
-  onBack: () => void;
   onComplete: () => boolean;
   onStartTrial: () => void;
   onCreated?: () => void;
   onAdjust: () => void;
-  backLabel: string;
   onSaveMethod: (skillId: string, method: TeachingMethod) => boolean;
 }) {
   const { storage } = useAccount();
@@ -88,7 +84,7 @@ export function TestingPage({
     return (
       <main className="page-frame creation-flow">
         <h1>请先整理教学方法</h1>
-        <Button onClick={onAdjust}>返回设计</Button>
+        <Button variant="outline" onClick={onAdjust}><ArrowLeft data-icon="inline-start" />返回上一步</Button>
       </main>
     );
   }
@@ -96,10 +92,9 @@ export function TestingPage({
     <main className="testing-page">
       <header className="testing-toolbar">
         <div className="page-frame testing-toolbar-inner">
-          <button className="back-link" onClick={onBack}>
-            <ArrowLeft />
-            {backLabel}
-          </button>
+          <Button className="testing-previous" variant="outline" onClick={previous}>
+            <ArrowLeft data-icon="inline-start" />返回上一步
+          </Button>
           <div className="testing-title">
             <h1><span>{assistant.name}</span>{' '}<span>方法检验</span></h1>
             <i className={completed >= cases.length ? 'done' : ''}>{completed >= cases.length ? '核对完成' : '待核对'}</i>
@@ -147,7 +142,6 @@ export function TestingPage({
                 ))}
               </div>
               <div className="complete-actions">
-                <Button variant="outline" size="lg" onClick={previous}>返回上一步</Button>
                 <Button variant="outline" size="lg" onClick={onAdjust}>
                   返回调整
                 </Button>
@@ -166,7 +160,6 @@ export function TestingPage({
               testCase={current}
               index={cursor}
               total={cases.length}
-              onPrevious={previous}
               onConfirm={confirmCurrent}
               onEdit={() => setEditingSkillId(current.skillId)}
             />

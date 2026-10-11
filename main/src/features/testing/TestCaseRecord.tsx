@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CircleDot } from 'lucide-react';
+import { ArrowRight, CircleDot } from 'lucide-react';
 import type { DemoTestCase } from './testData';
 import { Button } from '@/components/ui/button';
 
@@ -6,14 +6,12 @@ export function TestCaseRecord({
   testCase,
   index,
   total,
-  onPrevious,
   onConfirm,
   onEdit,
 }: {
   testCase: DemoTestCase;
   index: number;
   total: number;
-  onPrevious: () => void;
   onConfirm: () => void;
   onEdit: () => void;
 }) {
@@ -54,7 +52,6 @@ export function TestCaseRecord({
         {testCase.attention && <p className="attention-note">{testCase.attention}</p>}
       </div>
       <div className="case-confirmation">
-        <Button className="test-previous" variant="outline" onClick={onPrevious}><ArrowLeft data-icon="inline-start" />返回上一步</Button>
         <Button variant="outline" onClick={onEdit}>修改当前方法</Button>
         <Button size="lg" onClick={onConfirm}>
           {index === total - 1 ? '确认并完成' : '确认并继续'}

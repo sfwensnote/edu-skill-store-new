@@ -372,7 +372,6 @@ function SkillWorkspace() {
       )}
       {route.page === 'test' && current && (
         <TestingPage
-          backLabel={returnLabel(route, { page: 'create', assistantId: current.id })}
           onAdjust={() => {
             const parent = returnRoute(route, { page: 'create', assistantId: current.id });
             goTo(
@@ -386,7 +385,6 @@ function SkillWorkspace() {
             ...current,
             skills: current.skills.filter((skill) => platform.isSkillIncluded(current.id, skill.id)),
           }}
-          onBack={() => back({ page: 'create', assistantId: current.id })}
           onComplete={() => platform.setStatus(current.id, 'TESTED')}
           onSaveMethod={(skillId, method) => {
             if (!platform.saveReviewedMethod(current.id, skillId, method)) return false;

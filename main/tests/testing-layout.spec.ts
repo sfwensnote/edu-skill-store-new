@@ -25,6 +25,15 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await expect(page.getByRole('status').filter({ hasText: '正在打开方法检验' })).toBeVisible();
   await expect(page).toHaveURL(/check-layout\/test/);
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  const previous = page.getByRole('button', { name: '返回上一步', exact: true });
+  await expect(previous).toHaveCount(1);
+  await expect(previous).toBeInViewport();
+  await previous.click();
+  await expect(page).toHaveURL(/#\/create\/check-layout/);
+  await expect(page.getByRole('heading', { name: '创建教学方法', level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: '编辑SKILL 名称', exact: true })).toContainText('思路追问');
+  await page.getByRole('button', { name: '这就是我的教学方法', exact: true }).click();
+  await expect(page).toHaveURL(/check-layout\/test/);
   const heading = page.getByRole('heading', { name: '思路追问 方法检验', level: 1 });
   await expect(heading).toBeVisible();
   const progress = page.getByRole('progressbar', { name: '方法检验进度' });
@@ -42,6 +51,7 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await page.screenshot({ path: info.outputPath('check-layout-desktop.png'), fullPage: true });
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
+    await expect(previous).toBeInViewport();
     await expect(progress).toBeVisible();
     await expect(page.locator('.test-record')).toBeVisible();
     await expect(page.getByRole('tab', { name: '核对进度', exact: true })).toHaveCount(0);
@@ -66,6 +76,8 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await page.getByRole('button', { name: '确认并完成', exact: true }).click();
   await expect(progress).toHaveAttribute('value', '2');
   await expect(page.getByRole('heading', { name: '教学方法核对完成' })).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(previous).toBeInViewport();
   await page.getByRole('button', { name: '返回上一步', exact: true }).click();
   await expect(page.locator('.test-case-head')).toContainText('情况 2');
   await expect(progress).toHaveAttribute('value', '2');
