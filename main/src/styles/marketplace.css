@@ -73,52 +73,6 @@
   color: var(--ink-2);
   font-size: 14px;
 }
-.area-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-.area-card {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 28px;
-  text-align: center;
-  background: white;
-  transition: border-color 0.15s;
-}
-.area-card:hover {
-  border-color: var(--line-strong);
-  background: var(--muted);
-}
-.area-card > svg {
-  width: 28px;
-  height: 28px;
-  margin: 0 auto 18px;
-}
-.area-card > p {
-  color: var(--ink-2);
-  margin: 8px 0 20px;
-}
-.area-card > div {
-  border-top: 1px solid var(--line);
-  text-align: left;
-  padding-top: 14px;
-}
-.area-card small {
-  color: var(--ink-2);
-}
-.entry-link {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  color: var(--blue);
-  font-size: 14px;
-  margin-top: 16px;
-}
-.entry-link svg {
-  width: 16px;
-}
 .market-panel {
   padding: 24px;
   border: 1px solid var(--line);
@@ -126,44 +80,6 @@
   background: #fff;
   margin-top: 20px;
   min-width: 0;
-}
-.home-public .section-title {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.section-title > svg {
-  width: 26px;
-}
-.section-title > div {
-  flex: 1;
-}
-.section-title p {
-  color: var(--ink-2);
-}
-.public-grid {
-  margin-top: 20px;
-  border-top: 1px solid var(--line);
-  padding-top: 24px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.public-grid button {
-  background: transparent;
-  border: 0;
-  text-align: center;
-  padding: 16px;
-}
-.public-grid button:hover {
-  background: var(--muted);
-}
-.public-grid svg {
-  width: 22px;
-  margin: 0 auto 12px;
-}
-.public-grid p {
-  color: var(--ink-2);
 }
 .daily-entry {
   max-width: 760px;
@@ -182,29 +98,6 @@
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 16px;
-}
-.level-entry {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  padding: 24px 0;
-}
-.level-entry + .level-entry {
-  border-top: 1px solid var(--line);
-}
-.level-entry > svg {
-  flex-shrink: 0;
-  width: 24px;
-  margin-top: 5px;
-}
-.level-entry > div {
-  flex: 1;
-}
-.level-entry small {
-  display: block;
-}
-.level-entry [data-slot='button'] {
-  margin-top: 3px;
 }
 .detail-heading {
   display: flex;
@@ -234,24 +127,6 @@
 .market-filters select {
   min-width: 100px;
 }
-.search-field {
-  flex: 1;
-  min-width: 240px;
-  border: 1px solid var(--input);
-  border-radius: 6px;
-  padding: 0 12px;
-  height: 40px;
-}
-.search-field svg {
-  width: 18px;
-  color: var(--ink-2);
-}
-.search-field input {
-  border: 0;
-  width: 100%;
-  outline: none;
-  background: transparent;
-}
 .market-page select,
 .inquiry-page select {
   border: 1px solid var(--input);
@@ -260,23 +135,12 @@
   background: white;
   color: var(--ink);
 }
-.skill-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
 .skill-card {
   margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-}
-.card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
 }
 .skill-card h2 {
   font-size: 18px;
@@ -301,9 +165,6 @@
   gap: 4px;
   font-size: 13px;
   color: var(--ink-2);
-}
-.validation-label {
-  margin: 8px 0;
 }
 .empty-state {
   text-align: center;

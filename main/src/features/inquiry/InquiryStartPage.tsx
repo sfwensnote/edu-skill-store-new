@@ -8,7 +8,6 @@ import {
   rentalSampleDesign,
   levelNames,
   type ContextualDesign,
-  type DesignLevel,
 } from '../../../shared/contextual-design';
 import { prepareOutcome, parseInquiryStartDraft } from '../../../shared/inquiry-workflow';
 import type { AppRoute } from '@/lib/routes';

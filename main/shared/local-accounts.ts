@@ -9,7 +9,7 @@ const accountSchema = z.object({
   role: z.enum(['teacher', 'admin']), disabled: z.boolean(),
   salt: z.string().regex(/^[a-f0-9]{32}$/), hash: z.string().regex(/^[a-f0-9]{64}$/),
 });
-export type LocalAccount = z.infer<typeof accountSchema>;
+type LocalAccount = z.infer<typeof accountSchema>;
 export type AccountIdentity = Pick<LocalAccount, 'id' | 'login' | 'name' | 'role' | 'disabled'>;
 const credentials = z.object({
   login: z.string().trim().toLowerCase().regex(/^[a-z0-9_.@-]{3,40}$/),
@@ -17,7 +17,7 @@ const credentials = z.object({
 });
 
 // 仅用于浏览器内的登录演示；不能用于真实服务的认证或权限判断。
-export const initialAccounts: LocalAccount[] = [
+const initialAccounts: LocalAccount[] = [
   { id: primaryTeacherId, login: 'teacher', name: '教师', role: 'teacher', disabled: false,
     salt: 'e3710a69caed2449bfd2de7da1bab411', hash: '1405b77025d4f76f280a3dd7d80122c21e00e2ea06c4ae5c0f14adfcc8bc2146' },
   { id: 'demo-admin', login: 'admin', name: '管理员', role: 'admin', disabled: false,

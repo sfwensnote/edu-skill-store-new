@@ -1,6 +1,4 @@
 import type {
-  AssistantStatus,
-  DesignerMessage,
   EducationalSkill,
   TeachingAssistant,
 } from '../../shared/assistant';
@@ -107,31 +105,4 @@ export const initialMine: TeachingAssistant[] = [
     ], false),
     status: 'DRAFT',
   },
-];
-
-export const initialDesignerMessages: DesignerMessage[] = [
-  {
-    id: 'welcome',
-    assistantId: 'new',
-    role: 'assistant',
-    content: '你好，我是教学设计器。告诉我你希望助手面对哪些学生、解决什么教学问题，以及你希望它怎样帮助学生。',
-    createdAt: now,
-  },
-];
-
-export const statusLabels: Record<AssistantStatus, string> = {
-  DRAFT: '草稿',
-  GENERATED: '待检测',
-  TESTED: '检测完成',
-  TRIAL: '试用中',
-  ACTIVE: '运行中',
-};
-
-export const demoSessions = [
-  { id: 'session-1', date: '2026/09/09', time: '14:32', turns: 8, skills: ['错误后反思引导', '渐进式提示'], anomaly: '' },
-  { id: 'session-2', date: '2026/09/09', time: '10:15', turns: 5, skills: ['理解确认', '渐进式提示'], anomaly: '' },
-  { id: 'session-3', date: '2026/09/08', time: '16:20', turns: 12, skills: ['错误后反思引导', '理解确认', '渐进式提示'], anomaly: '第二次提示过于直接' },
-  { id: 'session-4', date: '2026/09/08', time: '09:41', turns: 6, skills: ['渐进式提示', '错误后反思引导'], anomaly: '' },
-  { id: 'session-5', date: '2026/09/07', time: '15:03', turns: 10, skills: ['理解确认', '错误后反思引导'], anomaly: '未能识别学生的知识点混淆' },
-  { id: 'session-6', date: '2026/09/07', time: '11:18', turns: 4, skills: ['渐进式提示'], anomaly: '' },
 ];

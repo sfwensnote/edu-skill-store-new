@@ -114,6 +114,7 @@ export function MethodOutline({
         <TeachingTagsField required value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
       </StepSection>
       <StepSection number={2} title="教学目标框架" updated={updatedSection === 2}>
+        <p className="method-completion-hint">以下内容可通过左侧提示自动补全</p>
         {field('想解决的问题', 'problem')}
         {field('希望学生达到', 'expectedOutcome')}
         {field('什么时候开始', 'trigger')}
@@ -241,10 +242,10 @@ export function MethodOutline({
                   ...method,
                   principles: [
                     ...method.principles.filter((item) => !item.startsWith(boundaryPrefix)),
-                    ...(value.trim() ? [`${boundaryPrefix}${value}`] : []),
+                    ...(value.trim() ? [`${boundaryPrefix}${value.trim()}`] : []),
                   ],
                 },
-                'principles',
+                'boundary',
               )
             }
           />

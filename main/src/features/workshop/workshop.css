@@ -452,6 +452,3 @@
     min-height: 44px;
   }
 }
-.workshop-method-archive { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 18px; }
-.workshop-method-archive summary { cursor: pointer; color: var(--ink-2); min-height: 38px; }
-.workshop-method-archive > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }

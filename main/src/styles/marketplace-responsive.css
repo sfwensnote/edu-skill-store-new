@@ -7,16 +7,9 @@
     flex-direction: column;
     gap: 12px;
   }
-  .skill-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .workshop-item {
     align-items: flex-start;
     flex-direction: column;
-  }
-  .item-actions {
-    max-width: none;
-    justify-content: flex-start;
   }
 }
 @media (max-width: 760px) {
@@ -70,8 +63,6 @@
   .inquiry-page h1 {
     font-size: 24px;
   }
-  .area-grid,
-  .public-grid,
   .editor-columns,
   .detail-grid {
     grid-template-columns: 1fr;
@@ -79,36 +70,8 @@
   .market-panel {
     padding: 18px;
   }
-  .area-card {
-    padding: 24px;
-  }
-  .section-title {
-    flex-wrap: wrap;
-  }
-  .home-public .section-title [data-slot='button'] {
-    margin-left: 42px;
-  }
-  .public-grid {
-    gap: 8px;
-  }
-  .level-entry {
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-  .level-entry > div {
-    min-width: 70%;
-  }
-  .level-entry [data-slot='button'] {
-    margin-left: 38px;
-  }
-  .skill-grid {
-    grid-template-columns: 1fr;
-  }
   .market-filters {
     gap: 12px;
-  }
-  .search-field {
-    flex-basis: 100%;
   }
   .market-filters > label {
     flex-wrap: wrap;
@@ -141,17 +104,8 @@
   .editor-footer > .inline-actions {
     justify-content: flex-start;
   }
-  .local-task {
-    flex-direction: column;
-  }
-  .item-actions [data-slot='button'] {
-    min-height: 40px;
-  }
   .field-grid {
     grid-template-columns: 1fr 1fr;
-  }
-  .workshop-tabs button {
-    padding-inline: 12px;
   }
   .status-banner,
   .review-banner {

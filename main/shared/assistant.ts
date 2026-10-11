@@ -53,20 +53,11 @@ export function canGenerateAssistant(assistant: TeachingAssistant) {
   return Boolean(assistant.name.trim() && assistant.goal.trim() && assistant.skills.length);
 }
 
-export const designerMessageSchema = z.object({
-  id: z.string(),
-  assistantId: z.string(),
-  role: z.enum(['user', 'assistant']),
-  content: text(4000),
-  createdAt: z.string().datetime(),
-});
-export type DesignerMessage = z.infer<typeof designerMessageSchema>;
-
 export type AssistantSummary = Omit<TeachingAssistant, 'skills' | 'userId' | 'createdAt'> & {
   skillCount: number;
 };
 
-export type LibraryFilters = {
+type LibraryFilters = {
   query: string;
   grade: string;
   subject: string;
@@ -131,8 +122,8 @@ export function summarizeUsage(sessions: UsageSessionRecord[]) {
   };
 }
 
-export type TestVerdict = 'pass' | 'attention' | 'fail';
-export type TestCaseType = 'typical' | 'boundary' | 'constraint';
+type TestVerdict = 'pass' | 'attention' | 'fail';
+type TestCaseType = 'typical' | 'boundary' | 'constraint';
 
 export type TestCaseResult = {
   id: string;
@@ -150,14 +141,4 @@ export type TestCaseResult = {
   constraints: { status: TestVerdict; reason: string };
   verdict: TestVerdict;
   summary: string;
-};
-
-export type TestRunView = {
-  id: string;
-  assistantId: string;
-  version: string;
-  status: 'RUNNING' | 'COMPLETED';
-  startedAt: string;
-  completedAt?: string;
-  cases: TestCaseResult[];
 };

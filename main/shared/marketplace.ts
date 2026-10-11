@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { skillSchema, type EducationalSkill, type TeachingAssistant } from './assistant';
 import type { ContextualDesign, DesignLevel } from './contextual-design';
-import { isActivityDraft, type LearningSettings, type TeachingActivityDraft } from './teaching-activity';
+import { isActivityDraft, type LearningSettings, type TeachingActivityDraft } from './legacy-activity';
 import { isStoredDesign, isStoredTask } from './workspace-storage';
 
-export type TeachingArea = 'daily' | 'inquiry';
+type TeachingArea = 'daily' | 'inquiry';
 export type SkillEntry = {
   id: string;
   skill: EducationalSkill;

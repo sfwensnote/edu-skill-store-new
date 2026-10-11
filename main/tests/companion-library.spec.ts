@@ -149,14 +149,20 @@ test('复制只创建独立学伴草稿，原学伴与我的 SKILL 保持，复�
 test('删除需确认，失败保留学伴，重试成功后刷新仍删除并保留 SKILL', async ({ page }) => {
   await seed(page);
   const skillsBefore = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
+  const deleteButton = page.getByRole('button', { name: '删除学伴：数学学伴', exact: true });
+  await expect(deleteButton).toBeVisible();
+  await expect(page.getByRole('button', { name: '删除学伴：自选形象学伴', exact: true })).toBeVisible();
   async function openDelete() {
-    await page.getByRole('button', { name: '更多操作：数学学伴', exact: true }).click();
-    await page.getByRole('menuitem', { name: '删除学伴', exact: true }).click();
+    await deleteButton.click();
     await expect(page.getByRole('dialog')).toContainText('数学学伴');
   }
   await openDelete();
   await page.getByRole('button', { name: '取消', exact: true }).click();
   await expect(page.locator('.companion-card')).toHaveCount(3);
+  await expect(deleteButton).toBeFocused();
+  await openDelete(); await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(deleteButton).toBeFocused();
   await openDelete(); await blockWrites(page);
   await page.getByRole('button', { name: '确认删除', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText('删除未保存');
@@ -168,6 +174,13 @@ test('删除需确认，失败保留学伴，重试成功后刷新仍删除并�
   await expect(page.locator('body')).not.toHaveCSS('pointer-events', 'none');
   expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(skillsBefore);
   await page.reload(); await expect(page.locator('[data-companion-id="math"]')).toHaveCount(0);
+  for (const name of ['阅读学伴', '自选形象学伴']) {
+    await page.getByRole('button', { name: `删除学伴：${name}`, exact: true }).click();
+    await page.getByRole('button', { name: '确认删除', exact: true }).click();
+  }
+  await expect(page.getByRole('heading', { name: '还没有学伴', exact: true })).toBeVisible();
+  await page.reload(); await expect(page.locator('.companion-card')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(skillsBefore);
   await page.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '首页', exact: true }).click();
   await expect(page).toHaveURL(/#\/home$/);
 });

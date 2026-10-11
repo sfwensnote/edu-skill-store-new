@@ -1,7 +1,5 @@
-import { useRef } from 'react';
-import { BookOpen, Clock3, Copy, FileText, Link, MoreHorizontal, Trash2 } from 'lucide-react';
+import { BookOpen, Clock3, Copy, FileText, Link, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { LearningCompanion } from '../../../shared/learning-companion';
 import type { SkillEntry } from '../../../shared/marketplace';
 import { CompanionAvatar } from './CompanionProfile';
@@ -12,7 +10,6 @@ export function CompanionCard({ value, skills, onOpen, onEdit, onCopy, onRemove 
   onOpen: () => void; onEdit: () => void; onCopy: () => void;
   onRemove: (trigger: HTMLButtonElement | null) => void;
 }) {
-  const moreRef = useRef<HTMLButtonElement>(null);
   const selected = [...new Set(value.skillIds)].map(id => ({ id, entry: skills.find(entry => entry.id === id) }));
   const updated = new Date(value.updatedAt);
   const time = Number.isFinite(updated.getTime()) ? updated.toLocaleString('zh-CN', {
@@ -37,12 +34,9 @@ export function CompanionCard({ value, skills, onOpen, onEdit, onCopy, onRemove 
         <Button onClick={onOpen}>查看学伴</Button>
         <Button variant="outline" onClick={onEdit}>{value.status === 'draft' ? '继续创建' : '编辑'}</Button>
         <Button variant="outline" onClick={onCopy}><Copy data-icon="inline-start" />复制</Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild><Button ref={moreRef} variant="outline" size="icon" aria-label={`更多操作：${value.name || '未命名学伴'}`}><MoreHorizontal /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end"><DropdownMenuGroup>
-            <DropdownMenuItem variant="destructive" onSelect={() => onRemove(moreRef.current)}><Trash2 />删除学伴</DropdownMenuItem>
-          </DropdownMenuGroup></DropdownMenuContent>
-        </DropdownMenu>
+        <Button variant="destructive" aria-label={`删除学伴：${value.name || '未命名学伴'}`} onClick={event => onRemove(event.currentTarget)}>
+          <Trash2 data-icon="inline-start" />删除
+        </Button>
       </div>
     </div>
     <div className="companion-card-sections">

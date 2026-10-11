@@ -24,6 +24,7 @@ const emptyCopy = {
   skills: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
   created: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
   added: ['还没有从集市添加 SKILL', '', '前往教学 SKILL 集市'],
+  favorites: ['还没有收藏 SKILL', '', '前往教学 SKILL 集市'],
 } as const;
 
 export function WorkshopPage(props: WorkshopProps) {
@@ -100,7 +101,16 @@ export function WorkshopPage(props: WorkshopProps) {
     },
     favorite: props.onFavorite,
     share: (item) => { if (item.kind === 'skill') props.onShare(item.entry); },
-    mount: (item) => { if (item.kind === 'skill') props.onMount(item.entry); },
+    mount: (item) => {
+      if (item.kind !== 'skill') return;
+      const entry = [...props.skills, ...props.addedSkills].find(
+        (value) => value.id === item.id || value.addedFrom?.id === item.id,
+      );
+      if (entry) props.onMount(entry);
+    },
+    add: (item) => {
+      if (item.kind === 'skill' && props.onAddSkill(item.entry)) setMessage('已添加到我的 SKILL');
+    },
     remove: (item, trigger) => {
       dialogOrigin.current = trigger;
       setPending({
@@ -119,7 +129,7 @@ export function WorkshopPage(props: WorkshopProps) {
     },
   };
   function emptyAction() {
-    if (tab === 'added') props.onMarket();
+    if (tab === 'added' || tab === 'favorites') props.onMarket();
     else props.onCreate();
   }
   const select = (key: 'grade' | 'subject' | 'sort', name: string, options: [string, string][]) => (
@@ -221,9 +231,11 @@ export function WorkshopPage(props: WorkshopProps) {
               <WorkshopResourceCard
                 key={item.id}
                 item={item}
-                tab={tab}
                 favorite={props.favorites.includes(item.id)}
                 shared={props.shared.includes(item.id)}
+                canMount={[...props.skills, ...props.addedSkills].some(
+                  (entry) => entry.id === item.id || entry.addedFrom?.id === item.id,
+                )}
                 actions={actions}
               />
             ))}

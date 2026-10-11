@@ -119,7 +119,7 @@ export function rentalSampleDesign(id: string): ContextualDesign {
 }
 
 const normalize = (text: string) => text.replace(/[\s，,。；;]/g, '');
-export function isRentalSample(design: ContextualDesign) {
+function isRentalSample(design: ContextualDesign) {
   return design.subject === '数学' && normalize(design.originalProblem) === normalize(sampleOriginal);
 }
 

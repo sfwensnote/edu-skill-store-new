@@ -187,7 +187,7 @@ export function buildMockRuntimeReply(assistant: TeachingAssistant, input: strin
   return { content, activeSkillIds: selected ? [selected.id] : [], anomaly: null as null | string };
 }
 
-export type ReportInput = {
+type ReportInput = {
   assistantName: string;
   conversations: number;
   skillTriggers: number;

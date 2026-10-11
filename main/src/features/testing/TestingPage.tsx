@@ -135,9 +135,7 @@ export function TestingPage({
                       <strong>{item.title}</strong>
                       <small>{assistant.skills.find((skill) => skill.id === item.skillId)?.name}</small>
                     </p>
-                    <em className={item.attention ? 'attention' : ''}>
-                      {item.methodReview ? '已确认' : item.attention ? '需关注' : '已核对'}
-                    </em>
+                    <em>已确认</em>
                   </div>
                 ))}
               </div>

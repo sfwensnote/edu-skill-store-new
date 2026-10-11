@@ -2,12 +2,8 @@ import { test, expect, type Page } from './demo-workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { buildContextualProblem, rentalSampleDesign } from '../shared/contextual-design';
 import { assistantSkillEntries } from '../shared/marketplace';
-import {
-  learningResources,
-  learningTaskSnapshot,
-  newActivityDraft,
-  type LearningActivityDraft,
-} from '../shared/teaching-activity';
+import type { LocalTeachingTask } from '../shared/marketplace';
+import { legacyActivityDraft } from './fixtures/legacy-activity';
 
 async function seed(page: Page) {
   const design = rentalSampleDesign('audit-design');
@@ -24,13 +20,17 @@ async function seed(page: Page) {
   assistant.skills[0].name = '我的证据追问方法';
   assistant.skills[0].behaviorSteps = ['请学生指出支持结论的证据', '追问证据和观点之间的联系'];
   const entry = assistantSkillEntries([assistant])[0];
-  const draft = newActivityDraft('learning', 'audit-activity') as LearningActivityDraft;
+  const draft = legacyActivityDraft('audit-activity');
   draft.step = 3;
   draft.resourceKey = 'design:audit-design:1';
   draft.settings.title = '我的学习活动';
   draft.settings.instructions = '请记录自己的依据';
   draft.settings.allowRetry = false;
-  const task = learningTaskSnapshot(draft, learningResources([design])[0], undefined);
+  const task: LocalTeachingTask = {
+    id: draft.id, title: draft.settings.title, kind: 'design', level: 1, design: structuredClone(design),
+    instructions: draft.settings.instructions, feedback: draft.settings.feedback, submissions: [],
+    createdAt: draft.updatedAt, activitySettings: { ...draft.settings }, status: 'draft',
+  };
   await page.addInitScript(
     ({ design, assistant, draft, task }) => {
       if (!localStorage.getItem('teaching-method.market-workspace.v1'))
@@ -119,7 +119,7 @@ test('从学习活动查看方法再应用，建立独立 SKILL 配置，不恢�
 });
 
 test('报告沿用当前方法并移除虚构统计，分享不会激活助手且展示所有方法', async ({ page }) => {
-  const { assistant } = await seed(page);
+  await seed(page);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/#/assistant/audit-teacher/logs');

@@ -221,11 +221,7 @@ summary:focus-visible {
 }
 .market-panel,
 .creation-panel,
-.usage-card,
-.latest-report,
-.run-records,
-.summary-strip,
-.report-sections > section {
+.run-records {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -469,7 +465,7 @@ summary:focus-visible {
     justify-content: space-between;
   }
   .header-nav button {
-    flex: 1;
+    flex: 1 0 auto;
     min-width: 0;
     padding: 0 5px;
     font-size: 12px;

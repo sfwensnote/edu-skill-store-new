@@ -110,7 +110,7 @@ test('从已发布个人来源添加也不会取得所有权，来源移除后�
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
 });
 
-test('集市两个操作与我的三类在桌面、平板和手机可见且不溢出', async ({ page }) => {
+test('集市两个操作与我的分类在桌面、平板和手机可见且不溢出', async ({ page }) => {
   await page.goto('/#/market');
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
@@ -123,7 +123,7 @@ test('集市两个操作与我的三类在桌面、平板和手机可见且不�
   await page.goto('/#/workshop?tab=added');
   await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true })).toHaveValue('added');
   await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).locator('option')).toHaveText([
-    '全部（7）', '我创建的（6）', '从集市添加（1）',
+    '全部（7）', '我创建的（6）', '从集市添加（1）', '我的收藏（0）',
   ]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

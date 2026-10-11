@@ -1,8 +1,8 @@
 import { companionsKey, readCompanions } from './learning-companion';
+import { marketWorkspaceKey as workspaceKey } from './workspace-keys';
 
 type TaskStorage = Pick<Storage, 'getItem' | 'setItem'>;
 type Change = { key: string; before: string; after: string };
-const workspaceKey = 'teaching-method.market-workspace.v1';
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 
 // 用户授权清除旧任务；只处理已知旧结构，新的三项教学场景与 SKILL 不清理。

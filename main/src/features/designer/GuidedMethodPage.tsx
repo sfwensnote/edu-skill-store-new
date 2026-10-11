@@ -8,6 +8,7 @@ import { MethodOutline } from './MethodOutline';
 import { MethodPreview } from './MethodPreview';
 import {
   demoIdea,
+  boundaryPrefix,
   methodError,
   mockQuestions,
   recordAnswer,
@@ -35,6 +36,7 @@ export function GuidedMethodPage({
   const [preview, setPreview] = useState(false);
   const [updated, setUpdated] = useState<{ section: number; at: number } | null>(null);
   const question = mockQuestions[draft.questionIndex];
+  const answerLimit = question?.id === 'boundary' ? 500 - boundaryPrefix.length : 500;
   const answer =
     question && draft.pendingAnswer?.questionId === question.id
       ? draft.pendingAnswer.value
@@ -71,7 +73,7 @@ export function GuidedMethodPage({
   function submitAnswer() {
     if (!answer.trim() || !question) return;
     const next = recordAnswer(draft, answer);
-    const section = question.id === 'principle' ? 4 : ['outcome', 'trigger'].includes(question.id) ? 2 : 3;
+    const section = question.id === 'boundary' ? 5 : question.id === 'principle' ? 4 : ['outcome', 'trigger'].includes(question.id) ? 2 : 3;
     if (JSON.stringify(next.method) !== JSON.stringify(method)) setUpdated({ section, at: Date.now() });
     onChange(next);
     setError('');
@@ -149,7 +151,7 @@ export function GuidedMethodPage({
               <Textarea
                 id="guided-answer"
                 value={answer}
-                maxLength={500}
+                maxLength={answerLimit}
                 placeholder={question.placeholder}
                 onChange={(event) =>
                   onChange({
@@ -158,8 +160,8 @@ export function GuidedMethodPage({
                   })
                 }
               />
-              {answer.length >= 450 && (
-                <span className="answer-count">还可输入 {500 - answer.length} 字</span>
+              {answer.length >= answerLimit - 50 && (
+                <span className="answer-count">还可输入 {answerLimit - answer.length} 字</span>
               )}
               <div className="answer-actions">
                 <button

@@ -3,15 +3,14 @@ import { assistantSkillEntries, parseMarketWorkspace, type SkillEntry } from '..
 import { isStoredAssistant } from '../../shared/workspace-storage';
 import { isMethodReviewed } from '../../shared/method-review';
 
-export type WorkspaceStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem' | 'key' | 'length'>;
-export const ownersStorageKey = 'teaching-assistant.frontend-demo.v2';
-export const marketWorkspaceKey = 'teaching-method.market-workspace.v1';
+import { ownersStorageKey, marketWorkspaceKey, excludedSkillsKey, companionsKey, type WorkspaceStorage } from '../../shared/workspace-keys';
+export { ownersStorageKey, marketWorkspaceKey, type WorkspaceStorage } from '../../shared/workspace-keys';
 export function accountWorkspaceKey(accountId: string, key: string) {
   // 首个教师账号沿用原存储，保留清空后已新建的内容。
   return accountId === primaryTeacherId ? key : `teaching-method.account:${accountId}:${key}`;
 }
 function isWorkspaceKey(key: string) {
-  return key === 'teaching-method.companions.v1' || key === ownersStorageKey || key === marketWorkspaceKey || key === 'teaching-assistant.excluded-skills.v1' ||
+  return key === companionsKey || key === ownersStorageKey || key === marketWorkspaceKey || key === excludedSkillsKey ||
     key.startsWith(`${ownersStorageKey}.recovery:`) || key.startsWith('teaching-assistant.method-draft.v1:') ||
     key.startsWith('teaching-assistant.check-progress:');
 }
@@ -43,7 +42,7 @@ export function readPublishedSkills(storage: WorkspaceStorage & AccountStorage, 
     const reviewed = owners.filter(isStoredAssistant).filter(isMethodReviewed);
     const market = parseMarketWorkspace(personal.getItem(marketWorkspaceKey));
     let excluded: Record<string, unknown> = {};
-    try { excluded = JSON.parse(personal.getItem('teaching-assistant.excluded-skills.v1') || '{}') || {}; } catch { /* 使用已保存的核对状态。 */ }
+    try { excluded = JSON.parse(personal.getItem(excludedSkillsKey) || '{}') || {}; } catch { /* 使用已保存的核对状态。 */ }
     return assistantSkillEntries(reviewed).filter(entry => market.sharedSkillIds.includes(entry.id) &&
       !(Array.isArray(excluded[entry.assistantId!]) && (excluded[entry.assistantId!] as unknown[]).includes(entry.skill.id)))
       .map(entry => account.id === viewerId ? { ...entry, creator: account.name }

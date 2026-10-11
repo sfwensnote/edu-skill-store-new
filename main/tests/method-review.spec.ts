@@ -28,6 +28,8 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/#/assistant/review-flow/test');
   await page.getByRole('button', { name: '确认并继续' }).click();
+  await expect(page.locator('.test-record')).toContainText('我已经回顾了自己的思路，但还是没有找到哪里出了问题。');
+  await expect(page.locator('.test-record')).toContainText('你已经回顾过思路');
   await page.getByRole('button', { name: '修改当前方法' }).click();
   const editor = page.getByRole('dialog');
   await editor.getByRole('button', { name: '编辑做法 2' }).click();
@@ -50,6 +52,8 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.getByRole('button', { name: '预览这一步' }).nth(1).click();
   await expect(page.getByRole('tab', { name: '体验引导' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('review-method:1');
+  await expect(page.locator('.student-message').first()).toContainText('我已经回顾了自己的思路，但还是没有找到哪里出了问题。');
+  await expect(page.locator('.student-message').last()).toContainText('先标出你不确定的一步');
   await page.screenshot({ path: 'docs/assets/简化后-方法预览.png', fullPage: true });
   await page.getByLabel('以学生身份输入').fill('我回顾了，还是找不到问题。');
   await page.getByRole('button', { name: '发送学生问题' }).click();

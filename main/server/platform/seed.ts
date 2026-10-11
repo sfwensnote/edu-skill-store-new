@@ -159,5 +159,3 @@ function seedUsage(db: DatabaseSync, now: string) {
     }
   });
 }
-
-export const demoAccount = { email: demoEmail, password: demoPassword };

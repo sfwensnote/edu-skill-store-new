@@ -6,9 +6,7 @@ html {
 :is(input, textarea, select, summary, button, [tabindex='-1']) {
   scroll-margin-block: 16px;
 }
-main:focus,
-.activity-configure-panel:focus,
-.activity-form-error:focus {
+main:focus {
   outline: none;
 }
 .skip-link {
@@ -60,13 +58,6 @@ main:focus,
   resize: none;
 }
 .page-frame .chat-composer textarea.auto-textarea:focus {
-  outline: none;
-}
-.activity-workbench .activity-search:focus-within {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px var(--blue-soft);
-}
-.activity-workbench .activity-search input:focus {
   outline: none;
 }
 @media (max-width: 900px) {

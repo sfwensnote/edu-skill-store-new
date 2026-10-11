@@ -6,9 +6,7 @@ import { isStoredAssistant } from '../../shared/workspace-storage';
 import { reviseReviewedMethod } from '../../shared/method-review';
 import type { TeachingMethod } from '../../shared/teaching-method';
 import { workspaceKeys, type WorkspaceStorage } from '@/lib/account-workspace';
-
-const storageKey = 'teaching-assistant.frontend-demo.v2';
-const excludedKey = 'teaching-assistant.excluded-skills.v1';
+import { ownersStorageKey as storageKey, excludedSkillsKey as excludedKey } from '../../shared/workspace-keys';
 
 function loadAssistants(storage: WorkspaceStorage) {
   try {

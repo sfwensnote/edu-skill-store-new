@@ -110,7 +110,7 @@ function restore(storage: WorkspaceStorage, assistant: TeachingAssistant, skillI
     teachingScene: method.category || '',
     stage: selected ? 'method' : 'idea',
     method,
-    questionIndex: selected ? 6 : 0,
+    questionIndex: selected ? mockQuestions.length : 0,
     editingSkillId: selected?.id,
   };
 }
@@ -135,8 +135,6 @@ export function DesignerPage({
   onSaveExit: () => void;
   onUpdate: (patch: Partial<TeachingAssistant>) => boolean;
   onStartTest: () => boolean;
-  isSkillIncluded: (id: string) => boolean;
-  onToggleSkill: (id: string) => void;
 }) {
   const [draft, setDraft] = useState(() => restore(storage, assistant, selectedSkillId, sourceTags, sourceCategory));
   const [storageError, setStorageError] = useState('');
@@ -239,9 +237,7 @@ export function DesignerPage({
         <div><h1 ref={headingRef} tabIndex={-1}>
           {selectedSkillId ? '编辑教学方法' : '创建教学方法'}
         </h1>
-        <p className="creation-position">
-          {draft.stage === 'idea' ? '1 · 教学想法' : '2 · 梳理方法'}
-        </p></div>
+        </div>
         <Button
           className="page-heading-actions"
           variant="ghost"

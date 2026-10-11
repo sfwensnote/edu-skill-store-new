@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SkillIcon } from '@/components/SkillIcon';
 import { teachingCategoryOf } from '../../../shared/teaching-tags';
-import { type WorkItem, type WorkshopTab } from './workshop-catalog';
+import type { WorkItem } from './workshop-catalog';
 
 export type WorkActions = {
   view: (item: WorkItem) => void;
@@ -31,19 +31,20 @@ export type WorkActions = {
   favorite: (id: string) => void;
   share: (item: WorkItem) => void;
   mount: (item: WorkItem, trigger: HTMLButtonElement | null) => void;
+  add: (item: WorkItem) => void;
   remove: (item: WorkItem, trigger: HTMLButtonElement | null) => void;
 };
 export function WorkshopResourceCard({
   item,
-  tab,
   favorite,
   shared,
+  canMount,
   actions,
 }: {
   item: WorkItem;
-  tab: WorkshopTab;
   favorite: boolean;
   shared: boolean;
+  canMount: boolean;
   actions: WorkActions;
 }) {
   const moreRef = useRef<HTMLButtonElement>(null);
@@ -103,6 +104,7 @@ export function WorkshopResourceCard({
           </Button>
         )}
         {own && item.kind === 'skill' && <Button variant="outline" onClick={() => actions.share(item)}>{shared ? '管理发布' : '发布到集市'}</Button>}
+        {item.kind === 'skill' && !canMount && <Button variant="outline" onClick={() => actions.add(item)}>添加到我的 SKILL</Button>}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -126,7 +128,7 @@ export function WorkshopResourceCard({
                   <Heart fill={favorite ? 'currentColor' : 'none'} />
                   {favorite ? '取消收藏' : '收藏'}
                 </DropdownMenuItem>
-                {item.kind === 'skill' && (
+                {item.kind === 'skill' && canMount && (
                   <DropdownMenuItem onSelect={() => actions.mount(item, moreRef.current)}>
                     <Link />
                     挂载到学伴

@@ -219,14 +219,6 @@
   border: 0;
   text-align: left;
 }
-.catalog-status {
-  flex: none;
-  font-size: 11px;
-  color: var(--primary);
-  background: var(--blue-soft);
-  padding: 2px 7px;
-  border-radius: 4px;
-}
 .market-catalog .skill-practice {
   display: -webkit-box;
   -webkit-box-orient: vertical;

@@ -14,16 +14,14 @@
   color: var(--ink-2);
   font-size: 14px;
 }
-.editor-levels,
-.workshop-tabs {
+.editor-levels {
   display: flex;
   margin-top: 24px;
   border-bottom: 1px solid var(--line);
   gap: 8px;
   overflow-x: auto;
 }
-.editor-levels button,
-.workshop-tabs button {
+.editor-levels button {
   padding: 13px 16px;
   border: 0;
   border-bottom: 2px solid transparent;
@@ -32,8 +30,7 @@
   white-space: nowrap;
   min-height: 44px;
 }
-.editor-levels button.active,
-.workshop-tabs button.active {
+.editor-levels button.active {
   color: var(--blue);
   border-bottom-color: var(--blue);
   font-weight: 600;

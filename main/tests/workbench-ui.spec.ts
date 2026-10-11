@@ -41,7 +41,7 @@ test('工作区可预览、折叠并恢复手动修改与结束条件，形成 S
   await expect(page.getByRole('button', { name: '编辑结束条件' })).toContainText(
     '两次提示后仍停滞时，转交教师。',
   );
-  for (let index = 1; index < 6; index++)
+  for (let index = 1; index < mockQuestions.length; index++)
     await page.getByRole('button', { name: '提交', exact: true }).click();
   await expect(page.getByRole('button', { name: '形成 SKILL', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();

@@ -20,11 +20,24 @@ function catalog() {
 }
 test('我的 SKILL 按创建与集市添加分类，全部为两者之和', () => {
   const c = catalog();
-  assert.deepEqual(Object.keys(c), ['skills', 'created', 'added']);
+  assert.deepEqual(Object.keys(c), ['skills', 'created', 'added', 'favorites']);
   assert.equal(c.skills.length, 7);
   assert.equal(c.created.length, 6);
   assert.equal(c.added.length, 1);
   assert.equal(c.added[0].createdAt, '2026-10-10T08:00:00Z');
+});
+test('收藏独立汇集自己和集市的方法，忽略失效旧记录，不增加我的 SKILL 数量', () => {
+  const skills = assistantSkillEntries(initialMine);
+  const addedSkills = addMarketSkill([], marketSkills[0], '2026-10-10T08:00:00Z');
+  const before = structuredClone({ skills, addedSkills, marketSkills });
+  const c = workshopCollections({ skills, addedSkills, assistants: initialMine,
+    catalogSkills: marketSkills, favorites: [skills[0].id, marketSkills[0].id,
+      addedSkills[0].id, marketSkills[0].id, 'design:old:3', 'missing'] });
+  assert.deepEqual(c.favorites.map(item => item.id), [skills[0].id, marketSkills[0].id, addedSkills[0].id]);
+  assert.equal(c.skills.length, skills.length + addedSkills.length);
+  assert.deepEqual({ skills, addedSkills, marketSkills }, before);
+  const filters = restoreWorkshopSearch(JSON.stringify({ panels: { favorites: { subject: '数学', sort: 'name' } } }));
+  assert.equal(filters.panels.favorites?.subject, '数学');
 });
 test('搜索教学内容并组合筛选，按真实日期排序；无日期项保持稳定顺序', () => {
   const c = catalog();

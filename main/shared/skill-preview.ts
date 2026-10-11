@@ -14,7 +14,7 @@ export const skillPreviewSchema = z.object({
     '试用情况不存在')
   .refine((value) => value.messages.reduce((size, item) => size + item.content.length, 0) <= 20000,
     '对话过长，请重新开始');
-export type SkillPreviewRequest = z.infer<typeof skillPreviewSchema>;
+type SkillPreviewRequest = z.infer<typeof skillPreviewSchema>;
 
 export function compileSkillInstructions(skill: EducationalSkill): string {
   const steps = methodPreviewCases([skill]).map((step, index) =>
@@ -31,9 +31,9 @@ export function demoSkillReply({ skill, messages, caseId }: SkillPreviewRequest)
   const selected = caseId ? cases.find((item) => item.id === caseId) : cases[0];
   if (!selected) throw new Error('没有找到这项试用情况。');
   const turn = messages.filter((item) => item.role === 'assistant').length;
-  const action = cases[Math.min(cases.indexOf(selected) + turn, cases.length - 1)]?.action || selected.action;
+  const action = caseId ? selected.action : cases[Math.min(turn, cases.length - 1)]?.action || selected.action;
   const quoted = action.match(/(?:询问|追问|提问|问|回复|说)[：:，,\s]*[“「]([^”」]{2,500})[”」]/)?.[1];
-  if (/不要|避免|不应|不能/.test(action))
+  if (/^(?:不要|避免|不应|不能)/.test(action))
     return '当前方法暂不支持这类对话，请查看方法说明或选择其他试用情况。';
   if (quoted) return quoted;
   if (/总结|概括|归纳/.test(action)) return '请用自己的话说说刚才解决问题的关键一步。';
@@ -42,7 +42,10 @@ export function demoSkillReply({ skill, messages, caseId }: SkillPreviewRequest)
   if (/朗读|语气|停顿|重音/.test(action)) return '请标出你停顿的位置。再读一遍，比较两种停顿下句子的意思。';
   if (/同类|练习|问题/.test(action) && /独立|检测|确认/.test(`${skill.name} ${action}`))
     return '请提供原题或刚才讨论的内容，我再给你一道同类题。';
-  if (/检查|错误位置|纠错|标出.*不确定/.test(action)) return '先标出你不确定的一步，检查这一步是否符合题目条件。你发现了什么？';
+  if (/检查|错误位置|纠错|标出.*不确定/.test(action)) {
+    const revisited = /回顾/.test(selected.condition) && /还是|仍|没有|未/.test(selected.condition);
+    return `${revisited ? '你已经回顾过思路，我们再检查具体的一步。' : ''}先标出你不确定的一步，检查这一步是否符合题目条件。你发现了什么？`;
+  }
   if (/提示|方向|下一步/.test(action)) return '你想达到什么结果？先说说下一步可以尝试什么，我再给你提示。';
   if (/思路|思考|解释|说出|回顾|询问|确认/.test(action))
     return '请把你目前的做法和理由写出来，标出你不确定的地方。';

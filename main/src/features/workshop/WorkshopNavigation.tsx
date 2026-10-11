@@ -1,10 +1,11 @@
-import { FileCheck2, FolderPen, Store } from 'lucide-react';
+import { FileCheck2, FolderPen, Heart, Store } from 'lucide-react';
 import { workshopTabs, type WorkshopTab } from './workshop-catalog';
 
-export const workshopIcons = {
+const workshopIcons = {
   skills: FileCheck2,
   created: FolderPen,
   added: Store,
+  favorites: Heart,
 };
 export function WorkshopNavigation({
   tab,

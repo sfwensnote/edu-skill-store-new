@@ -178,6 +178,8 @@ function SkillWorkspace() {
     ? publicLibrary.find((item) => item.id === routeAssistantId)
     : undefined;
   const mySkills = [...personalSkills, ...market.addedSkills];
+  const mountableSkill = selectedSkill && mySkills.find(entry =>
+    entry.id === selectedSkill.id || entry.addedFrom?.id === selectedSkill.id);
   const selectedCompanion = 'companionId' in route ? companions.items.find(item => item.id === route.companionId) : undefined;
 
   return (
@@ -213,13 +215,13 @@ function SkillWorkspace() {
           favorite={market.favorites.includes(selectedSkill.id)}
           backLabel={returnLabel(route, { page: 'market' })}
           onBack={() => back({ page: 'market' })}
-          onUse={() => setMounting(selectedSkill)}
+          onUse={() => { if (mountableSkill) setMounting(mountableSkill); }}
           onFavorite={() => market.toggleFavorite(selectedSkill.id)}
           onCopy={() => copySkill(selectedSkill)}
           onAdd={() => market.addSkill(selectedSkill)}
           added={Boolean(selectedSkill.addedFrom) || addedIds.includes(selectedSkill.id)}
           onEdit={selectedSkill.assistantId ? () => editSkill(selectedSkill) : undefined}
-          canMount={mySkills.some(entry => entry.id === selectedSkill.id)}
+          canMount={Boolean(mountableSkill)}
           onCheck={selectedSkill.assistantId ? () => checkSkill(selectedSkill) : undefined}
           onPublish={selectedSkill.assistantId ? () => setPublishing(selectedSkill) : undefined}
           shared={market.sharedSkillIds.includes(selectedSkill.id)}
@@ -267,6 +269,8 @@ function SkillWorkspace() {
       )}
       {(route.page === 'workshop' || route.page === 'mine') && (
         <WorkshopPage
+          catalogSkills={visibleMarketSkills}
+          onAddSkill={market.addSkill}
           tab={route.page === 'mine' ? 'skills' : route.tab}
           onTab={(tab) => navigate({ page: 'workshop', tab })}
           skills={personalSkills}
@@ -366,8 +370,6 @@ function SkillWorkspace() {
             navigate({ page: 'test', assistantId: current.id });
             return true;
           }}
-          isSkillIncluded={(skillId) => platform.isSkillIncluded(current.id, skillId)}
-          onToggleSkill={(skillId) => platform.toggleSkill(current.id, skillId)}
         />
       )}
       {route.page === 'test' && current && (

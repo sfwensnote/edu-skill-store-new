@@ -4,6 +4,8 @@ import { compileSkillInstructions, demoSkillReply, skillPreviewSchema } from '..
 import { initialMine } from '../src/data/platform';
 import { marketSkills } from './fixtures/marketplace';
 import { skillCreatorLabel, skillSourceText, skillValidationLabel } from '../shared/skill-display';
+import { methodPreviewCases } from '../shared/method-preview';
+import { createTestCases } from '../src/features/testing/testData';
 
 const skill = { ...initialMine[0].skills[0], id: 'reading', name: '阅读证据追问',
   trigger: '学生只有观点没有证据', purpose: '用原文支持判断',
@@ -50,6 +52,28 @@ test('无对应演示的自定义做法不伪造执行结果，缺题不编造�
   assert.doesNotMatch(demoSkillReply({ skill: negative, messages }), /你错了/);
   const quote = { ...skill, steps: [{ condition: '学生答错', action: '追问：“原文中哪句话支持你的判断？”' }] };
   assert.equal(demoSkillReply({ skill: quote, messages }), '原文中哪句话支持你的判断？');
+});
+
+test('指定情况的预览不随对话次数推进，检验与预览的情况 2 一致', () => {
+  const method = { ...skill, steps: [
+    { condition: '学生第一次答错', action: '先请学生回顾解题思路' },
+    { condition: '回顾以后还是没有发现问题', action: '提醒他检查可能出错的那一步，但不直接指出错误' },
+    { condition: '学生已经改正', action: '用同类练习确认独立完成' },
+  ] };
+  const preview = methodPreviewCases([method])[1];
+  const check = createTestCases([method])[1];
+  assert.equal(check.studentInput, preview.studentInput);
+  assert.match(check.studentInput, /已经回顾.*还是没有/);
+  const request = { skill: method, caseId: preview.id,
+    messages: [{ role: 'user' as const, content: preview.studentInput }] };
+  const reply = demoSkillReply(request);
+  assert.equal(check.assistantOutput, reply);
+  assert.match(reply, /已经回顾过思路.*检查具体的一步/);
+  assert.match(reply, /标出你不确定的一步/);
+  assert.equal(demoSkillReply({ ...request, messages: [
+    ...request.messages, { role: 'assistant', content: reply }, ...request.messages,
+    { role: 'assistant', content: reply }, ...request.messages,
+  ] }), reply);
 });
 test('预览拒绝不存在的情况、系统消息、超长和不完整对话', () => {
   assert.equal(skillPreviewSchema.safeParse({ skill, messages }).success, true);

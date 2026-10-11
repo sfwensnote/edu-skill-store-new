@@ -36,7 +36,7 @@ export type Skill = z.infer<typeof skillSchema>;
 export type Material = z.infer<typeof materialSchema>;
 export type Agent = z.infer<typeof agentSchema>;
 export type Message = z.infer<typeof messageSchema>;
-export type Mode = 'demo' | 'live';
+type Mode = 'demo' | 'live';
 export type Check = {
   name: string;
   kind: 'technical' | 'education';

@@ -1,14 +1,13 @@
 import { expect, test, type Page } from './workspace-fixture';
 import { initialMine } from '../src/data/platform';
 import { buildContextualProblem, rentalSampleDesign } from '../shared/contextual-design';
-import { newActivityDraft } from '../shared/teaching-activity';
+import { legacyActivityDraft } from './fixtures/legacy-activity';
 
 async function seed(page: Page) {
   const design = rentalSampleDesign('frontend-review-design');
   design.contextualProblem = { ...buildContextualProblem(design), confirmed: true };
   design.savedLevels = [1];
-  const draft = newActivityDraft('learning', 'frontend-review-activity');
-  if (draft.path !== 'learning') throw new Error('测试夹具应创建学习活动');
+  const draft = legacyActivityDraft('frontend-review-activity');
   draft.resourceKey = `design:${design.id}:1`;
   draft.settings.title = '租赁方案课堂活动';
   draft.settings.instructions = '比较不同使用时长的费用，并说明你的依据。';

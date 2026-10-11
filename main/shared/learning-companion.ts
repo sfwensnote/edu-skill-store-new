@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { SkillEntry } from './marketplace';
 
-export const companionsKey = 'teaching-method.companions.v1';
+export { companionsKey } from './workspace-keys';
 const materialSchema = z.object({ id: z.string(), name: z.string(), type: z.string(), size: z.number(), data: z.string(), text: z.string() });
 export type CompanionMaterial = z.infer<typeof materialSchema>;
 const legacyTaskSchema = z.object({ title: z.string(), audience: z.string(), subject: z.string(), duration: z.string(),

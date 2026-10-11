@@ -1,5 +1,5 @@
 import { ArrowRight, CircleDot } from 'lucide-react';
-import type { DemoTestCase } from './testData';
+import type { MethodCheckCase } from './testData';
 import { Button } from '@/components/ui/button';
 
 export function TestCaseRecord({
@@ -9,7 +9,7 @@ export function TestCaseRecord({
   onConfirm,
   onEdit,
 }: {
-  testCase: DemoTestCase;
+  testCase: MethodCheckCase;
   index: number;
   total: number;
   onConfirm: () => void;
@@ -21,12 +21,6 @@ export function TestCaseRecord({
         <h2>{testCase.title}</h2>
       </div>
       <p className="scenario-copy">{testCase.scenario}</p>
-      {!testCase.methodReview && (
-        <div className="test-question">
-          <span>题目</span>
-          <strong>解方程：3x + 6 = 12</strong>
-        </div>
-      )}
       <div className="simulation-flow">
         <div className="simulation-line student">
           <span className="speaker">学生输入</span>
@@ -41,7 +35,7 @@ export function TestCaseRecord({
         </div>
       </div>
       <div className="check-list">
-        {testCase.expectedAction && <p>预期做法：{testCase.expectedAction}</p>}
+        <p>预期做法：{testCase.expectedAction}</p>
         <h2>需要核对的原则</h2>
         {testCase.checks.map((check) => (
           <p key={check}>
@@ -49,7 +43,6 @@ export function TestCaseRecord({
             {check}
           </p>
         ))}
-        {testCase.attention && <p className="attention-note">{testCase.attention}</p>}
       </div>
       <div className="case-confirmation">
         <Button variant="outline" onClick={onEdit}>修改当前方法</Button>

@@ -37,6 +37,9 @@ jobs:
       - name: 运行单元与集成测试
         run: npm test
 
+      - name: 检查无引用源码
+        run: npm run check:source
+
       - name: 检查类型并按仓库子路径构建
         run: npm run build -- --base "/${GITHUB_REPOSITORY#*/}/"
 

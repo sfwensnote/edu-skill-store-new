@@ -118,7 +118,7 @@ export function isStoredDesign(value: unknown): value is ContextualDesign {
   );
 }
 
-export function isStoredSkillEntry(value: unknown): value is SkillEntry {
+function isStoredSkillEntry(value: unknown): value is SkillEntry {
   return (
     object(value) &&
     strings(value, [

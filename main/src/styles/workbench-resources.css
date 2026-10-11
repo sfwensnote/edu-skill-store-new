@@ -2,99 +2,6 @@
 .home-page {
   max-width: 1460px;
 }
-.home-heading {
-  margin: 8px 0 24px;
-}
-.home-heading h1 {
-  font-size: 30px;
-}
-.area-grid {
-  gap: 24px;
-}
-.area-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 28px;
-  text-align: left;
-  transition:
-    border-color 180ms,
-    background-color 180ms;
-}
-.area-card:hover {
-  border-color: var(--line-strong);
-  background: var(--blue-faint);
-}
-.area-card-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  border: 0 !important;
-  padding: 0 !important;
-}
-.area-card-title svg {
-  width: 25px;
-  height: 25px;
-  color: var(--blue);
-}
-.area-card h2 {
-  font-size: 24px;
-}
-.area-card > p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--ink-2);
-}
-.area-card .entry-link {
-  justify-content: flex-start;
-  margin-top: 20px;
-  font-weight: 550;
-}
-.home-destinations {
-  margin-top: 26px;
-  border-top: 1px solid var(--line);
-}
-.home-destinations > button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 21px 8px;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  transition: background-color 180ms;
-}
-.home-destinations > button:hover {
-  background: var(--blue-faint);
-}
-.home-destinations > button > svg:first-child {
-  width: 22px;
-  height: 22px;
-  color: var(--blue);
-}
-.home-destinations h2 {
-  font-size: 17px;
-}
-.home-destinations > button > svg:last-child,
-.home-destinations > button > span {
-  margin-left: auto;
-}
-.home-destinations > button > span {
-  font-size: 13px;
-  color: var(--ink-2);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.home-destinations > button > span svg {
-  width: 17px;
-}
-.home-destinations > button > svg:last-child {
-  width: 17px;
-}
 .daily-page {
   max-width: 960px;
 }
@@ -135,28 +42,8 @@
 .market-filters > label {
   font-size: 13px;
 }
-.market-filters .search-field {
-  min-width: 220px;
-  background: var(--card);
-}
-.market-page .market-filters .search-field input {
-  border: 0;
-  padding: 0;
-  min-height: 36px;
-  outline-offset: 3px;
-}
 .market-filters select {
   min-width: 98px;
-}
-.skill-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--card);
-  overflow: hidden;
-  margin-top: 14px;
 }
 .skill-card.market-panel {
   border: 0;
@@ -171,46 +58,6 @@
 }
 .skill-card:last-child {
   border-bottom: 0;
-}
-.skill-resource-body {
-  flex: 1;
-  min-width: 0;
-}
-.skill-resource-body h2 {
-  margin: 0 0 6px;
-  font-size: 18px;
-}
-.skill-resource-body h2 button {
-  text-align: left;
-}
-.skill-resource-body h2 button:hover {
-  color: var(--blue);
-}
-.skill-resource-body .skill-practice {
-  margin: 0 0 10px;
-  max-width: 980px;
-  color: var(--ink);
-  font-size: 15px;
-  line-height: 1.75;
-}
-.skill-resource-body .card-meta {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-top: 0;
-  margin: 0;
-  border: 0;
-  font-size: 12px;
-}
-.skill-resource-body .validation-label {
-  margin: 0;
-}
-.skill-resource-actions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
 }
 .detail-heading {
   margin-top: 0;
@@ -259,14 +106,6 @@
   position: sticky;
   top: 84px;
 }
-.workshop-tabs {
-  margin-top: 0;
-  gap: 12px;
-}
-.workshop-tabs button {
-  font-size: 14px;
-  padding: 12px 16px;
-}
 .workshop-item.market-panel {
   border-radius: 0;
   border: 0;
@@ -282,21 +121,10 @@
 .workshop-item > div:first-child > p {
   margin: 6px 0;
 }
-.item-actions {
-  gap: 6px;
-  max-width: 450px;
-}
-.item-actions [data-slot='button'] {
-  font-size: 13px;
-}
 .assistant-list {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 9px;
-}
-.resource-notice {
-  color: var(--ink-2);
-  font-size: 13px;
 }
 @media (max-width: 1100px) {
   .detail-grid {
@@ -310,51 +138,16 @@
     align-items: flex-start;
     gap: 14px;
   }
-  .item-actions {
-    justify-content: flex-start;
-    max-width: none;
-  }
 }
 @media (max-width: 760px) {
-  .area-grid {
-    gap: 16px;
-  }
-  .area-card {
-    padding: 22px;
-  }
-  .home-heading {
-    margin-bottom: 22px;
-  }
-  .home-heading h1 {
-    font-size: 26px;
-  }
-  .home-destinations > button {
-    padding: 18px 0;
-    gap: 12px;
-  }
-  .home-destinations > button > span {
-    font-size: 0;
-  }
   .skill-card.market-panel {
     padding: 18px;
     align-items: stretch;
     flex-direction: column;
     gap: 14px;
   }
-  .skill-resource-actions {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .skill-resource-body .card-meta {
-    gap: 6px 14px;
-  }
   .market-filters {
     padding: 0;
-  }
-  .market-filters .search-field {
-    flex-basis: 100%;
-    min-width: 0;
   }
   .workshop-item.market-panel {
     padding: 18px 14px;

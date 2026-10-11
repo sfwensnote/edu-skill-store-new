@@ -1,8 +1,6 @@
 @media (max-width: 1100px) {
   .page-frame { width: min(100% - 40px, 1480px); }
   .header-inner { width: calc(100% - 40px); }
-  .designer-workspace { grid-template-columns: minmax(350px,.78fr) minmax(520px,1.22fr); }
-  .logs-grid { grid-template-columns: 1fr 310px; }
   .session-row { grid-template-columns: 115px minmax(240px,1fr) minmax(130px,230px) 18px; }
 }
 
@@ -20,7 +18,7 @@
   .page-frame { width: calc(100% - 28px); }
   :root { --text-title: 24px; --space-page: 24px; }
   .page-title-block h1 { font-size: var(--text-title); }
-  .filter-group button, .record-filters button, .mobile-filter-button, .mobile-filter-head button, .range-button { min-height: 44px; }
+  .filter-group button, .mobile-filter-button, .mobile-filter-head button { min-height: 44px; }
   .mobile-filter-head button { min-width: 44px; }
   .library-page { display: block; padding-top: 24px; }
   .filter-rail { width: min(84vw,320px); height: 100vh; position: fixed; z-index: 80; inset: 0 auto 0 0; padding: 20px; border: 0; background: #fff; transform: translateX(-103%); transition: transform .2s ease; overflow: auto; }
@@ -36,40 +34,14 @@
   .assistant-icon { width: 44px; height: 44px; }
   .assistant-meta { grid-column: 2; margin-top: -4px; font-size: var(--text-caption); }
   .row-chevron { grid-column: 3; grid-row: 1 / span 2; }
-  .mine-page .assistant-row-main { grid-template-columns: 48px minmax(0,1fr) 18px; }
-  .assistant-delete { width: 44px; height: 44px; margin-right: 2px; opacity: 1; }
-  .mine-heading [data-slot='button'] { display: none; }
   .library-detail-hero { grid-template-columns: 1fr; padding-top: 34px; }
-  .designer-toolbar { height: 58px; }
-  .toolbar-actions [data-slot='button']:first-child { display: none; }
-  .mobile-workspace-tabs { height: 44px; display: grid; grid-template-columns: 1fr 1fr; padding: 0 14px; border-bottom: 1px solid var(--line); background: #fff; }
-  .mobile-workspace-tabs button { border: 0; border-bottom: 2px solid transparent; color: var(--ink-2); background: transparent; }
-  .mobile-workspace-tabs button.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 650; }
-  .designer-workspace { width: 100%; height: calc(100vh - 158px); min-height: 620px; display: block; border: 0; border-radius: 0; box-shadow: none; }
-  .workspace-panel { display: none; height: 100%; }
-  .workspace-panel.mobile-active { display: block; }
-  .chat-panel { border: 0; }
-  .draft-panel-head { padding-inline: 18px; }
-  .draft-document { padding: 24px 18px; }
-  .skill-details { padding-left: 18px; }
-  .skill-details dl > div { grid-template-columns: 1fr; gap: 5px; }
-  .generation-steps { flex-direction: column; gap: 6px; }
-  .empty-guide { gap: 20px; }
   .testing-toolbar-inner { padding-block: 18px; gap: 12px; }
   .testing-title h1 { font-size: 24px; gap: 8px; }
   .testing-title h1 span:first-child { font-size: 20px; }
   .logs-hero { display: block; }
   .logs-hero-actions { margin-top: 18px; }
-  .logs-grid { display: block; }
-  .summary-strip { grid-template-columns: 1fr 1fr; }
-  .summary-strip > div { padding: 12px; }
-  .summary-strip > div + div { border-left: 0; }
-  .summary-strip > div:nth-child(even) { border-left: 1px solid var(--line); }
-  .logs-side-column { margin-top: 18px; }
   .session-row { grid-template-columns: 90px 1fr 18px; gap: 10px; }
-  .session-anomaly { grid-column: 2; }
   .session-row > svg { grid-column: 3; grid-row: 1 / span 2; }
-  .detail-summary, .report-sections { grid-template-columns: 1fr; }
   .report-publish { align-items: stretch; flex-direction: column; }
   .report-publish [data-slot='button'] { width: 100%; }
 }
@@ -79,8 +51,6 @@
   .logs-title-row { align-items: flex-start; }
   .logs-title-row h1 { font-size: var(--text-title); }
   .logs-hero-actions { display: grid; grid-template-columns: 1fr 1fr; }
-  .summary-icon { width: 34px; height: 34px; }
-  .summary-strip strong { font-size: 16px; }
   .run-records { padding-inline: 12px; }
   .session-row { grid-template-columns: 78px 1fr 16px; }
   .session-detail small { white-space: normal; }

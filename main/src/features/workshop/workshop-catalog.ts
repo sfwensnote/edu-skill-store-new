@@ -7,6 +7,7 @@ export const workshopTabs = [
   ['skills', '全部'],
   ['created', '我创建的'],
   ['added', '从集市添加'],
+  ['favorites', '我的收藏'],
 ] as const;
 export type WorkshopTab = (typeof workshopTabs)[number][0];
 type WorkInfo = {
@@ -34,7 +35,7 @@ export const defaultWorkFilters: WorkshopFilters = {
   subject: '全部',
   sort: 'updated',
 };
-export type WorkshopSearchState = { query: string; panels: Partial<Record<WorkshopTab, WorkshopFilters>> };
+type WorkshopSearchState = { query: string; panels: Partial<Record<WorkshopTab, WorkshopFilters>> };
 export function restoreWorkshopSearch(raw: string | null): WorkshopSearchState {
   try {
     const stored = JSON.parse(raw || '{}');
@@ -53,7 +54,7 @@ export function restoreWorkshopSearch(raw: string | null): WorkshopSearchState {
     return { query: '', panels: {} };
   }
 }
-export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): WorkItem {
+function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): WorkItem {
   const owner = assistants.find((a) => a.id === entry.assistantId);
   return {
     kind: 'skill',
@@ -84,10 +85,14 @@ export function workshopCollections({
   skills,
   addedSkills,
   assistants,
+  favorites = [],
+  catalogSkills = [],
 }: {
   skills: SkillEntry[];
   addedSkills: SkillEntry[];
   assistants: TeachingAssistant[];
+  favorites?: string[];
+  catalogSkills?: SkillEntry[];
 }): Record<WorkshopTab, WorkItem[]> {
   const personal = skills.map((e) => skillWork(e, assistants));
   const added = addedSkills.map((e) => skillWork(e, assistants));
@@ -114,6 +119,10 @@ export function workshopCollections({
     skills: [...personal, ...methodDrafts, ...added],
     created: [...personal, ...methodDrafts],
     added,
+    favorites: [...new Set(favorites)].flatMap((id) => {
+      const entry = [...skills, ...addedSkills, ...catalogSkills].find((item) => item.id === id);
+      return entry ? [skillWork(entry, assistants)] : [];
+    }),
   };
 }
 export function matchesWork(item: WorkItem, query: string): boolean {

@@ -17,7 +17,7 @@ export type TeachingMethod = {
   principles: string[];
 };
 
-export type MethodAnswer = { questionId: string; question: string; answer: string };
+type MethodAnswer = { questionId: string; question: string; answer: string };
 
 export type CreationDraft = {
   sourceRevision?: number;
@@ -75,6 +75,12 @@ export const mockQuestions = [
     question: '有哪些做法需要避免？',
     placeholder: '写下需要遵守的原则……',
     example: '第一次答错的时候不要直接给完整答案。',
+  },
+  {
+    id: 'boundary',
+    question: '在什么情况下结束引导，或交由教师继续处理？',
+    placeholder: '说说学生达到什么表现时可以结束，或什么情况需要教师介入……',
+    example: '学生能说明错因并独立改正时结束；仍然无法理解时交由教师处理。',
   },
 ] as const;
 
@@ -136,6 +142,11 @@ export function recordAnswer(draft: CreationDraft, answer: string): CreationDraf
       break;
     case 'principle':
       if (editable('principles') && !method.principles.includes(value)) method.principles.push(value);
+      break;
+    case 'boundary':
+      // 旧草稿曾将结束条件和原则共用修改标记；已有手动结束条件仍优先保留。
+      if (editable('boundary') && !(draft.manualEdits.includes('principles') && method.principles.some(item => item.startsWith(boundaryPrefix))))
+        method.principles = [...method.principles.filter(item => !item.startsWith(boundaryPrefix)), `${boundaryPrefix}${value}`];
       break;
   }
   return {

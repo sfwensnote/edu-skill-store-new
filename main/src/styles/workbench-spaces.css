@@ -188,8 +188,7 @@
   background: var(--card);
 }
 .simulation-line.assistant,
-.test-question,
-.conversation-turn.assistant {
+.test-question {
   border-color: var(--line);
 }
 .flow-line {
@@ -210,27 +209,6 @@
   border: 1px solid var(--line);
   background: var(--card);
   border-radius: 9px;
-}
-.task-form-step {
-  padding-top: 18px;
-  border-top: 1px solid var(--line-soft);
-}
-.task-feedback-settings {
-  margin: 16px 0;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-.task-feedback-settings summary {
-  cursor: pointer;
-}
-.task-list-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.local-task {
-  padding: 18px 0;
 }
 .student-task {
   max-width: 1020px;
@@ -269,44 +247,11 @@
 .student-message.user p {
   border-color: var(--line);
 }
-.student-composer {
-  background: var(--card);
-}
-.student-composer textarea {
-  border: 0;
-  min-height: 94px;
-}
-.student-composer button {
-  border-radius: 7px;
-}
-.summary-icon {
-  color: var(--blue);
-  background: var(--blue-soft);
-}
-.record-filters button.active,
 .report-publish {
   border-color: var(--line);
 }
-.report-sections,
-.detail-summary {
-  gap: 24px;
-}
-.report-sections > section {
-  background: var(--card);
-}
-.detail-summary > div {
-  background: var(--card);
-}
-.session-time,
-.session-time small,
-.session-detail small,
-.session-anomaly,
-.usage-row small,
-.breadcrumbs button {
+.session-detail small {
   color: var(--ink-2);
-}
-.session-anomaly.has {
-  color: var(--orange);
 }
 @media (max-width: 1100px) {
   .inquiry-start-columns {
@@ -350,10 +295,6 @@
   .outcome-option > span {
     grid-column: 2;
     grid-row: 3;
-  }
-  .outcome-level {
-    display: block;
-    margin: 4px 0 0;
   }
   .inquiry-start-aside {
     display: block;

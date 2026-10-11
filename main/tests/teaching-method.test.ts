@@ -54,7 +54,7 @@ test('初步想法只整理问题，不生成教学步骤或 SKILL', () => {
   assert.deepEqual(prepareMethod('另一位教师的原始想法', emptyMethod()).problem, '另一位教师的原始想法');
 });
 
-test('六轮回答逐步形成方法，条件可以先于做法出现', () => {
+test('七轮回答逐步形成方法，结束条件最后补全，条件可以先于做法出现', () => {
   let draft = {
     ...defaultCreationDraft(),
     originalIdea: demoIdea,
@@ -75,10 +75,29 @@ test('六轮回答逐步形成方法，条件可以先于做法出现', () => {
   draft = recordAnswer(draft, mockQuestions[5].example);
   assert.equal(draft.questionIndex, 6);
   assert.equal(draft.conversation.length, 6);
+  draft = recordAnswer(draft, mockQuestions[6].example);
+  assert.equal(draft.questionIndex, 7);
+  assert.equal(draft.conversation.at(-1)?.questionId, 'boundary');
+  assert.equal(draft.method.principles.at(-1), `结束条件：${mockQuestions[6].example}`);
   assert.ok(methodError(draft.method));
   draft.method = completeTeachingMethod({ ...draft.method, tags: ['错因辅导'] });
   assert.equal(methodError(draft.method), '');
   assert.deepEqual(packageTeachingMethod(draft.method, 'skill').steps, draft.method.teachingSteps);
+});
+
+test('结束条件回答独立于选填原则，保留新旧草稿中教师手动填写的结束条件', () => {
+  const boundary = '结束条件：教师手动保留的结束条件';
+  const draft = { ...defaultCreationDraft(), questionIndex: 6,
+    method: { ...emptyMethod(), principles: ['教师填写的原则'] }, manualEdits: ['principles'] };
+  const next = recordAnswer(draft, '学生能独立解释时结束');
+  assert.deepEqual(next.method.principles, ['教师填写的原则', '结束条件：学生能独立解释时结束']);
+  assert.equal(recordAnswer(draft, '  '), draft);
+  for (const marker of ['boundary', 'principles']) {
+    const manual = { ...draft, manualEdits: [marker], method: { ...draft.method, principles: [boundary] } };
+    const preserved = recordAnswer(manual, '另一种结束条件');
+    assert.deepEqual(preserved.method.principles, [boundary]);
+    assert.equal(preserved.conversation.at(-1)?.answer, '另一种结束条件');
+  }
 });
 
 test('右侧教师修改后的内容优先于后续问答，SKILL 忠实使用最终方法', () => {
@@ -200,7 +219,7 @@ test('旧格式的语文方法核对也使用自己的内容，不生成数学�
   };
   const cases = createTestCases([skill]);
   assert.equal(cases.length, skill.behaviorSteps.length);
-  assert.ok(cases.every((item) => item.methodReview));
+  assert.ok(cases.every((item) => item.studentInput && item.expectedAction));
   assert.ok(!JSON.stringify(cases).includes('方程'));
   assert.equal(cases[0].expectedAction, skill.behaviorSteps[0]);
   assert.match(cases[0].assistantOutput, /你的判断依据是什么/);

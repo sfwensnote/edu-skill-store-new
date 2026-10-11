@@ -13,8 +13,7 @@ import {
 } from '../../shared/marketplace';
 import { outcomeIssue } from '../../shared/inquiry-workflow';
 import type { WorkspaceStorage } from '@/lib/account-workspace';
-
-export const marketStorageKey = 'teaching-method.market-workspace.v1';
+import { marketWorkspaceKey as marketStorageKey } from '../../shared/workspace-keys';
 export function useMarketWorkspace(storage: WorkspaceStorage) {
   const [state, setState] = useState(() => {
     try {
@@ -108,15 +107,6 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
     );
     return saved ? copied.id : '';
   }
-  function removeDesign(id: string) {
-    return update(
-      (current) => ({
-        ...current,
-        designs: current.designs.filter((d) => d.id !== id),
-      }),
-      true,
-    );
-  }
   function toggleFavorite(id: string) {
     return update(
       (current) => ({
@@ -176,7 +166,6 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
     retryDesignSave,
     saveDesign,
     copyDesign,
-    removeDesign,
     toggleFavorite,
     addSkill,
     removeAddedSkill,

@@ -6,6 +6,7 @@ export type WorkshopProps = {
   onTab: (tab: string) => void;
   skills: SkillEntry[];
   addedSkills: SkillEntry[];
+  catalogSkills: SkillEntry[];
   favorites: string[];
   shared: string[];
   assistants: TeachingAssistant[];
@@ -14,6 +15,7 @@ export type WorkshopProps = {
   onCopySkill: (entry: SkillEntry) => void;
   onDeleteSkill: (entry: SkillEntry) => boolean;
   onMount: (entry: SkillEntry) => void;
+  onAddSkill: (entry: SkillEntry) => boolean;
   onFavorite: (id: string) => void;
   onShare: (entry: SkillEntry) => void;
   onCreate: () => void;

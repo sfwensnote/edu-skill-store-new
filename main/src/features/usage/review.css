@@ -14,15 +14,6 @@
 .report-methods-summary .report-method h3 { font-size: 16px; margin-bottom: 6px; }
 .report-methods-summary .report-method p { color: var(--ink-2); line-height: 1.8; }
 .report-page-new .report-publish { margin-top: 24px; }
-.logs-page .usage-card p,
-.logs-page .latest-report p {
-  margin-top: 14px;
-  color: var(--ink-2);
-  line-height: 1.7;
-}
-.report-page-new .report-sections {
-  align-items: start;
-}
 .report-page-new .report-method + .report-method {
   margin-top: 20px;
   padding-top: 20px;
@@ -37,17 +28,6 @@
   margin-top: 5px;
   color: var(--ink-2);
   line-height: 1.65;
-}
-.student-preview-page .preview-methods > summary {
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--primary);
-}
-.student-preview-page .preview-methods[open] > summary {
-  margin-bottom: 18px;
-}
-.student-preview-page .preview-methods > div + div {
-  margin-top: 16px;
 }
 @media (max-width: 640px) {
   .logs-page .method-preview-row {

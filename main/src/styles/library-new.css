@@ -19,7 +19,7 @@
 .library-search input { flex: 1; border: 0; outline: 0; color: var(--ink); background: transparent; }
 .library-search input::placeholder { color: var(--ink-3); }
 .list-heading { height: 62px; display: flex; align-items: center; justify-content: space-between; }
-.list-heading strong, .mine-count { font-size: 16px; }
+.list-heading strong { font-size: 16px; }
 .assistant-list { border-top: 1px solid var(--line); }
 .assistant-row { width: 100%; min-height: 94px; display: flex; align-items: center; border-bottom: 1px solid var(--line); background: #fff; transition: background .15s; }
 .assistant-row:hover { background: var(--blue-faint); }
@@ -34,22 +34,6 @@
 .assistant-meta i { font-style: normal; color: var(--line-strong); }
 .row-chevron { width: 19px; color: var(--ink-2); }
 .list-empty { padding: 80px 24px; color: var(--ink-2); text-align: center; border-top: 1px solid var(--line); }
-.mine-page { padding-top: var(--space-page); padding-bottom: 72px; }
-.mine-heading { display: flex; align-items: flex-start; justify-content: space-between; }
-.mine-count { padding: 30px 0 16px; font-weight: 650; }
-.mine-page .assistant-row-main { grid-template-columns: 66px minmax(300px,1fr) 140px 24px; }
-.assistant-delete { margin-right: 12px; color: var(--ink-3); opacity: .72; }
-.assistant-delete:hover, .assistant-delete:focus-visible { color: var(--destructive); opacity: 1; }
-.assistant-delete-dialog { padding: 22px; }
-.assistant-delete-dialog [data-slot='dialog-title'] { font-size: 18px; line-height: 1.35; }
-.assistant-delete-dialog [data-slot='dialog-description'] { line-height: 1.7; }
-.assistant-delete-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-.status-text { font-weight: 620; }
-.status-draft { color: var(--ink-2); }
-.status-generated { color: var(--orange); }
-.status-tested { color: var(--blue); }
-.status-trial { color: var(--blue); }
-.status-active { color: var(--green); }
 .library-detail-page { padding-top: var(--space-page); padding-bottom: 80px; }
 .library-detail-hero { display: grid; grid-template-columns: 84px 1fr; gap: 26px; padding: 54px 0 46px; border-bottom: 1px solid var(--line); }
 .detail-icon { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 12px; background: var(--blue-soft); color: var(--blue); }

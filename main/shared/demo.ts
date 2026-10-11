@@ -1,7 +1,5 @@
 import type { Brief, Material, Skill } from './schema';
 
-export const demoDemand =
-  '我是一名七年级数学老师，想做一个一元一次方程作业讲评助手。学生提交解题过程后，先帮他们找出可能的错因，每次只给一步提示，不直接给最终答案，最后出一道类似的题检查理解。';
 export const demoBrief: Brief = {
   audience: '七年级学生',
   goal: '理解等式性质，能解释一元一次方程的求解步骤',

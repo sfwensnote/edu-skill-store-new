@@ -12,42 +12,20 @@ import './preview-workspace.css';
 
 type PreviewMessage = { role: 'student' | 'assistant'; content: string };
 
-function isEquationDemo(assistant: TeachingAssistant) {
-  return (
-    !assistant.revision &&
-    assistant.subject === '数学' &&
-    /方程/.test(`${assistant.activity} ${assistant.goal}`) &&
-    assistant.skills.every((skill) =>
-      ['reflect', 'progressive-hint', 'understanding-check'].includes(skill.id),
-    )
-  );
+function initialMessages(skill?: TeachingAssistant['skills'][number], example?: MethodPreviewCase): PreviewMessage[] {
+  if (!skill || !example) return [];
+  return [
+    { role: 'student', content: example.studentInput },
+    { role: 'assistant', content: demoSkillReply({ skill, caseId: example.id,
+      messages: [{ role: 'user', content: example.studentInput }] }) },
+  ];
 }
 
-function initialMessages(equationDemo: boolean): PreviewMessage[] {
-  return equationDemo
-    ? [
-        { role: 'assistant', content: '我们一起看看这道题：3x + 6 = 12。你已经算到哪一步了？' },
-        { role: 'student', content: '我算出来 x = 9，但老师说不对。' },
-        { role: 'assistant', content: '先不急着改答案。你能说说从 3x + 6 = 12 到 x = 9，你是怎样计算的吗？' },
-      ]
-    : [{ role: 'assistant', content: '请说说你正在处理的问题，以及你已经尝试过什么。' }];
-}
-
-function fixedReply(input: string, equationDemo: boolean, example?: MethodPreviewCase, skill?: TeachingAssistant['skills'][number], history: PreviewMessage[] = []): string {
-  if (!equationDemo) {
-    if (!skill) return '请先选择一项 SKILL。';
-    return demoSkillReply({ skill, caseId: example?.id, messages: [
-      ...history.slice(1).map((item) => ({ role: item.role === 'student' ? 'user' as const : 'assistant' as const, content: item.content })),
-      { role: 'user', content: input },
-    ] });
-  }
-  if (/12\s*\+\s*6|移到右边|移项/.test(input))
-    return '你已经说出了关键一步。为了消去左边的 +6，等式两边应该同时做加法还是减法？先试着写出这一步。';
-  if (/两边.*减|减去\s*6|减\s*6/.test(input))
-    return '对，等式两边同时减去 6，仍能保持相等。现在请你写出新的等式，再试着求出 x。';
-  if (/不会|提示|不知道|卡住/.test(input))
-    return '先看等式左边的 +6。你想让它消失时，等式两边可以同时做什么操作？';
-  return '先不急着看答案。请把你目前的计算过程写出来，我们从你不确定的那一步开始。';
+function fixedReply(input: string, example: MethodPreviewCase | undefined, skill: TeachingAssistant['skills'][number], history: PreviewMessage[]): string {
+  return demoSkillReply({ skill, caseId: example?.id, messages: [
+    ...history.map(item => ({ role: item.role === 'student' ? 'user' as const : 'assistant' as const, content: item.content })),
+    { role: 'user', content: input },
+  ] });
 }
 
 export function StudentPreviewPage({
@@ -71,14 +49,13 @@ export function StudentPreviewPage({
   onShare: (skillId: string) => void;
   sharedSkillIds: string[];
 }) {
-  const [equationDemo, setEquationDemo] = useState(() => isEquationDemo(assistant) && !initialCaseId);
   const cases = methodPreviewCases(assistant.skills);
   const [caseId, setCaseId] = useState(initialCaseId || cases[0]?.id || '');
   const selected = cases.find((item) => item.id === caseId) || cases[0];
   const activeSkill = assistant.skills.find((skill) => skill.id === selected?.skillId) || assistant.skills[0];
   const shared = sharedSkillIds.includes(activeSkill?.id || '');
   const [view, setView] = useState<'chat' | 'method'>('chat');
-  const [messages, setMessages] = useState<PreviewMessage[]>(() => initialMessages(equationDemo));
+  const [messages, setMessages] = useState<PreviewMessage[]>(() => initialMessages(activeSkill, selected));
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
   const chatRef = useRef<HTMLElement>(null);
@@ -90,13 +67,13 @@ export function StudentPreviewPage({
     const input = value.trim();
     if (!input) return;
     if (!activeSkill || !skillPreviewSchema.safeParse({ skill: activeSkill, caseId: selected?.id, messages: [
-      ...messages.slice(1).map((item) => ({ role: item.role === 'student' ? 'user' : 'assistant', content: item.content })),
+      ...messages.map((item) => ({ role: item.role === 'student' ? 'user' : 'assistant', content: item.content })),
       { role: 'user', content: input },
     ] }).success) { setError('对话过长，请重新开始。当前输入仍保留。'); return; }
     setMessages((items) => [
       ...items,
       { role: 'student', content: input },
-      { role: 'assistant', content: fixedReply(input, equationDemo, selected, activeSkill,
+      { role: 'assistant', content: fixedReply(input, selected, activeSkill,
         messages) },
     ]);
     setValue('');
@@ -104,14 +81,14 @@ export function StudentPreviewPage({
   }
   function reset() {
     setError('');
-    setMessages(initialMessages(equationDemo));
+    setMessages(initialMessages(activeSkill, selected));
     setValue('');
   }
   function selectCase(id: string) {
     setError('');
-    setEquationDemo(false);
     setCaseId(id);
-    setMessages(initialMessages(false));
+    const example = cases.find(item => item.id === id);
+    setMessages(initialMessages(assistant.skills.find(skill => skill.id === example?.skillId), example));
     setValue('');
   }
   const backText = backLabel;
@@ -132,7 +109,7 @@ export function StudentPreviewPage({
         { value: 'method', label: '方法步骤', panelId: 'preview-method' },
       ]} />
       <div id="preview-experience" role="tabpanel" aria-labelledby="preview-experience-tab" hidden={view !== 'chat'}>
-      {!equationDemo && <MethodSituationSelect cases={cases} value={caseId} onChange={selectCase} />}
+      <MethodSituationSelect cases={cases} value={caseId} onChange={selectCase} />
       <section
         ref={chatRef}
         className="student-chat preview-chat"
@@ -160,14 +137,7 @@ export function StudentPreviewPage({
       />
       <div className="preview-under-chat">
         <div className="preview-suggestions">
-          {(equationDemo
-            ? [
-                '我把左边的 6 移到右边，算成了 12 + 6。',
-                '我还是不知道下一步怎么做。',
-                '应该两边都减去 6 吗？',
-              ]
-            : ['我遇到了困难，想请你帮我看看。']
-          ).map((sample) => (
+          {[selected?.studentInput || ''].map((sample) => (
             <button
               key={sample}
               onClick={() => {
@@ -187,7 +157,7 @@ export function StudentPreviewPage({
       </div>
       <div id="preview-method" role="tabpanel" aria-labelledby="preview-method-tab" hidden={view !== 'method'}>
         {assistant.skills.length > 1 && <label className="form-field">选择教学方法
-          <select aria-label="选择教学方法" value={activeSkill?.id} onChange={(event) => setCaseId(`${event.target.value}:0`)}>
+          <select aria-label="选择教学方法" value={activeSkill?.id} onChange={(event) => selectCase(`${event.target.value}:0`)}>
             {assistant.skills.map((skill) => <option key={skill.id} value={skill.id}>{skill.name}</option>)}
           </select>
         </label>}
