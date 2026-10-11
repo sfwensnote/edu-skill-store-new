@@ -36,7 +36,8 @@ async function create(page: Page) {
 }
 async function finish(page: Page) {
   await page.getByRole('button', { name: '下一步：预览与保存', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '4. 预览与保存', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '预览与保存', exact: true })).toBeVisible();
+  await expect(page.getByRole('complementary', { name: '学伴预览' })).toBeVisible();
   await page.getByRole('button', { name: /^(创建学伴|保存学伴)$/ }).click();
 }
 
@@ -195,20 +196,26 @@ test('发布保存失败不跳转、不假报成功，重试只发布一次', as
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
 });
 
-test('四步创建按项校验，三项场景保持简洁，返回与刷新保留输入，右侧预览同步更新', async ({ page }, info) => {
+test('四步创建保留输入，预览仅在最后一步显示并排在保存区域下方', async ({ page }, info) => {
   await page.setViewportSize({ width: 1540, height: 1000 });
   await page.goto('/#/companions/profile-buddy/edit');
   await expect(page.getByRole('list', { name: '创建进度' }).getByRole('listitem')).toHaveCount(4);
+  const preview = page.getByRole('complementary', { name: '学伴预览' });
+  await expect(preview).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '基本信息', exact: true })).toBeVisible();
+  await expect.poll(() => page.locator('.companion-avatar-options img').evaluateAll(images => images.every(image => (image as HTMLImageElement).naturalWidth > 0))).toBe(true);
   await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('学伴名称');
   await basic(page);
   await page.getByRole('radio', { name: '简洁风格', exact: true }).check();
   const avatar = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=', 'base64');
   await page.getByLabel('上传学伴形象', { exact: true }).setInputFiles({ name: '头像.png', mimeType: 'image/png', buffer: avatar });
-  await expect(page.getByRole('complementary', { name: '学伴预览' }).locator('img')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: '自定义上传学伴形象', exact: true }).locator('img')).toHaveAttribute('src', /^data:image\/png;base64,/);
+  await expect(preview).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole('complementary', { name: '学伴预览' })).toContainText('帮助学生检查解题思路');
-  await expect(page.getByRole('complementary', { name: '学伴预览' }).locator('img')).toHaveCount(2);
+  await expect(page.getByRole('textbox', { name: '学伴简介', exact: true })).toHaveValue('帮助学生检查解题思路');
+  await expect(page.getByRole('button', { name: '自定义上传学伴形象', exact: true }).locator('img')).toHaveAttribute('src', /^data:image\/png;base64,/);
+  await expect(preview).toHaveCount(0);
   await page.getByRole('radio', { name: '默认形象', exact: true }).check();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath('companion-profile-desktop.png'), fullPage: true });
@@ -217,11 +224,16 @@ test('四步创建按项校验，三项场景保持简洁，返回与刷新保�
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.screenshot({ path: info.outputPath('companion-profile-mobile.png'), fullPage: true });
+  await page.getByRole('radio', { name: '简洁风格', exact: true }).check();
   await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '选择 SKILL', exact: true })).toBeVisible();
+  await expect(preview).toHaveCount(0);
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
+  await expect(preview).toHaveCount(0);
   await expect(page.getByRole('alert')).toContainText('至少一项方法');
   await page.getByRole('checkbox', { name: /错因追问/ }).check();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '教学场景', exact: true })).toBeVisible();
   await expect(page.locator('.companion-scene-fields').getByRole('combobox')).toHaveCount(2);
   await expect(page.locator('.companion-scene-fields').getByRole('textbox')).toHaveCount(1);
   await page.getByRole('button', { name: '下一步：预览与保存', exact: true }).click();
@@ -233,11 +245,30 @@ test('四步创建按项校验，三项场景保持简洁，返回与刷新保�
   await page.reload();
   await expect(page.getByRole('combobox', { name: '学习情境', exact: true })).toHaveValue('课堂学习');
   await expect(page.getByRole('textbox', { name: '学习任务与目标', exact: true })).toHaveValue('检查解题思路，说明每一步的理由');
-  await expect(page.getByRole('complementary', { name: '学伴预览' })).toContainText('错因追问');
+  await expect(preview).toHaveCount(0);
   await page.screenshot({ path: info.outputPath('companion-scene-mobile.png'), fullPage: true });
   await page.setViewportSize({ width: 1540, height: 1000 });
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath('companion-scene-desktop.png'), fullPage: true });
+  await page.getByRole('button', { name: '下一步：预览与保存', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '预览与保存', exact: true })).toBeVisible();
+  await expect(preview).toContainText('错因追问');
+  await expect(preview).toContainText('帮助学生检查解题思路');
+  await expect(preview).toContainText('检查解题思路，说明每一步的理由');
+  await expect(preview.locator('.companion-avatar[data-style="simple"]')).toHaveCount(2);
+  await page.reload();
+  await expect(preview).toBeVisible();
+  for (const width of [1540, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const form = await page.locator('.companion-editor').boundingBox();
+    const below = await preview.boundingBox();
+    expect(below!.y).toBeGreaterThanOrEqual(form!.y + form!.height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: info.outputPath(`companion-final-${width}.png`), fullPage: true });
+  }
+  await page.getByRole('button', { name: '返回上一步', exact: true }).click();
+  await expect(preview).toHaveCount(0);
+  await expect(page.getByRole('textbox', { name: '学习任务与目标', exact: true })).toHaveValue('检查解题思路，说明每一步的理由');
   await finish(page);
   await page.goto('/#/companions');
   await expect(page.locator('.companion-card')).toHaveCount(1);

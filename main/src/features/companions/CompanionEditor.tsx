@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, Bot, Check, FileText, Save, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, Check, FileText, Save, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/Workbench';
 import { SaveFailureExitGuard } from '@/components/SaveFailureExitGuard';
@@ -60,7 +60,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
     <button className="back-link" disabled={reading} onClick={() => leave(onBack)}><ArrowLeft />返回我的学伴</button>
     <header className="companion-creation-heading">
       <div><h1>{editing ? '编辑我的学伴' : '创建我的学伴'}</h1><p>选择教学方法，设置学生的学习任务。</p></div>
-      <div className="companion-hero-art" aria-hidden="true"><BookOpen /><Bot /><FileText /></div>
+      <img className="companion-hero-art" src={`${import.meta.env.BASE_URL}companion-hero.png`} alt="" aria-hidden="true" />
     </header>
     <ol className="companion-stepper" aria-label="创建进度">{companionSteps.map(item => <li key={item.step} aria-current={value.step === item.step ? 'step' : undefined} data-completed={item.step < value.step}>
       <span className="companion-step-number">{item.step < value.step ? <Check /> : item.step}</span>
@@ -74,7 +74,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
           onClick={() => moveTo(item.step)}><Icon /><span>{item.label}</span></button>;
       })}</nav>
       <section className="market-panel companion-editor" aria-labelledby="companion-step-title">
-        <header className="companion-step-heading"><h2 id="companion-step-title" ref={headingRef} tabIndex={-1}>{value.step}. {currentStep.label}</h2><p>{stepHints[value.step - 1]}</p></header>
+        <header className="companion-step-heading"><h2 id="companion-step-title" ref={headingRef} tabIndex={-1}>{currentStep.label}</h2><p>{stepHints[value.step - 1]}</p></header>
         {value.step === 1 && <CompanionProfile value={value} onChange={change} onBusy={setReading} />}
         {value.step === 2 && <>
           <div className="companion-skill-list">{skills.map(entry => <label key={entry.id} className="companion-skill-option">
@@ -103,7 +103,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
           </Button>
         </footer>
       </section>
-      <CompanionPreview value={value} skills={skills} />
+      {value.step === 4 && <CompanionPreview value={value} skills={skills} />}
     </div>
     <SaveFailureExitGuard failed={unsaved} onRetry={() => persist(valueRef.current)} />
   </main>;

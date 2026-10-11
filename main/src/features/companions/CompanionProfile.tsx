@@ -1,13 +1,12 @@
 import { useRef, useState } from 'react';
-import { Bot, Smile, Upload, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { LearningCompanion } from '../../../shared/learning-companion';
 
 const avatars = [
-  { id: 'default', label: '默认形象', icon: UserRound },
-  { id: 'lively', label: '活泼风格', icon: Smile },
-  { id: 'simple', label: '简洁风格', icon: Bot },
+  { id: 'default', label: '默认形象' },
+  { id: 'lively', label: '活泼风格' },
+  { id: 'simple', label: '简洁风格' },
 ] as const;
 const years: Record<string, string[]> = {
   小学: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'],
@@ -16,9 +15,9 @@ const years: Record<string, string[]> = {
 const subjects = ['任意学科', '语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理', '科学', '信息技术', '其他'];
 
 export function CompanionAvatar({ value }: { value: LearningCompanion }) {
-  const Icon = avatars.find(item => item.id === value.avatar)?.icon || UserRound;
   return <span className="companion-avatar" data-style={value.avatar} aria-hidden="true">
-    {value.avatar === 'custom' && value.avatarImage ? <img src={value.avatarImage} alt="" /> : <Icon />}
+    {value.avatar === 'custom' && value.avatarImage ? <img src={value.avatarImage} alt="" /> :
+      <img className="companion-avatar-art" src={`${import.meta.env.BASE_URL}companion-avatars.png`} alt="" />}
   </span>;
 }
 
@@ -78,8 +77,8 @@ export function CompanionProfile({ value, onChange, onBusy }: {
         <span>{item.label}</span>
       </label>)}
         <div className="companion-custom-avatar">
-          <Button variant="outline" className="companion-avatar-upload" disabled={reading} aria-label="自定义上传学伴形象" onClick={() => uploadInput.current?.click()}>
-            {value.avatar === 'custom' && value.avatarImage ? <CompanionAvatar value={value} /> : <Upload data-icon="inline-start" />}
+          <Button variant="outline" className="companion-avatar-upload" disabled={reading} data-selected={value.avatar === 'custom'} aria-label="自定义上传学伴形象" onClick={() => uploadInput.current?.click()}>
+            <CompanionAvatar value={value.avatar === 'custom' ? value : { ...value, avatar: 'custom', avatarImage: '' }} />
           </Button>
           <span>自定义上传</span>
         </div>
