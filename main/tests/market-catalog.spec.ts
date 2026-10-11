@@ -92,13 +92,16 @@ test('手机集市使用白色分类面板，分类与标签共同生效并可�
   await page.screenshot({ path: 'docs/assets/SKILL集市手机.png', fullPage: true });
 });
 
-test('我的 SKILL 试用留在作者流程，原版集市与日常教学可用', async ({ page }) => {
+test('我的 SKILL 不提供试用，方法检验与原版集市导航可用', async ({ page }) => {
   await page.goto('/#/daily');
   await page.setViewportSize({ width: 1440, height: 1000 });
   const card = await page.locator('.daily-entry').boundingBox();
   expect(Math.abs(card!.x + card!.width / 2 - 720)).toBeLessThan(2);
   await page.goto('/#/workshop?tab=skills');
-  await page.locator('.workshop-item').first().getByRole('button', { name: '试用 SKILL', exact: true }).click();
+  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.locator('.workshop-item').first().getByRole('button', { name: '查看', exact: true }).click();
+  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '方法检验', exact: true }).click();
   await expect(page).toHaveURL(/#\/assistant\/[^/]+\/test/);
   await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByRole('button', { name: '布置任务', exact: true })).toHaveCount(0);

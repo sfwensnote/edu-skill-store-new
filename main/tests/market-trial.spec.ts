@@ -107,8 +107,7 @@ test('方法内容改变或没有匹配案例时仍可阅读、添加，不套�
   }, workspace);
   await page.goto('/#/workshop?tab=added');
   await page.getByRole('button', { name: '查看', exact: true }).click();
-  await expect(trial(page)).toContainText('暂无试用案例');
-  await expect(trial(page).getByRole('button')).toHaveCount(0);
+  await expect(trial(page)).toHaveCount(0);
   await expect(page.getByText('先把答案给学生，再讲解', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '已添加', exact: true })).toBeDisabled();
   expect(await page.evaluate(() => localStorage.getItem('teaching-method.market-workspace.v1'))).toBe(workspace);

@@ -109,7 +109,11 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   )).toBe(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'docs/assets/简化后-方法详情-手机.png', fullPage: true, animations: 'disabled', scale: 'css' });
-  await page.getByRole('button', { name: '试用 SKILL', exact: true }).click();
+  await page.goto('/#/workshop?tab=created');
+  await page.locator('.workshop-item').filter({ hasText: '第二项方法' }).getByRole('button', { name: '查看', exact: true }).click();
+  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.goto('/#/assistant/multi-review/student-preview?from=method&case=method-two:0');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('method-two:0');
   await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
   await page.getByRole('button', { name: '完成，返回我的 SKILL' }).click();

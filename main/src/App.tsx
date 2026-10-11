@@ -22,6 +22,7 @@ import {
   returnRoute,
   returnLabel,
   navigationRoute,
+  activeNavigationPage,
   type AppRoute,
 } from '@/lib/routes';
 import { HomePage, DailyPage } from '@/features/marketplace/LandingPages';
@@ -42,22 +43,28 @@ import { readPublishedSkills } from '@/lib/account-workspace';
 import { useCompanions } from '@/features/companions/useCompanions';
 import { CompanionsPage, CompanionDetail } from '@/features/companions/CompanionPages';
 import { CompanionEditor } from '@/features/companions/CompanionEditor';
+import { LegacyTaskCleanup } from '@/features/companions/LegacyTaskCleanup';
 import { MountSkillDialog } from '@/features/companions/MountSkillDialog';
 import { PublishSkillDialog } from '@/features/workshop/PublishSkillDialog';
 import { newCompanion, type LearningCompanion } from '../shared/learning-companion';
 
 export default function App() {
-  return <AccountProvider><SkillWorkspace /></AccountProvider>;
+  return <AccountProvider><LegacyTaskCleanup><SkillWorkspace /></LegacyTaskCleanup></AccountProvider>;
 }
 function SkillWorkspace() {
   const { account, storage } = useAccount();
   const route = useAppRoute();
+  const currentRouteHash = routeHash(route);
   usePageFocus(route);
   const platform = useDemoPlatform(storage, account.id);
   const market = useMarketWorkspace(storage);
   const companions = useCompanions(storage);
   const [publishing, setPublishing] = useState<SkillEntry | null>(null);
   const [mounting, setMounting] = useState<SkillEntry | null>(null);
+  useEffect(() => {
+    setPublishing(null);
+    setMounting(null);
+  }, [currentRouteHash]);
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
@@ -201,7 +208,7 @@ function SkillWorkspace() {
       )}
       {route.page === 'skill-detail' && selectedSkill && (
         <SkillDetailPage
-          key={selectedSkill.id}
+          key={`skill-detail:${selectedSkill.id}`}
           entry={selectedSkill}
           favorite={market.favorites.includes(selectedSkill.id)}
           backLabel={returnLabel(route, { page: 'market' })}
@@ -216,18 +223,17 @@ function SkillWorkspace() {
           onCheck={selectedSkill.assistantId ? () => checkSkill(selectedSkill) : undefined}
           onPublish={selectedSkill.assistantId ? () => setPublishing(selectedSkill) : undefined}
           shared={market.sharedSkillIds.includes(selectedSkill.id)}
-          onPreview={selectedSkill.assistantId ? (index) => {
-            const assistant = platform.getAssistant(selectedSkill.assistantId!);
-            if (!assistant) return;
-            if (index === undefined && (!platform.isSkillIncluded(assistant.id, selectedSkill.skill.id) || !isMethodReviewed(assistant)))
-              checkSkill(selectedSkill);
-            else navigate({ page: 'trial-preview', assistantId: assistant.id, from: 'method', caseId: `${selectedSkill.skill.id}:${index || 0}` });
-          } : undefined}
+          showTrial={activeNavigationPage(route) === 'market'}
         />
+      )}
+      {route.page === 'skill-detail' && !selectedSkill && (
+        <main className="page-frame not-found"><h1>没有找到这项 SKILL</h1>
+          <button onClick={() => back({ page: 'market' })}>{returnLabel(route, { page: 'market' })}</button>
+        </main>
       )}
       {route.page === 'inquiry-editor' && design && (
         <InquiryEditor
-          key={design.id}
+          key={`inquiry-editor:${design.id}`}
           design={design}
           level={route.level}
           preview={route.view === 'preview'}
@@ -268,15 +274,6 @@ function SkillWorkspace() {
           favorites={market.favorites}
           shared={market.sharedSkillIds}
           assistants={platform.assistants}
-          onTrialSkill={(entry) => {
-            if (!entry.assistantId) { navigate({ page: 'skill-detail', skillId: entry.id }); return; }
-            const assistant = platform.getAssistant(entry.assistantId);
-            if (!assistant || !isMethodReviewed(assistant) || !platform.isSkillIncluded(assistant.id, entry.skill.id)) {
-              checkSkill(entry);
-              return;
-            }
-            navigate({ page: 'trial-preview', assistantId: entry.assistantId, caseId: `${entry.skill.id}:0`, from: 'method' });
-          }}
           onEditSkill={editSkill}
           onOpenSkill={(skillId) => navigate({ page: 'skill-detail', skillId })}
           onCopySkill={copySkill}
@@ -292,18 +289,21 @@ function SkillWorkspace() {
       )}
       {(route.page === 'companions' || route.page === 'space') && <CompanionsPage items={companions.items} skills={mySkills}
         onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion} />}
-      {route.page === 'companion-edit' && <CompanionEditor key={route.companionId}
+      {route.page === 'companion-edit' && <CompanionEditor key={`companion-editor:${route.companionId}`}
         initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={mySkills} onSave={companions.save}
         onBack={() => goTo({ page: 'companions' })} onSkills={() => navigate({ page: 'workshop' })}
         onDone={() => goTo({ page: 'companion-detail', companionId: route.companionId })} />}
       {route.page === 'companion-detail' && (selectedCompanion ? <CompanionDetail value={selectedCompanion} skills={mySkills}
         onBack={() => goTo({ page: 'companions' })} onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })} /> :
         <main className="page-frame not-found"><h1>没有找到这个学伴</h1><button onClick={() => goTo({ page: 'companions' })}>返回我的学伴</button></main>)}
-      {mounting && <MountSkillDialog key={mounting.id} entry={mounting} items={companions.items} onSave={companions.save}
-        onClose={() => setMounting(null)} onOpen={openCompanion} onCreate={() => {
+      {mounting && <MountSkillDialog key={`mount-skill:${mounting.id}`} entry={mounting} items={companions.items} onSave={companions.save}
+        onClose={() => setMounting(null)} onOpen={(value) => {
+          setMounting(null);
+          navigate({ page: 'companion-detail', companionId: value.id });
+        }} onCreate={() => {
           navigate({ page: 'companion-edit', companionId: crypto.randomUUID(), skillId: mounting.id }); setMounting(null);
         }} />}
-      {publishing && <PublishSkillDialog key={publishing.id} entry={publishing} shared={market.sharedSkillIds.includes(publishing.id)}
+      {publishing && <PublishSkillDialog key={`publish-skill:${publishing.id}`} entry={publishing} shared={market.sharedSkillIds.includes(publishing.id)}
         checked={Boolean(publishing.assistantId && platform.getAssistant(publishing.assistantId) && isMethodReviewed(platform.getAssistant(publishing.assistantId)!) && platform.isSkillIncluded(publishing.assistantId, publishing.skill.id))}
         onClose={() => setPublishing(null)} onCheck={() => checkSkill(publishing)}
         onPublish={() => {
@@ -315,14 +315,13 @@ function SkillWorkspace() {
       {route.page === 'task-preview' && task?.kind === 'skill' && <MethodTrialRecord task={task} onBack={() => back({ page: 'workshop', tab: 'skills' })} />}
       {route.page === 'task-preview' && task?.kind === 'design' && (
         <TaskPreview
-          key={task.id}
+          key={`task-preview:${task.id}`}
           task={task}
           onBack={() => back({ page: 'space' })}
           onSubmit={(s) => market.submitTask(task.id, s)}
         />
       )}
-      {((route.page === 'skill-detail' && !selectedSkill) ||
-        (route.page === 'task-preview' && !task) ||
+      {((route.page === 'task-preview' && !task) ||
         (route.page === 'inquiry-editor' && !design) || missingEditingSkill) && (
         <main className="page-frame not-found">
           <h1>没有找到这项内容</h1>
@@ -345,7 +344,7 @@ function SkillWorkspace() {
       )}
       {route.page === 'create' && current && !missingEditingSkill && (
         <DesignerPage
-          key={current.id + (route.skillId || '')}
+          key={`method-editor:${current.id}:${route.skillId || ''}`}
           assistant={current}
           storage={storage}
           selectedSkillId={route.skillId}
@@ -380,7 +379,7 @@ function SkillWorkspace() {
                 : { page: 'create', assistantId: current.id, returnTo: route.returnTo },
             );
           }}
-          key={current.id + current.updatedAt}
+          key={`method-check:${current.id}:${current.updatedAt}`}
           assistant={{
             ...current,
             skills: current.skills.filter((skill) => platform.isSkillIncluded(current.id, skill.id)),
@@ -437,7 +436,7 @@ function SkillWorkspace() {
       )}
       {route.page === 'trial-preview' && current && !missingPreviewCase && (
         <StudentPreviewPage
-          key={current.id + (route.caseId || '')}
+          key={`student-preview:${current.id}:${route.caseId || ''}`}
           assistant={{ ...current, skills: current.skills.filter((skill) => previewSkillId ? skill.id === previewSkillId : platform.isSkillIncluded(current.id, skill.id)) }}
           onBack={() => back({ page: route.from === 'method' ? 'logs' : route.from, assistantId: current.id })}
           initialCaseId={route.caseId}

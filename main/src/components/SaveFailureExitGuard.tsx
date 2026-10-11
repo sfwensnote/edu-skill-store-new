@@ -14,7 +14,7 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
       event.preventDefault();
       event.returnValue = '';
     }
-    function guard(event: HashChangeEvent) {
+    function guard(event: Event) {
       const next = window.location.hash;
       if (next === currentHash.current) return;
       if (!latest.current.failed) {
@@ -28,9 +28,11 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
       setError('');
     }
     window.addEventListener('beforeunload', beforeUnload);
+    window.addEventListener('popstate', guard, true);
     window.addEventListener('hashchange', guard, true);
     return () => {
       window.removeEventListener('beforeunload', beforeUnload);
+      window.removeEventListener('popstate', guard, true);
       window.removeEventListener('hashchange', guard, true);
     };
   }, []);

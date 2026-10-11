@@ -83,10 +83,10 @@ test('数量来自实际作品，组合筛选在详情返回和刷新后保留�
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await expect(page.locator('[data-kind="pbl"], [data-kind="chains"], [data-kind="problems"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '设计情境作品' })).toHaveCount(0);
-  await page.locator('[data-work-id="personal:assistant-demo-active:reflect"]').getByRole('button', { name: '试用 SKILL', exact: true }).click();
-  await expect(page).toHaveURL(/student-preview.*case=reflect%3A0/);
-  await expect(page.getByRole('button', { name: '完成，返回我的 SKILL' })).toBeVisible();
-  await page.getByRole('button', { name: '完成，返回我的 SKILL' }).click();
+  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.locator('[data-work-id="personal:assistant-demo-active:reflect"]').getByRole('button', { name: '查看', exact: true }).click();
+  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
   await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
 });
 
@@ -123,7 +123,7 @@ test('创建分类的发布管理和收藏保留，更多菜单支持键盘关�
   expect(stored[0].skills[0].id).not.toBe('reflect');
 });
 
-test('旧 PBL 分类退回 SKILL，旧项目、任务与收藏不被清空或展示', async ({ page }) => {
+test('旧 PBL 分类退回 SKILL，旧任务清空，项目与收藏不进入个人方法列表', async ({ page }) => {
   await seedWorks(page);
   await page.evaluate(() => {
     const key = 'teaching-method.market-workspace.v1';
@@ -142,7 +142,7 @@ test('旧 PBL 分类退回 SKILL，旧项目、任务与收藏不被清空或展
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   const workspace = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1') || '{}'));
   expect(workspace.designs).toHaveLength(2);
-  expect(workspace.tasks[0].design.id).toBe('workshop-lesson');
+  expect(workspace.tasks).toEqual([]);
   expect(workspace.favorites).toEqual(['design:workshop-lesson:3']);
 });
 

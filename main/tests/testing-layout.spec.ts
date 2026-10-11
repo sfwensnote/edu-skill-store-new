@@ -90,7 +90,15 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await expect(page.locator('.market-resource-card')).toContainText('任意学科');
   await page.getByRole('button', { name: '查看与试用', exact: true }).click();
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+  const trial = page.getByRole('region', { name: '试用 SKILL', exact: true });
+  await expect(trial).toBeVisible();
+  await expect(trial.getByRole('combobox', { name: '试用案例', exact: true }).locator('option')).toHaveCount(2);
+  await trial.getByRole('button', { name: '查看模型回复', exact: true }).click();
+  await expect(trial.getByRole('log', { name: '试用对话' })).toContainText('请把你目前的做法和理由写出来');
   await page.goto('/#/workshop?tab=created');
   await expect(page.locator('.workshop-item')).toContainText('任意学科');
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
+  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '查看', exact: true }).click();
+  await expect(trial).toHaveCount(0);
 });

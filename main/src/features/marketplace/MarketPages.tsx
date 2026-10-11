@@ -18,7 +18,7 @@ export function SkillDetailPage({
   onEdit,
   backLabel,
   onUse,
-  onPreview,
+  showTrial = true,
   onCheck,
   onPublish,
   shared = false,
@@ -34,7 +34,7 @@ export function SkillDetailPage({
   onEdit?: () => void;
   backLabel: string;
   onUse: () => void;
-  onPreview?: (index?: number) => void;
+  showTrial?: boolean;
   onCheck?: () => void;
   onPublish?: () => void;
   shared?: boolean;
@@ -59,8 +59,7 @@ export function SkillDetailPage({
         </div>
         <div className="inline-actions">
           {onCheck && <Button onClick={onCheck}>方法检验</Button>}
-          {onPreview ? <Button variant="outline" onClick={() => onPreview()}>试用 SKILL</Button> :
-            <Button disabled={added} onClick={onAdd}>{added ? '已添加' : '添加到我的 SKILL'}<ArrowRight /></Button>}
+          {!entry.assistantId && <Button disabled={added} onClick={onAdd}>{added ? '已添加' : '添加到我的 SKILL'}<ArrowRight /></Button>}
           {onPublish && <Button variant="outline" onClick={onPublish}>{shared ? '管理发布' : '发布到集市'}</Button>}
           {canMount && <Button variant="outline" onClick={onUse}>挂载到学伴</Button>}
           {onEdit && <Button variant="outline" onClick={onEdit}>编辑我的方法</Button>}
@@ -77,9 +76,9 @@ export function SkillDetailPage({
           </Button>}
         </div>
       </header>
-      <div className="detail-grid">
+      <div className={showTrial ? 'detail-grid' : 'detail-grid method-only-detail'}>
         <section className="market-panel method-detail">
-          <MethodSteps skill={entry.skill} onPreview={onPreview ? (index) => onPreview(index) : undefined} />
+          <MethodSteps skill={entry.skill} />
           <h3>课堂使用</h3>
           <p>{entry.example}</p>
           {source && <details>
@@ -87,7 +86,7 @@ export function SkillDetailPage({
             <p>{source}</p>
           </details>}
         </section>
-        <SkillChatPreview key={`${entry.id}:${entry.version}`} skill={entry.skill} />
+        {showTrial && <SkillChatPreview key={`${entry.id}:${entry.version}`} skill={entry.skill} />}
       </div>
     </main>
   );

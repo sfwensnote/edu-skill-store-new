@@ -42,12 +42,12 @@ test('集市添加不创建可编辑副本；分类、刷新、试用与移除�
   await expect(card).toHaveCount(1);
   await expect(card).toContainText(title);
   await expect(card.getByRole('button', { name: '编辑', exact: true })).toHaveCount(0);
-  await card.getByRole('button', { name: '试用 SKILL', exact: true }).click();
+  await expect(card.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await card.getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
   await expect(page.getByText('方法示例', { exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
-  await expect(page.locator('.experience-turn')).toHaveCount(2);
+  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
   expect((await stored(page)).owners).toEqual(before);
   await page.reload();
   await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();

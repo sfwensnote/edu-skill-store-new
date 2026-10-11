@@ -95,9 +95,6 @@ export function WorkshopPage(props: WorkshopProps) {
     edit: (item) => {
       if (item.kind === 'skill') props.onEditSkill(item.entry);
     },
-    trial: (item) => {
-      if (item.kind === 'skill') props.onTrialSkill(item.entry);
-    },
     copy: (item) => {
       if (item.kind === 'skill' && item.entry.assistantId) props.onCopySkill(item.entry);
     },

@@ -21,7 +21,6 @@ type WorkInfo = {
   updatedAt?: string;
   status: string;
   detail: string;
-  canUse: boolean;
 };
 export type WorkItem = WorkInfo &
   (
@@ -79,12 +78,6 @@ export function skillWork(entry: SkillEntry, assistants: TeachingAssistant[]): W
     updatedAt: entry.addedFrom?.addedAt || owner?.updatedAt,
     status: skillValidationLabel(entry),
     detail: '',
-    canUse: Boolean(
-      entry.skill.name.trim() &&
-      entry.skill.purpose.trim() &&
-      entry.skill.trigger.trim() &&
-      entry.skill.behaviorSteps.some((s) => s.trim()),
-    ),
   };
 }
 export function workshopCollections({
@@ -116,7 +109,6 @@ export function workshopCollections({
       updatedAt: assistant.updatedAt,
       status: '尚未形成 SKILL',
       detail: '梳理中',
-      canUse: false,
     }));
   return {
     skills: [...personal, ...methodDrafts, ...added],

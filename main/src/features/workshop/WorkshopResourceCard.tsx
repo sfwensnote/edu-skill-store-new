@@ -26,7 +26,6 @@ import { type WorkItem, type WorkshopTab } from './workshop-catalog';
 export type WorkActions = {
   view: (item: WorkItem) => void;
   edit: (item: WorkItem) => void;
-  trial: (item: WorkItem) => void;
   copy: (item: WorkItem) => void;
   favorite: (id: string) => void;
   share: (item: WorkItem) => void;
@@ -98,14 +97,6 @@ export function WorkshopResourceCard({
         <Button variant="outline" onClick={() => actions.view(item)}>
           {viewLabel}
         </Button>
-        {item.canUse && (
-          <Button
-            title="试用 SKILL"
-            onClick={() => actions.trial(item)}
-          >
-            试用 SKILL
-          </Button>
-        )}
         {own && item.kind !== 'method-draft' && (
           <Button variant="outline" onClick={() => actions.edit(item)}>
             编辑

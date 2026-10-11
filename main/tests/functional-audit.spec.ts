@@ -116,6 +116,8 @@ test('旧探究直接地址复制失败不新增幽灵副本，恢复后可创�
 
 test('教师回答保存失败时导航会提示，恢复存储后可保存并离开', async ({ page }) => {
   await page.goto('/#/create/functional-leave');
+  await page.getByLabel('教学想法').fill('学生遇到困难时先让他说明思路，再提示下一步。');
+  await page.getByRole('checkbox', { name: '标签 错因辅导', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
   await blockStorage(page, 'teaching-assistant.method-draft.v1:functional-leave');
   await page.getByLabel('你的回答', { exact: true }).fill('需要保留的尚未提交回答');

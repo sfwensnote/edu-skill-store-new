@@ -17,7 +17,7 @@ test('首页只保留 SKILL 入口，创建直接进入方法编辑，导航保�
   await expect(main.getByRole('list')).toHaveCount(1);
   await expect(main).not.toContainText(/PBL|情境探究|设计探究|教学任务|教学活动/);
   const nav = page.getByRole('navigation', { name: '主要导航' });
-  await expect(nav.getByRole('button')).toHaveText(['首页', '教学 SKILL 集市', '我的 SKILL']);
+  await expect(nav.getByRole('button')).toHaveText(['首页', '教学 SKILL 集市', '我的 SKILL', '我的学伴']);
   await expect(main.getByRole('list').getByRole('button')).toHaveCount(0);
   await main.getByRole('button', { name: '进入教学方法工坊', exact: true }).press('Enter');
   await expect(page).toHaveURL(/#\/create\/[^?]+/);

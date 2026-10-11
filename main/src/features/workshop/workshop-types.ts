@@ -16,7 +16,6 @@ export type WorkshopProps = {
   onMount: (entry: SkillEntry) => void;
   onFavorite: (id: string) => void;
   onShare: (entry: SkillEntry) => void;
-  onTrialSkill: (entry: SkillEntry) => void;
   onCreate: () => void;
   onMarket: () => void;
   onOpenAssistant: (id: string) => void;
