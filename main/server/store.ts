@@ -65,4 +65,8 @@ CREATE INDEX IF NOT EXISTS idx_assistants_user ON assistants(user_id,updated_at)
 CREATE INDEX IF NOT EXISTS idx_skills_assistant ON skills(assistant_id);
 CREATE INDEX IF NOT EXISTS idx_usage_assistant ON usage_sessions(assistant_id,started_at);
 `);
-seedPlatform(db);
+const userColumns = new Set((db.prepare('PRAGMA table_info(users)').all() as { name: string }[]).map(column => column.name));
+if (!userColumns.has('role')) db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'teacher'");
+if (!userColumns.has('disabled')) db.exec('ALTER TABLE users ADD COLUMN disabled INTEGER NOT NULL DEFAULT 0');
+if (process.env.ENABLE_LEGACY_SEED === 'true' && process.env.NODE_ENV !== 'production') seedPlatform(db);
+else db.prepare("UPDATE users SET disabled=1 WHERE id='demo-teacher'").run();

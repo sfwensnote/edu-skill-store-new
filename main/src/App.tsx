@@ -3,7 +3,11 @@ import { AppHeader } from '@/components/AppHeader';
 import { LibraryPage } from '@/features/library/LibraryPage';
 import { LibraryDetailPage } from '@/features/library/LibraryDetailPage';
 import { DesignerPage } from '@/features/designer/DesignerPage';
-import { TestingPage } from '@/features/testing/TestingPage';
+import { MethodDetectionPage } from '@/features/execution/MethodDetectionPage';
+import { StudentTrialPage } from '@/features/execution/StudentTrialPage';
+import { useVerification } from '@/features/execution/useVerification';
+import { executionApi, isVerified, serviceConfigured } from '@/features/execution/api';
+import type { Trial, Verification } from '../shared/execution';
 import { LogsPage } from '@/features/usage/LogsPage';
 import { LogDetailPage } from '@/features/usage/LogDetailPage';
 import { ReportPage } from '@/features/usage/ReportPage';
@@ -49,6 +53,8 @@ import { PublishSkillDialog } from '@/features/workshop/PublishSkillDialog';
 import { newCompanion, type LearningCompanion } from '../shared/learning-companion';
 
 export default function App() {
+  const route = useAppRoute();
+  if (route.page === 'student-trial') return <StudentTrialPage key={route.invitation} invitation={route.invitation} />;
   return <AccountProvider><LegacyTaskCleanup><SkillWorkspace /></LegacyTaskCleanup></AccountProvider>;
 }
 function SkillWorkspace() {
@@ -59,6 +65,7 @@ function SkillWorkspace() {
   const platform = useDemoPlatform(storage, account.id);
   const market = useMarketWorkspace(storage);
   const companions = useCompanions(storage);
+  const verification = useVerification();
   const [publishing, setPublishing] = useState<SkillEntry | null>(null);
   const [mounting, setMounting] = useState<SkillEntry | null>(null);
   useEffect(() => {
@@ -68,13 +75,15 @@ function SkillWorkspace() {
   const routeAssistantId = 'assistantId' in route ? route.assistantId : '';
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
-  const personalSkills = assistantSkillEntries(platform.assistants).map((entry) =>
-    entry.assistantId && !platform.isSkillIncluded(entry.assistantId, entry.skill.id)
-      ? { ...entry, validation: '待核对' as const } : entry);
+  const personalSkills = assistantSkillEntries(platform.assistants).map(entry => ({ ...entry,
+    validation: verification.verified(entry) ? '已验证' : '待检测' }));
   let publishedSkills: SkillEntry[] = [];
   let catalogError = '';
   try { publishedSkills = readPublishedSkills(localStorage, account.id); }
   catch { catalogError = '集市资料读取失败，请检查浏览器存储后重试。'; }
+  // 服务端教师不会出现在旧本机账号列表中，自己的发布项仍按当前工作区读取。
+  publishedSkills = [...publishedSkills, ...personalSkills.filter(entry => market.sharedSkillIds.includes(entry.id) &&
+    !publishedSkills.some(item => item.id === entry.id) && entry.assistantId && isMethodReviewed(platform.getAssistant(entry.assistantId)!))];
   const allSkills = [...personalSkills, ...marketSkills, ...publishedSkills, ...market.addedSkills];
   const addedIds = [...personalSkills.map((entry) => entry.id), ...market.addedSkills.map((entry) => entry.addedFrom!.id)];
   const visibleMarketSkills = [
@@ -133,7 +142,7 @@ function SkillWorkspace() {
   }
   function checkSkill(entry: SkillEntry) {
     const assistant = entry.assistantId ? platform.getAssistant(entry.assistantId) : undefined;
-    if (!assistant) return;
+    if (!assistant) { setMounting(null); navigate({ page: 'skill-check', skillId: entry.id }); return; }
     const included = platform.isSkillIncluded(assistant.id, entry.skill.id);
     if (!included && !platform.toggleSkill(assistant.id, entry.skill.id)) return;
     if ((!included || !isMethodReviewed(assistant)) && !platform.setStatus(assistant.id, 'GENERATED')) return;
@@ -222,7 +231,7 @@ function SkillWorkspace() {
           added={Boolean(selectedSkill.addedFrom) || addedIds.includes(selectedSkill.id)}
           onEdit={selectedSkill.assistantId ? () => editSkill(selectedSkill) : undefined}
           canMount={Boolean(mountableSkill)}
-          onCheck={selectedSkill.assistantId ? () => checkSkill(selectedSkill) : undefined}
+          onCheck={mountableSkill ? () => checkSkill(mountableSkill) : undefined}
           onPublish={selectedSkill.assistantId ? () => setPublishing(selectedSkill) : undefined}
           shared={market.sharedSkillIds.includes(selectedSkill.id)}
           showTrial={activeNavigationPage(route) === 'market'}
@@ -293,15 +302,24 @@ function SkillWorkspace() {
       )}
       {(route.page === 'companions' || route.page === 'space') && <CompanionsPage items={companions.items} skills={mySkills}
         onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion}
-        onEdit={value => navigate({ page: 'companion-edit', companionId: value.id })} onCopy={companions.copy} onRemove={companions.remove} />}
+        onEdit={value => navigate({ page: 'companion-edit', companionId: value.id })} onCopy={companions.copy} onRemove={async id => {
+          if (serviceConfigured) {
+            const trials = await executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(id)}`);
+            if (trials.some(trial => trial.status === 'open' && Date.parse(trial.expiresAt) > Date.now()))
+              throw new Error('请先结束正在开放的学生试用，再删除学伴。');
+          }
+          return companions.remove(id);
+        }} />}
       {route.page === 'companion-edit' && <CompanionEditor key={`companion-editor:${route.companionId}`}
         initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={mySkills} onSave={companions.save}
         onBack={() => goTo({ page: 'companions' })} onSkills={() => navigate({ page: 'workshop' })}
         onDone={() => goTo({ page: 'companion-detail', companionId: route.companionId })} />}
       {route.page === 'companion-detail' && (selectedCompanion ? <CompanionDetail value={selectedCompanion} skills={mySkills}
+        onCheck={checkSkill} onMethods={() => navigate({ page: 'workshop' })}
         onBack={() => goTo({ page: 'companions' })} onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })} /> :
         <main className="page-frame not-found"><h1>没有找到这个学伴</h1><button onClick={() => goTo({ page: 'companions' })}>返回我的学伴</button></main>)}
       {mounting && <MountSkillDialog key={`mount-skill:${mounting.id}`} entry={mounting} items={companions.items} onSave={companions.save}
+        onCheck={() => checkSkill(mounting)}
         onClose={() => setMounting(null)} onOpen={(value) => {
           setMounting(null);
           navigate({ page: 'companion-detail', companionId: value.id });
@@ -309,11 +327,11 @@ function SkillWorkspace() {
           navigate({ page: 'companion-edit', companionId: crypto.randomUUID(), skillId: mounting.id }); setMounting(null);
         }} />}
       {publishing && <PublishSkillDialog key={`publish-skill:${publishing.id}`} entry={publishing} shared={market.sharedSkillIds.includes(publishing.id)}
-        checked={Boolean(publishing.assistantId && platform.getAssistant(publishing.assistantId) && isMethodReviewed(platform.getAssistant(publishing.assistantId)!) && platform.isSkillIncluded(publishing.assistantId, publishing.skill.id))}
+        checked={Boolean(verification.verified(publishing) && publishing.assistantId && platform.getAssistant(publishing.assistantId) && isMethodReviewed(platform.getAssistant(publishing.assistantId)!) && platform.isSkillIncluded(publishing.assistantId, publishing.skill.id))}
         onClose={() => setPublishing(null)} onCheck={() => checkSkill(publishing)}
         onPublish={() => {
           const assistant = publishing.assistantId ? platform.getAssistant(publishing.assistantId) : undefined;
-          return Boolean(assistant && isMethodReviewed(assistant) && platform.isSkillIncluded(assistant.id, publishing.skill.id) && market.shareMany([publishing.id]));
+          return Boolean(verification.verified(publishing) && assistant && isMethodReviewed(assistant) && platform.isSkillIncluded(assistant.id, publishing.skill.id) && market.shareMany([publishing.id]));
         }}
         onWithdraw={() => market.removeShares([publishing.id])}
         onMarket={() => { setPublishing(null); navigate({ page: 'market' }); }} />}
@@ -373,7 +391,9 @@ function SkillWorkspace() {
         />
       )}
       {route.page === 'test' && current && (
-        <TestingPage
+        <MethodDetectionPage
+          entries={personalSkills.filter(entry => entry.assistantId === current.id && platform.isSkillIncluded(current.id, entry.skill.id))}
+          onBack={() => back({ page: 'create', assistantId: current.id })}
           onAdjust={() => {
             const parent = returnRoute(route, { page: 'create', assistantId: current.id });
             goTo(
@@ -382,25 +402,17 @@ function SkillWorkspace() {
                 : { page: 'create', assistantId: current.id, returnTo: route.returnTo },
             );
           }}
-          key={`method-check:${current.id}:${current.updatedAt}`}
-          assistant={{
-            ...current,
-            skills: current.skills.filter((skill) => platform.isSkillIncluded(current.id, skill.id)),
+          key={`method-check:${current.id}`}
+          onConfirmed={() => {
+            void executionApi<Verification[]>('/verified').then(proofs => {
+              const included = personalSkills.filter(entry => entry.assistantId === current.id && platform.isSkillIncluded(current.id, entry.skill.id));
+              if (included.length && included.every(entry => isVerified(entry, proofs))) platform.setStatus(current.id, 'TESTED');
+            }).catch(() => { /* 确认记录已由服务器保存，资格状态由公共钩子刷新。 */ });
           }}
-          onComplete={() => platform.setStatus(current.id, 'TESTED')}
-          onSaveMethod={(skillId, method) => {
-            if (!platform.saveReviewedMethod(current.id, skillId, method)) return false;
-            market.removeShares(personalSkills.filter((entry) => entry.assistantId === current.id).map((entry) => entry.id));
-            return true;
-          }}
-          onStartTrial={() => {
-            if (platform.setStatus(current.id, 'TRIAL')) navigate({ page: 'trial-preview', assistantId: current.id, from: 'test' });
-          }}
-          onCreated={
-            current.skills.some((skill) => skill.steps) ? () => navigate({ page: 'workshop' }) : undefined
-          }
         />
       )}
+      {route.page === 'skill-check' && <MethodDetectionPage key={`added-check:${route.skillId}`}
+        entries={mySkills.filter(entry => entry.id === route.skillId)} onBack={() => back({ page: 'workshop' })} />}
       {route.page === 'logs' && current && (
         <LogsPage
           onBack={() => back({ page: 'workshop', tab: 'assistants' })}

@@ -172,44 +172,6 @@
   padding: 12px 0;
   border-bottom: 1px solid var(--line-soft);
 }
-.test-record {
-  max-width: none;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 28px;
-}
-.case-confirmation {
-  position: sticky;
-  bottom: 0;
-  justify-content: flex-end;
-  padding: 12px 0 0;
-  border: 0;
-  background: var(--card);
-}
-.simulation-line.assistant,
-.test-question {
-  border-color: var(--line);
-}
-.flow-line {
-  background: var(--line);
-}
-.flow-line svg {
-  background: var(--card);
-}
-.complete-actions {
-  position: sticky;
-  bottom: 0;
-  background: var(--card);
-  border-top: 1px solid var(--line);
-  padding: 14px;
-}
-.test-complete {
-  padding: 24px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  border-radius: 9px;
-}
 .student-task {
   max-width: 1020px;
 }
@@ -304,12 +266,6 @@
   }
   .inquiry-page > .editor-footer {
     padding: 12px;
-  }
-  .test-record {
-    padding: 20px 16px;
-  }
-  .case-confirmation {
-    position: static;
   }
   .student-task > .market-panel {
     padding: 20px;

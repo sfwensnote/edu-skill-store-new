@@ -10,13 +10,24 @@ import { evaluate } from './evaluation';
 import { authRouter, currentUser } from './auth';
 import { db } from './store';
 import { previewSkill } from './skill-preview';
+import { executionRouter } from './execution/router';
 
 
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
+  app.use('/api/execution', express.json({ limit: '8mb' }));
   app.use(express.json({ limit: '2mb' }));
   app.use('/api', (req, res, next) => {
+    const allowed = (process.env.FRONTEND_ORIGINS || '').split(',').map(origin => origin.trim()).filter(Boolean);
+    if (req.headers.origin && allowed.includes(req.headers.origin)) {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
+      next(); return;
+    }
     if (
       req.method !== 'GET' &&
       req.headers.origin &&
@@ -30,6 +41,14 @@ export function createApp() {
   });
   app.get('/api/status', (_req, res) => res.json(modelStatus()));
   app.use('/api/auth', authRouter);
+  app.use('/api/execution', executionRouter);
+  app.use(['/api/chat', '/api/evaluate', '/api/design', '/api/skills/preview', '/api/materials'], (req, res, next) => {
+    const configured = modelStatus();
+    if ((process.env.NODE_ENV === 'production' || configured.designReady || configured.teachingReady) && !currentUser(req)) {
+      res.status(401).json({ error: '请先登录教师账号。' }); return;
+    }
+    next();
+  });
   app.post('/api/skills/preview', async (req, res) => res.json(await previewSkill(req.body)));
   app.post('/api/design', async (req, res) => {
     const { demand } = z.object({ demand: z.string().trim().min(10).max(4000) }).parse(req.body);

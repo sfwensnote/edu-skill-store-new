@@ -1,5 +1,7 @@
 import type { DesignLevel } from '../../shared/contextual-design';
 type RoutePage =
+  | { page: 'student-trial'; invitation: string }
+  | { page: 'skill-check'; skillId: string }
   | { page: 'home' | 'daily' | 'inquiry' | 'market' }
   | { page: 'companions' }
   | { page: 'companion-edit'; companionId: string; skillId?: string }
@@ -40,6 +42,8 @@ function parseRoute(hash: string): RoutePage {
     return { page: 'home' };
   }
   if (!parts.length || parts[0] === 'home') return { page: 'home' };
+  if (parts[0] === 'try') return { page: 'student-trial', invitation: parts[1] || '' };
+  if (parts[0] === 'skill-check' && parts[1]) return { page: 'skill-check', skillId: parts[1] };
   if (parts[0] === 'companions') {
     if (!parts[1]) return { page: 'companions' };
     return parts[2] === 'edit' ? { page: 'companion-edit', companionId: parts[1], skillId: params.get('skill') || undefined } : { page: 'companion-detail', companionId: parts[1] };
@@ -126,7 +130,7 @@ export function activeNavigationPage(
   if (['market', 'skill-detail', 'library', 'library-detail'].includes(context.page)) return 'market';
   if (['space', 'task-preview', 'use'].includes(context.page)) return 'space';
   if (
-    ['workshop', 'mine', 'create', 'test', 'logs', 'report', 'log-detail', 'trial-preview', 'inquiry-editor'].includes(
+    ['workshop', 'mine', 'create', 'test', 'skill-check', 'logs', 'report', 'log-detail', 'trial-preview', 'inquiry-editor'].includes(
       context.page,
     )
   )
@@ -159,6 +163,7 @@ export function navigationRoute(current: AppRoute, next: AppRoute): AppRoute {
     'task-preview',
     'create',
     'test',
+    'skill-check',
     'logs',
     'report',
     'log-detail',
@@ -177,6 +182,10 @@ export function returnLabel(route: AppRoute, fallback: AppRoute): string {
 }
 function pageHash(route: AppRoute): string {
   switch (route.page) {
+    case 'student-trial':
+      return `#/try/${encodeURIComponent(route.invitation)}`;
+    case 'skill-check':
+      return `#/skill-check/${encodeURIComponent(route.skillId)}`;
     case 'companion-edit':
       return `#/companions/${encodeURIComponent(route.companionId)}/edit${route.skillId ? `?skill=${encodeURIComponent(route.skillId)}` : ''}`;
     case 'companion-detail':

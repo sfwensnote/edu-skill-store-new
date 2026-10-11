@@ -34,6 +34,11 @@ function collect(file) {
   visit(ast);
 }
 const roots = ['src/main.tsx', 'server/index.ts', 'vite.config.ts', 'playwright.config.ts'].map(file => path.join(root, file));
+const scripts = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).scripts;
+for (const command of Object.values(scripts)) {
+  const entry = String(command).match(/\btsx\s+([^\s]+\.ts)\b/)?.[1];
+  if (entry) roots.push(path.join(root, entry));
+}
 roots.push(...parsed.fileNames.filter(file => /\.(?:test|spec)\.tsx?$/.test(file)));
 roots.forEach(collect);
 const reachable = new Set();

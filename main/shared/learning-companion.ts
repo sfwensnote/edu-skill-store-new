@@ -22,7 +22,7 @@ export type CompanionStep = z.infer<typeof stepSchema>;
 const designSchema = z.object({ contextual: z.boolean(), context: z.string(), question: z.string(),
   pbl: z.boolean(), drivingQuestion: z.string(), product: z.string(), stages: z.string() });
 export type CompanionDesign = z.infer<typeof designSchema>;
-const companionSchema = z.object({
+export const companionSchema = z.object({
   version: z.literal(2), id: z.string(), name: z.string(), introduction: z.string(), grade: z.string(), subject: z.string(), year: z.string(),
   avatar: z.enum(['default', 'lively', 'simple', 'custom']), avatarImage: z.string(),
   skillIds: z.array(z.string()), step: stepSchema,

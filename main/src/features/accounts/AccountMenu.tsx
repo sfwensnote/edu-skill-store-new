@@ -17,7 +17,7 @@ export function AccountMenu({ onMine }: { onMine: () => void }) {
         <DropdownMenuGroup>
           <DropdownMenuItem onSelect={onMine}>我的 SKILL</DropdownMenuItem>
           {account.role === 'admin' && <DropdownMenuItem onSelect={() => { setError(''); setManage(true); }}>账号管理</DropdownMenuItem>}
-          <DropdownMenuItem onSelect={event => { try { logout(); } catch (failure) { event.preventDefault(); setError(failure instanceof Error && /[\u4e00-\u9fff]/.test(failure.message) ? failure.message : '退出失败，请检查浏览器存储权限后重试。'); } }}>退出登录</DropdownMenuItem>
+          <DropdownMenuItem onSelect={event => { event.preventDefault(); void Promise.resolve().then(logout).catch(failure => setError(failure instanceof Error ? failure.message : '退出失败，请重试。')); }}>退出登录</DropdownMenuItem>
         </DropdownMenuGroup>
         {error && !manage && <p className="account-error account-menu-error" role="alert">{error}</p>}
       </DropdownMenuContent>
@@ -29,8 +29,8 @@ export function AccountMenu({ onMine }: { onMine: () => void }) {
         <ul className="account-list">{accounts.filter(a => a.role === 'teacher').map(teacher => <li key={teacher.id}>
           <div><strong>{teacher.name}</strong><span>{teacher.login}</span><small>{teacher.disabled ? '已停用' : '正常'}</small></div>
           <Button variant="outline" size="sm" onClick={() => {
-            try { setDisabled(teacher.id, !teacher.disabled); setError(''); }
-            catch (failure) { setError(failure instanceof Error && /[\u4e00-\u9fff]/.test(failure.message) ? failure.message : '账号设置未保存，请重试。'); }
+            void Promise.resolve().then(() => setDisabled(teacher.id, !teacher.disabled)).then(() => setError(''))
+              .catch(failure => setError(failure instanceof Error ? failure.message : '账号设置未保存，请重试。'));
           }}>{teacher.disabled ? '启用' : '停用'}</Button>
         </li>)}</ul>
       </DialogContent>

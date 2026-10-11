@@ -1,0 +1,9 @@
+{$WORKSHOP_DOMAIN} {
+  encode gzip
+  reverse_proxy workshop:5173
+  header {
+    X-Content-Type-Options nosniff
+    Referrer-Policy no-referrer
+    X-Frame-Options DENY
+  }
+}

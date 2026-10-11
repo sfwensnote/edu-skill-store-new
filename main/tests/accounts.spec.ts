@@ -2,6 +2,9 @@ import { test, expect, type Page } from '@playwright/test';
 import { accountSessionKey, accountsKey } from '../shared/local-accounts';
 import { skillResetKey } from '../shared/skill-reset';
 import { initialMine } from '../src/data/platform';
+import { packageTeachingMethod } from '../shared/teaching-method';
+import { completeTeachingMethod } from './fixtures/teaching-method';
+import { ownersStorageKey, marketWorkspaceKey } from '../shared/workspace-keys';
 
 async function login(page: Page, account = 'teacher', password = 'teacher123') {
   await page.getByLabel('账号', { exact: true }).fill(account);
@@ -14,25 +17,15 @@ async function logout(page: Page) {
   await page.getByRole('menuitem', { name: '退出登录' }).click();
   await expect(page.getByRole('heading', { name: '登录教学工坊' })).toBeVisible();
 }
-async function createAndPublish(page: Page) {
-  await page.getByRole('button', { name: '创建', exact: true }).click();
-  await page.getByLabel('教学想法').fill('学生阅读时只有判断，没有引用原文。');
-  await page.getByLabel('教学分类', { exact: true }).selectOption('课堂提问');
-  await page.getByRole('checkbox', { name: '标签 证据追问', exact: true }).check();
-  await page.getByRole('button', { name: '继续', exact: true }).click();
-  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['SKILL 简介', '引导学生引用原文支持观点'], ['结束条件', '学生能说明证据如何支持判断后结束'], ['希望学生达到', '用原文支持判断'], ['什么时候开始', '学生只表达观点']]) {
-    await page.getByRole('button', { name: `编辑${label}`, exact: true }).click();
-    await page.getByRole('textbox', { name: label, exact: true }).fill(value);
-  }
-  await page.getByRole('button', { name: '补充一种情况和做法', exact: true }).click();
-  for (const [label, value] of [['情况 1', '学生只有观点没有依据'], ['做法 1', '追问原文依据']]) {
-    await page.getByRole('button', { name: `编辑${label}`, exact: true }).click();
-    await page.getByRole('textbox', { name: label, exact: true }).fill(value);
-  }
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
-  await page.getByRole('button', { name: '确认并完成', exact: true }).click();
-  await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
-  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
+async function seedPublishedMethod(page: Page) {
+  // 账号隔离回归读取既有发布资料；新检测与发布门槛由 execution.spec.ts 验证。
+  const skill = packageTeachingMethod(completeTeachingMethod({ name: '阅读证据追问', description: '引导学生引用原文支持观点' }), 'reading');
+  const owner = { ...initialMine[0], id: 'account-fixture', name: skill.name, skills: [skill], status: 'TESTED' as const };
+  await page.evaluate(({ owner, keys }) => {
+    localStorage.setItem(keys.owners, JSON.stringify([owner]));
+    localStorage.setItem(keys.market, JSON.stringify({ version: 1, sharedSkillIds: [`personal:${owner.id}:${owner.skills[0].id}`] }));
+  }, { owner, keys: { owners: ownersStorageKey, market: marketWorkspaceKey } });
+  await page.reload(); await page.goto('/#/market');
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
 }
 test('教师从旧链接登录进入首页，刷新后身份保留，菜单没有管理员入口', async ({ page }, info) => {
@@ -54,8 +47,8 @@ test('教师从旧链接登录进入首页，刷新后身份保留，菜单没�
   await logout(page);
   expect(await page.evaluate(key => sessionStorage.getItem(key), accountSessionKey)).toBeNull();
 });
-test('教师完整创建并发布，另一教师只读添加；退出和刷新保留各自资料', async ({ page }) => {
-  await page.goto('/#/home'); await login(page); await createAndPublish(page);
+test('既有发布资料供另一教师只读添加；退出和刷新保留各自资料', async ({ page }) => {
+  await page.goto('/#/home'); await login(page); await seedPublishedMethod(page);
   await logout(page);
   await page.getByRole('button', { name: '注册教师账号', exact: true }).click();
   await page.getByLabel('姓名', { exact: true }).fill('李老师');
@@ -80,7 +73,7 @@ test('教师完整创建并发布，另一教师只读添加；退出和刷新�
   await page.reload(); await expect(page.locator('.workshop-item')).toHaveCount(0);
 });
 test('管理员停用使已登录教师退出，启用后原有 SKILL 保留', async ({ page, context }, info) => {
-  await page.goto('/#/home'); await login(page); await createAndPublish(page);
+  await page.goto('/#/home'); await login(page); await seedPublishedMethod(page);
   const adminPage = await context.newPage(); await adminPage.goto('/#/home');
   await login(adminPage, 'admin', 'admin123');
   await adminPage.getByRole('button', { name: '打开账号菜单' }).click();

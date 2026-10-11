@@ -25,7 +25,7 @@ export function seedPlatform(db: DatabaseSync) {
   const now = new Date().toISOString();
   if (!db.prepare('SELECT id FROM users WHERE id=?').get(demoUserId)) {
     const salt = 'demo-teacher-salt';
-    db.prepare('INSERT INTO users VALUES(?,?,?,?,?)').run(
+    db.prepare('INSERT INTO users(id,email,name,hash,salt) VALUES(?,?,?,?,?)').run(
       demoUserId,
       demoEmail,
       '张老师',

@@ -41,6 +41,8 @@ jobs:
         run: npm run check:source
 
       - name: 检查类型并按仓库子路径构建
+        env:
+          VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: npm run build -- --base "/${GITHUB_REPOSITORY#*/}/"
 
       - name: 上传静态网站产物

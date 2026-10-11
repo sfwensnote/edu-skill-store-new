@@ -6,7 +6,6 @@ import { resetExistingSkills } from '../shared/skill-reset';
 import './styles/base.css';
 import './styles/shell-new.css';
 import './styles/library-new.css';
-import './styles/testing-new.css';
 import './styles/usage-new.css';
 import './styles/responsive-new.css';
 import './styles/marketplace.css';

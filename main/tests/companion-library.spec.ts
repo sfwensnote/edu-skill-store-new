@@ -99,7 +99,7 @@ test('草稿可查看或继续创建，详情保留头像、场景、方法与�
   await page.locator('[data-companion-id="custom"]').getByRole('button', { name: '查看学伴', exact: true }).click();
   await expect(page).toHaveURL(/#\/companions\/custom(?:\?|$)/);
   await expect(page.locator('.companion-overview-image img')).toHaveAttribute('src', customImage);
-  await expect(page.getByRole('alert')).toContainText('关联的 SKILL 已移除');
+  await expect(page.getByRole('alert').filter({ hasText: '关联的 SKILL 已移除' })).toBeVisible();
   await page.getByRole('button', { name: '返回我的学伴', exact: true }).click();
   await page.locator('[data-companion-id="custom"]').getByRole('button', { name: '继续创建', exact: true }).click();
   await expect(page).toHaveURL(/#\/companions\/custom\/edit(?:\?|$)/);

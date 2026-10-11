@@ -97,14 +97,18 @@ test('后台隔离检查：请求校验、认证、资料归属、材料与挂�
       });
       process.env.TEACHING_MODEL_URL = `${await listen(model)}/v1`;
       process.env.TEACHING_MODEL_NAME = 'local-protocol-fixture';
-      const live = await (await fetch(`${root}/api/skills/preview`, json(request))).json();
+      const login = await fetch(`${root}/api/auth/login`, json({ email: 'a@example.test', password: 'fixture-password' }));
+      const credential = login.headers.get('set-cookie')!.split(';')[0];
+      const authorized = { ...json(request), headers: { ...json(request).headers, Cookie: credential } };
+      assert.equal((await fetch(`${root}/api/skills/preview`, json(request))).status, 401);
+      const live = await (await fetch(`${root}/api/skills/preview`, authorized)).json();
       assert.equal(live.mode, 'live'); assert.equal(live.content, '原文中哪句话支持你的看法？');
       assert.equal(received!.model, 'local-protocol-fixture');
       for (const text of [skill.name, skill.purpose, skill.trigger, skill.constraints[0], skill.steps[0].action])
         assert.ok(received!.messages[0].content.includes(text));
       assert.deepEqual(received!.messages.slice(1), request.messages);
       reject = true;
-      const failed = await fetch(`${root}/api/skills/preview`, json(request));
+      const failed = await fetch(`${root}/api/skills/preview`, authorized);
       assert.equal(failed.status, 500); assert.match((await failed.json()).error, /HTTP 503/);
     });
   } finally {

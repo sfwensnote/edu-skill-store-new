@@ -34,7 +34,7 @@ test('集市收藏在我的收藏中显示，查看返回与刷新保留，取�
   await expect(page.getByRole('button', { name: `收藏${source.skill.name}`, exact: true })).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('自己的方法与集市收藏共用列表，添加后只产生一份只读快照并挂载该快照', async ({ page }) => {
+test('自己的方法与集市收藏共用列表，只读快照保留来源，未验证时不能挂载', async ({ page }) => {
   const own = assistantSkillEntries(initialMine)[0];
   const source = marketSkills[0];
   await page.addInitScript(({ owners, favorites, keys }) => {
@@ -57,16 +57,17 @@ test('自己的方法与集市收藏共用列表，添加后只产生一份只�
   await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
   await card.getByRole('button', { name: /更多操作/ }).click();
   await page.getByRole('menuitem', { name: '挂载到学伴', exact: true }).click();
-  await page.getByRole('button', { name: '创建新学伴', exact: true }).click();
-  await expect(page).toHaveURL(/companions\/[^/]+\/edit/);
+  await expect(page.getByRole('button', { name: '创建新学伴', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: '前往 SKILL 检测', exact: true }).click();
+  await expect(page).toHaveURL(/skill-check\//);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('方法检测');
   const stored = await page.evaluate(({ market, owners }) => ({
     workspace: JSON.parse(localStorage.getItem(market)!), owners: JSON.parse(localStorage.getItem(owners)!),
   }), { market: marketWorkspaceKey, owners: ownersStorageKey });
   expect(stored.workspace.addedSkills).toHaveLength(1);
   expect(stored.workspace.addedSkills[0].addedFrom.id).toBe(source.id);
   expect(stored.owners).toEqual(initialMine);
-  const url = new URL(page.url().split('#')[1], 'http://local');
-  expect(url.searchParams.get('skill')).toBe(stored.workspace.addedSkills[0].id);
+  expect(decodeURIComponent(page.url())).toContain(stored.workspace.addedSkills[0].id);
 });
 
 test('取消收藏保存失败时保留列表，恢复写入后可重试，手机分类可用', async ({ page }) => {

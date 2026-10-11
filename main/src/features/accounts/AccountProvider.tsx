@@ -5,12 +5,14 @@ import { accountWorkspace, ownersStorageKey, type WorkspaceStorage } from '@/lib
 import { LoginPage } from './LoginPage';
 import { goTo } from '@/lib/routes';
 import './accounts.css';
+import { RemoteAccountProvider } from './RemoteAccountProvider';
+import { serviceConfigured } from '../execution/api';
 
 type AccountContextValue = {
   account: AccountIdentity; storage: WorkspaceStorage; accounts: AccountIdentity[];
-  logout: () => void; setDisabled: (id: string, disabled: boolean) => void;
+  logout: () => void | Promise<void>; setDisabled: (id: string, disabled: boolean) => void | Promise<void>;
 };
-const AccountContext = createContext<AccountContextValue | null>(null);
+export const AccountContext = createContext<AccountContextValue | null>(null);
 export function useAccount() {
   const value = useContext(AccountContext);
   if (!value) throw new Error('请先登录。');
@@ -25,6 +27,9 @@ function storedAccount() {
   catch { return { account: null, error: '浏览器未能读取登录状态，请检查存储权限后重试。' }; }
 }
 export function AccountProvider({ children }: { children: ReactNode }) {
+  return serviceConfigured ? <RemoteAccountProvider>{children}</RemoteAccountProvider> : <LocalAccountProvider>{children}</LocalAccountProvider>;
+}
+function LocalAccountProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState(storedAccount);
   const failedKeys = useRef(new Set<string>());
   function refresh() { setSession(storedAccount()); }

@@ -1,0 +1,58 @@
+.execution-page { padding-bottom: 40px; }
+.execution-heading { padding: 24px 0; }
+.execution-heading h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 20px; }
+.execution-heading h1 span { font-size: .7em; font-weight: 600; }
+.execution-heading .back-link { margin-bottom: 18px; }
+.execution-heading p { margin-top: 8px; color: var(--muted-foreground); }
+.execution-progress { display: flex; align-items: center; gap: 12px; max-width: 680px; margin-top: 20px; }
+.execution-progress progress { appearance: none; width: 100%; height: 8px; border: 0; border-radius: 4px; overflow: hidden; accent-color: var(--primary); background: var(--muted); }
+.execution-progress progress::-webkit-progress-bar { background: var(--border); }
+.execution-progress progress::-webkit-progress-value { background: var(--primary); }
+.execution-progress progress::-moz-progress-bar { background: var(--primary); }
+.execution-progress span { white-space: nowrap; }
+.execution-error { color: var(--destructive); margin: 16px 0; }
+.execution-cases { display: grid; gap: 20px; margin-top: 24px; }
+.execution-case, .execution-confirm, .execution-trial-panel, .execution-join { padding: 26px; }
+.execution-case > p { margin: 12px 0; }
+.execution-transcript { list-style: none; padding: 0; display: grid; gap: 16px; margin: 20px 0; }
+.execution-transcript > li { border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.execution-transcript > li[data-role="assistant"] { background: var(--secondary); }
+.execution-transcript > li[data-highlight] { outline: 2px solid var(--primary); outline-offset: 2px; }
+.execution-transcript > li > span { display: block; font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px; }
+.execution-transcript p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
+.execution-transcript details { font-size: 13px; margin-top: 12px; color: var(--muted-foreground); }
+.execution-verdicts { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.execution-verdicts li { border-top: 1px solid var(--border); padding-top: 16px; }
+.execution-verdicts li[data-status="fail"] strong { color: var(--destructive); }
+.execution-verdicts p, .execution-finding p { margin: 8px 0; line-height: 1.7; }
+.execution-case blockquote, .execution-finding blockquote { border-left: 3px solid var(--border); padding-left: 12px; margin: 12px 0; color: var(--muted-foreground); }
+.execution-confirm { margin-top: 24px; display: grid; gap: 18px; justify-items: start; }
+.execution-confirm label { display: flex; gap: 10px; align-items: center; }
+.execution-footer { margin-top: 24px; }
+.execution-trial-panel { margin-top: 24px; }
+.execution-trial-panel > h2 { font-size: 24px; }
+.execution-trial-panel > p { margin-top: 8px; }
+.execution-trial-settings { display: grid; grid-template-columns: repeat(2,minmax(0,240px)); gap: 20px; margin: 20px 0; }
+.execution-method-gate { margin-top: 20px; padding: 16px; background: var(--secondary); border-radius: 10px; }
+.execution-method-gate button { margin: 12px 12px 0 0; }
+.execution-trial-link, .execution-trial-history, .execution-self-test, .execution-student-records, .execution-report, .execution-review { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 24px; }
+.execution-trial-link > p, .execution-trial-history > p { margin: 12px 0; }
+.execution-trial-history > button { margin-right: 12px; }
+.execution-chat form { display: grid; gap: 12px; justify-items: start; }
+.execution-chat .form-field { width: 100%; }
+.execution-companion { display: flex; align-items: center; gap: 16px; }
+.execution-companion .companion-avatar { width: 64px; height: 64px; }
+.execution-student-records > details { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.execution-student-records summary { cursor: pointer; }
+.execution-report > section { margin-top: 24px; }
+.execution-report h3 { margin-bottom: 12px; }
+.execution-limitation { padding: 16px; background: var(--secondary); border-radius: 8px; margin-top: 16px; }
+.execution-finding { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.execution-review { display: grid; gap: 16px; }
+.execution-evidence-dialog { max-width: 760px; max-height: 85dvh; overflow-y: auto; }
+.student-trial { max-width: 900px; }
+@media (max-width: 600px) {
+  .execution-case, .execution-confirm, .execution-trial-panel, .execution-join { padding: 16px; }
+  .execution-verdicts, .execution-trial-settings { grid-template-columns: 1fr; }
+  .execution-trial-panel .inline-actions { flex-wrap: wrap; }
+}

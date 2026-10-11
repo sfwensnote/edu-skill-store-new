@@ -18,7 +18,7 @@ export function modelStatus(): Status {
   return { mode: designReady && teachingReady ? 'live' : 'demo', designReady, teachingReady };
 }
 
-export async function complete(role: ModelRole, system: string, messages: Message[]): Promise<string> {
+export async function complete(role: ModelRole, system: string, messages: Message[], maxTokens = 2500): Promise<string> {
   const c = config(role);
   if (!c.url || !c.name) throw new Error('模型接口尚未配置。');
   const response = await fetch(`${c.url.replace(/\/$/, '')}/chat/completions`, {
@@ -28,7 +28,7 @@ export async function complete(role: ModelRole, system: string, messages: Messag
       model: c.name,
       messages: [{ role: 'system', content: system }, ...messages],
       temperature: 0.3,
-      max_tokens: 2500,
+      max_tokens: maxTokens,
     }),
     signal: AbortSignal.timeout(60000),
   });

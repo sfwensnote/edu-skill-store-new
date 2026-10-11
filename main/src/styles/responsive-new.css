@@ -35,9 +35,6 @@
   .assistant-meta { grid-column: 2; margin-top: -4px; font-size: var(--text-caption); }
   .row-chevron { grid-column: 3; grid-row: 1 / span 2; }
   .library-detail-hero { grid-template-columns: 1fr; padding-top: 34px; }
-  .testing-toolbar-inner { padding-block: 18px; gap: 12px; }
-  .testing-title h1 { font-size: 24px; gap: 8px; }
-  .testing-title h1 span:first-child { font-size: 20px; }
   .logs-hero { display: block; }
   .logs-hero-actions { margin-top: 18px; }
   .session-row { grid-template-columns: 90px 1fr 18px; gap: 10px; }
@@ -54,6 +51,5 @@
   .run-records { padding-inline: 12px; }
   .session-row { grid-template-columns: 78px 1fr 16px; }
   .session-detail small { white-space: normal; }
-  .complete-actions { flex-direction: column; }
   .student-message { max-width: 88%; }
 }

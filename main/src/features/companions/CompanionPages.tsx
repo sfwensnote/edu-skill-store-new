@@ -12,10 +12,11 @@ import { CompanionAvatar } from './CompanionProfile';
 import './companions.css';
 import './companion-library.css';
 import './companion-overview.css';
+import { CompanionTrialPanel } from '../execution/CompanionTrialPanel';
 
 export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy, onRemove }: {
   items: LearningCompanion[]; skills: SkillEntry[]; onCreate: () => void; onOpen: (value: LearningCompanion) => void;
-  onEdit: (value: LearningCompanion) => void; onCopy: (id: string) => boolean; onRemove: (id: string) => boolean;
+  onEdit: (value: LearningCompanion) => void; onCopy: (id: string) => boolean; onRemove: (id: string) => boolean | Promise<boolean>;
 }) {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
@@ -23,6 +24,7 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy
   const [sort, setSort] = useState('updated');
   const [pending, setPending] = useState<LearningCompanion | null>(null);
   const [error, setError] = useState('');
+  const [removing, setRemoving] = useState(false);
   const [message, setMessage] = useState('');
   const headingRef = useRef<HTMLHeadingElement>(null);
   const originRef = useRef<HTMLButtonElement | null>(null);
@@ -52,19 +54,25 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy
         onOpen={() => onOpen(item)} onEdit={() => onEdit(item)} onCopy={() => {
           setMessage(''); if (onCopy(item.id)) { clearFilters(); setMessage('已复制为草稿'); }
         }} onRemove={trigger => { originRef.current = trigger; setError(''); setPending(item); }} />)}</div>}
-    <Dialog open={!!pending} onOpenChange={open => { if (!open) { setPending(null); setError(''); } }}>
+    <Dialog open={!!pending} onOpenChange={open => { if (!open && !removing) { setPending(null); setError(''); } }}>
       <DialogContent onCloseAutoFocus={event => { event.preventDefault(); (originRef.current?.isConnected ? originRef.current : headingRef.current)?.focus(); }}>
         <DialogHeader><DialogTitle>删除这个学伴？</DialogTitle><DialogDescription>“{pending?.name || '未命名学伴'}”及其学习任务、材料将从我的学伴中删除。挂载的 SKILL 仍保留。</DialogDescription></DialogHeader>
         {error && <p role="alert">{error}</p>}
-        <div className="inline-actions"><Button variant="outline" onClick={() => setPending(null)}>取消</Button><Button variant="destructive" onClick={() => {
-          if (!pending || !onRemove(pending.id)) { setError('删除未保存，学伴仍保留。请释放存储空间后重试。'); return; }
-          setPending(null); setError(''); clearFilters(); setMessage('已删除学伴');
-        }}>确认删除</Button></div>
+        <div className="inline-actions"><Button variant="outline" disabled={removing} onClick={() => setPending(null)}>取消</Button><Button variant="destructive" disabled={removing} onClick={() => {
+          if (!pending || removing) return; setRemoving(true);
+          void Promise.resolve().then(() => onRemove(pending.id)).then(success => {
+            if (!success) { setError('删除未保存，学伴仍保留。请释放存储空间后重试。'); return; }
+            setPending(null); setError(''); clearFilters(); setMessage('已删除学伴');
+          }).catch(error => setError(error instanceof Error ? error.message : '删除未完成，请重试。')).finally(() => setRemoving(false));
+        }}>{removing ? '正在检查…' : '确认删除'}</Button></div>
       </DialogContent>
     </Dialog>
   </main>;
 }
-export function CompanionDetail({ value, skills, onBack, onEdit }: { value: LearningCompanion; skills: SkillEntry[]; onBack: () => void; onEdit: () => void }) {
+export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMethods }: {
+  value: LearningCompanion; skills: SkillEntry[]; onBack: () => void; onEdit: () => void;
+  onCheck: (entry: SkillEntry) => void; onMethods: () => void;
+}) {
   const selected = value.skillIds.map(id => skills.find(entry => entry.id === id));
   return <main className="page-frame market-page companion-page companion-overview">
     <header className="companion-overview-heading page-heading">
@@ -94,5 +102,6 @@ export function CompanionDetail({ value, skills, onBack, onEdit }: { value: Lear
         <section className="market-panel companion-overview-panel"><h2><FileText aria-hidden="true" />教学材料 <small>{value.materials.length} 份</small></h2>{value.materials.length ? <ul className="companion-files">{value.materials.map(item => <li key={item.id}><span>{item.name}</span><Button variant="link" onClick={() => downloadMaterial(item)}>下载材料</Button></li>)}</ul> : <p className="subtle">未添加材料</p>}</section>
       </aside>
     </div>
+    <CompanionTrialPanel value={value} skills={skills} onEdit={onEdit} onCheck={onCheck} onMethods={onMethods} />
   </main>;
 }
