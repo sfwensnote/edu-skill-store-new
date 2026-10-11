@@ -4,6 +4,8 @@ import { demoIdea, type CreationDraft } from '../../../shared/teaching-method';
 import { MethodTextField } from './MethodTextField';
 import { TeachingCategoryField, TeachingTagsField } from '@/components/TeachingTagsField';
 import { isTeachingCategory, visibleTeachingTags } from '../../../shared/teaching-tags';
+import { SkillIconField } from '@/components/SkillIconField';
+import { useState } from 'react';
 
 export function IdeaForm({
   draft,
@@ -14,6 +16,7 @@ export function IdeaForm({
   onChange: (draft: CreationDraft) => void;
   onContinue: () => void;
 }) {
+  const [iconBusy, setIconBusy] = useState(false);
   const complete = !!draft.originalIdea.trim() && !!draft.grade.trim() && !!draft.subject.trim()
     && isTeachingCategory(draft.method.category) && visibleTeachingTags(draft.method.tags).length > 0;
   return (
@@ -21,7 +24,7 @@ export function IdeaForm({
       className="idea-form creation-panel"
       onSubmit={(event) => {
         event.preventDefault();
-        if (complete) onContinue();
+        if (complete && !iconBusy) onContinue();
       }}
     >
       <header>
@@ -107,8 +110,10 @@ export function IdeaForm({
       </div>
       <TeachingTagsField required value={draft.method.tags}
         onChange={(tags) => onChange({ ...draft, method: { ...draft.method, tags } })} />
+      <SkillIconField category={draft.method.category} value={draft.method.icon} onBusy={setIconBusy}
+        onChange={icon => onChange({ ...draft, method: { ...draft.method, icon } })} />
       <footer className="creation-footer">
-        <Button size="lg" type="submit" disabled={!complete}>
+        <Button size="lg" type="submit" disabled={!complete || iconBusy}>
           继续
           <ArrowRight data-icon="inline-end" />
         </Button>

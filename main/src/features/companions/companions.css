@@ -1,9 +1,6 @@
 .companion-page { max-width: 1180px; padding-bottom: 48px; }
-.companion-page h1 { font-size: 32px; font-weight: 700; }
 .companion-page h2 { font-size: 22px; font-weight: 650; margin-bottom: 18px; }
 .companion-page h2 small { margin-left: 8px; color: var(--ink-2); font-size: 14px; font-weight: 400; }
-.companion-activity { padding: 28px; }
-.companion-activity > section { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line); }
 .companion-page .form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; font-weight: 550; }
 .companion-page :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), select) { border: 1px solid var(--line); border-radius: 7px; background: var(--card); min-height: 44px; padding: 10px 12px; width: 100%; font-weight: 400; }
 .companion-page textarea { font-weight: 400; }
@@ -24,20 +21,11 @@
 .companion-files span { overflow-wrap: anywhere; }
 .companion-materials input { max-width: 100%; margin-top: 14px; }
 .companion-list { display: grid; gap: 18px; }
-.companion-card { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px; }
-.companion-card h2 { margin: 8px 0; }
-.companion-card p { margin: 6px 0; }
 .companion-card-task { white-space: pre-wrap; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .companion-task-summary > div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--line); }
 .companion-task-summary dt { color: var(--ink-2); }
 .companion-task-summary dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.companion-activity p { white-space: pre-wrap; overflow-wrap: anywhere; margin: 12px 0; }
-.companion-activity details { padding: 14px 0; border-bottom: 1px solid var(--line); }
-.companion-creation.page-frame { max-width: 1280px; padding-top: 24px; }
-.companion-creation-heading { display: flex; align-items: center; position: relative; min-height: 158px; padding-block: 20px 28px; }
 .companion-creation-heading > div { position: relative; max-width: calc(100% - 340px); }
-.companion-creation-heading h1 { font-size: 36px; line-height: 1.4; }
-.companion-creation-heading p { margin-top: 10px; color: var(--ink-2); }
 .companion-hero-art { position: absolute; right: 0; top: -4px; width: 540px; height: 180px; object-fit: contain; pointer-events: none; }
 .companion-stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 20px 24px; margin: 0 0 22px; gap: 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
 .companion-stepper li { display: flex; align-items: center; gap: 12px; min-width: 0; position: relative; color: var(--ink-2); }
@@ -58,7 +46,7 @@
 .companion-step-nav button:hover:not(:disabled) { background: var(--blue-faint); }
 .companion-step-nav button:disabled { opacity: .55; cursor: default; }
 .companion-step-nav button svg { width: 20px; height: 20px; flex-shrink: 0; }
-.companion-editor.market-panel { min-width: 0; padding: 28px; }
+.companion-editor.market-panel { grid-column: 2; min-width: 0; padding: 28px; }
 .companion-step-heading { margin-bottom: 28px; }
 .companion-step-heading h2 { margin-bottom: 8px; }
 .companion-step-heading p { color: var(--ink-2); font-size: 14px; line-height: 1.7; }
@@ -127,12 +115,9 @@
   .companion-stepper small { display: none; }
 }
 @media (max-width: 760px) {
-  .companion-page h1, .companion-creation-heading h1 { font-size: 28px; }
-  .companion-creation-heading { min-height: auto; padding-block: 18px 24px; }
-  .companion-creation-heading > div { max-width: 100%; }
+  .companion-page h1,     .companion-creation-heading > div { max-width: 100%; }
   .companion-hero-art { display: none; }
-  .companion-creation-heading p { font-size: 14px; }
-  .companion-activity, .companion-editor.market-panel, .companion-preview.market-panel { padding: 20px 16px; }
+    .companion-editor.market-panel, .companion-preview.market-panel { padding: 20px 16px; grid-column: 1; }
   .companion-creation-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .companion-step-nav.market-panel { display: none; }
   .companion-preview.market-panel { grid-column: 1; }
@@ -145,6 +130,5 @@
   .companion-avatar-tile, .companion-avatar-upload { height: 62px; }
   .companion-avatar-options .companion-avatar { width: 48px; height: 48px; }
   .companion-actions { gap: 10px; }
-  .companion-card { flex-wrap: wrap; padding: 20px; }
   .companion-task-summary > div { grid-template-columns: 1fr; gap: 6px; }
 }

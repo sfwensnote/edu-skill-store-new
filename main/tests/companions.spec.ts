@@ -196,7 +196,7 @@ test('发布保存失败不跳转、不假报成功，重试只发布一次', as
   await expect(page.locator('.market-resource-card')).toHaveCount(1);
 });
 
-test('四步创建保留输入，预览仅在最后一步显示并排在保存区域下方', async ({ page }, info) => {
+test('四步创建保留输入，预览仅在最后一步显示并排在保存区域上方', async ({ page }, info) => {
   await page.setViewportSize({ width: 1540, height: 1000 });
   await page.goto('/#/companions/profile-buddy/edit');
   await expect(page.getByRole('list', { name: '创建进度' }).getByRole('listitem')).toHaveCount(4);
@@ -261,8 +261,8 @@ test('四步创建保留输入，预览仅在最后一步显示并排在保存�
   for (const width of [1540, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     const form = await page.locator('.companion-editor').boundingBox();
-    const below = await preview.boundingBox();
-    expect(below!.y).toBeGreaterThanOrEqual(form!.y + form!.height);
+    const above = await preview.boundingBox();
+    expect(form!.y).toBeGreaterThanOrEqual(above!.y + above!.height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: info.outputPath(`companion-final-${width}.png`), fullPage: true });
   }

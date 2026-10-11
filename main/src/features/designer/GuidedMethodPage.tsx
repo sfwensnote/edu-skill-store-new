@@ -31,6 +31,7 @@ export function GuidedMethodPage({
   saveFailed?: boolean;
 }) {
   const [error, setError] = useState('');
+  const [iconBusy, setIconBusy] = useState(false);
   const [preview, setPreview] = useState(false);
   const [updated, setUpdated] = useState<{ section: number; at: number } | null>(null);
   const question = mockQuestions[draft.questionIndex];
@@ -76,6 +77,7 @@ export function GuidedMethodPage({
     setError('');
   }
   function confirm() {
+    if (iconBusy) return;
     if (supplement && (supplement.condition.trim() || supplement.action.trim())) {
       setError('请先保存补充，或取消补充后确认。');
       return;
@@ -244,7 +246,7 @@ export function GuidedMethodPage({
                 >
                   还需要补充
                 </Button>
-                <Button onClick={confirm}>
+                <Button disabled={iconBusy} onClick={confirm}>
                   这就是我的教学方法
                   <ArrowRight data-icon="inline-end" />
                 </Button>
@@ -284,6 +286,7 @@ export function GuidedMethodPage({
               method={method}
               onChange={updateMethod}
               updatedSection={updated?.section ?? null}
+              onIconBusy={setIconBusy}
             />
             <StickyActions
               status={
@@ -307,7 +310,7 @@ export function GuidedMethodPage({
                 <Eye data-icon="inline-start" />
                 预览 SKILL
               </Button>
-              <Button disabled={Boolean(methodError(method))} onClick={confirm}>
+              <Button disabled={iconBusy || Boolean(methodError(method))} onClick={confirm}>
                 形成 SKILL
               </Button>
             </StickyActions>

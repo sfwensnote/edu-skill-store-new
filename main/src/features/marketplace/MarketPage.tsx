@@ -19,7 +19,8 @@ import type { SkillEntry } from '../../../shared/marketplace';
 import { TeachingTagList } from '@/components/TeachingTagsField';
 import { teachingTagsOf } from '../../../shared/teaching-tags';
 import { skillCreatorLabel, skillValidationLabel } from '../../../shared/skill-display';
-import { MarketCategories, categoryIcons } from './MarketCategories';
+import { MarketCategories } from './MarketCategories';
+import { SkillIcon } from '@/components/SkillIcon';
 import {
   catalogBase,
   catalogItems,
@@ -95,7 +96,7 @@ export function MarketPage({
   );
   return (
     <main className="page-frame market-catalog market-page">
-      <header className="catalog-heading">
+      <header className="catalog-heading page-heading">
         <div>
           <h1>教学 SKILL 集市</h1>
         </div>
@@ -177,14 +178,11 @@ export function MarketPage({
           )}
           <div className="market-resource-list">
             {items.map((entry) => {
-              const category = categoryOf(entry),
-                Icon = categoryIcons[category];
+              const category = categoryOf(entry);
               const favorite = favorites.includes(entry.id);
               return (
                 <article className="skill-card market-resource-card" key={entry.id}>
-                  <div className="catalog-resource-icon" data-category={category}>
-                    <Icon aria-hidden="true" />
-                  </div>
+                  <SkillIcon className="catalog-resource-icon" category={category} icon={entry.skill.icon} />
                   <div className="catalog-resource-body">
                     <div className="catalog-resource-title">
                       <h2>

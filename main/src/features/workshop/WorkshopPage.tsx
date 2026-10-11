@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Filter, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/Workbench';
-import { WorkshopNavigation, WorkshopOverview } from './WorkshopNavigation';
+import { WorkshopNavigation } from './WorkshopNavigation';
 import { WorkshopResourceCard, type WorkActions } from './WorkshopResourceCard';
 import { WorkshopDialogs, type PendingRemoval } from './WorkshopDialogs';
 import {
@@ -140,16 +140,15 @@ export function WorkshopPage(props: WorkshopProps) {
   );
   return (
     <main className="page-frame market-page workshop-page">
-      <header className="workshop-heading">
+      <header className="workshop-heading page-heading">
         <div>
           <h1>我的 SKILL</h1>
         </div>
         <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} alt="" aria-hidden="true" />
-        <div className="workshop-create-actions">
+        <div className="workshop-create-actions page-heading-actions">
           <Button onClick={props.onCreate}>创建教学 SKILL</Button>
         </div>
       </header>
-      <WorkshopOverview collections={collections} tab={tab} onTab={switchTab} />
       <div className="workshop-layout">
         <WorkshopNavigation
           tab={tab}

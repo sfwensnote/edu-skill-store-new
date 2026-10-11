@@ -1,26 +1,4 @@
-.workshop-page.page-frame {
-  max-width: 1560px;
-  padding-top: 28px;
-}
-.workshop-heading {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  min-height: 122px;
-  margin-bottom: 20px;
-}
-.workshop-page .workshop-heading h1 {
-  font-size: 34px;
-  font-weight: 700;
-}
-.workshop-page .workshop-heading p {
-  font-size: 16px;
-  color: var(--ink-2);
-}
-.workshop-heading > div:first-child {
-  flex: 1;
-  min-width: 0;
-}
+
 .workshop-heading img {
   width: 320px;
   height: 122px;
@@ -30,28 +8,6 @@
   display: flex;
   gap: 12px;
   flex: none;
-}
-.workshop-overview {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 26px;
-}
-.workshop-stat {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  min-height: 118px;
-  padding: 20px 24px;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: var(--card);
-  transition: border-color 180ms;
-}
-.workshop-stat:hover,
-.workshop-stat[aria-pressed='true'] {
-  border-color: var(--line-strong);
 }
 .workshop-type-icon {
   display: grid;
@@ -67,34 +23,6 @@
   width: 32px;
   height: 32px;
   stroke-width: 1.6;
-}
-.workshop-stat-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-.workshop-stat-info > span {
-  font-size: 14px;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.workshop-stat-info strong {
-  font-size: 30px;
-  line-height: 1.2;
-  font-weight: 650;
-}
-.workshop-stat-info small {
-  font-size: 13px;
-  font-weight: 400;
-  margin-left: 8px;
-  color: var(--ink-2);
-}
-.workshop-stat-arrow {
-  width: 17px;
-  margin-left: auto;
-  color: var(--ink-2);
-  flex: none;
 }
 .workshop-layout {
   display: grid;
@@ -366,10 +294,6 @@
   .workshop-heading img {
     width: 200px;
   }
-  .workshop-stat {
-    gap: 14px;
-    padding: 18px;
-  }
   .workshop-layout {
     grid-template-columns: 230px minmax(0, 1fr);
   }
@@ -390,13 +314,7 @@
   .workshop-heading img {
     display: none;
   }
-  .workshop-overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .workshop-heading {
-    min-height: 100px;
-  }
-}
 @media (max-width: 900px) {
   .workshop-layout {
     grid-template-columns: 1fr;
@@ -444,22 +362,8 @@
   }
 }
 @media (max-width: 600px) {
-  .workshop-page.page-frame {
-    padding-top: 22px;
-  }
-  .workshop-heading {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-  .workshop-page .workshop-heading h1 {
-    font-size: 28px;
-  }
-  .workshop-page .workshop-heading p {
-    font-size: 14px;
-  }
-  .workshop-create-actions {
+
+        .workshop-create-actions {
     width: 100%;
     gap: 8px;
   }
@@ -467,37 +371,6 @@
     flex: 1;
     padding-inline: 9px;
     font-size: 13px;
-  }
-  .workshop-overview {
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-  .workshop-stat {
-    min-height: 76px;
-    gap: 10px;
-    padding: 14px 10px;
-  }
-  .workshop-stat .workshop-type-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 7px;
-  }
-  .workshop-stat .workshop-type-icon svg {
-    width: 24px;
-    height: 24px;
-  }
-  .workshop-stat-info > span {
-    font-size: 12px;
-  }
-  .workshop-stat-info strong {
-    font-size: 25px;
-  }
-  .workshop-stat-info small {
-    margin-left: 5px;
-    font-size: 12px;
-  }
-  .workshop-stat-arrow {
-    display: none;
   }
   .workshop-sidebar {
     flex-direction: column;

@@ -1,52 +1,11 @@
-import { ChevronRight, FileCheck2, FolderPen, Store } from 'lucide-react';
-import { workshopTabs, type WorkshopTab, type WorkItem } from './workshop-catalog';
+import { FileCheck2, FolderPen, Store } from 'lucide-react';
+import { workshopTabs, type WorkshopTab } from './workshop-catalog';
 
 export const workshopIcons = {
   skills: FileCheck2,
   created: FolderPen,
   added: Store,
 };
-export function WorkshopOverview({
-  collections,
-  tab,
-  onTab,
-}: {
-  collections: Record<WorkshopTab, WorkItem[]>;
-  tab: WorkshopTab;
-  onTab: (tab: WorkshopTab) => void;
-}) {
-  return (
-    <section className="workshop-overview" aria-label="SKILL 概览">
-      {workshopTabs.map(([key, label]) => {
-        const Icon = workshopIcons[key];
-        const drafts = collections[key].filter((item) => item.kind === 'method-draft').length;
-        return (
-          <button
-            key={key}
-            className="workshop-stat"
-            data-kind={key}
-            aria-label={`查看${label}`}
-            aria-pressed={tab === key}
-            onClick={() => onTab(key)}
-          >
-            <span className="workshop-type-icon">
-              <Icon aria-hidden="true" />
-            </span>
-            <span className="workshop-stat-info">
-              <span>{label}</span>
-              <strong>
-                {collections[key].length - drafts}
-                <small>个</small>
-                {!!drafts && <small> · {drafts} 份草稿</small>}
-              </strong>
-            </span>
-            <ChevronRight className="workshop-stat-arrow" aria-hidden="true" />
-          </button>
-        );
-      })}
-    </section>
-  );
-}
 export function WorkshopNavigation({
   tab,
   counts,

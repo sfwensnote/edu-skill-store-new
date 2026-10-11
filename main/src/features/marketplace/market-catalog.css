@@ -1,22 +1,4 @@
-.market-catalog.page-frame {
-  max-width: 1500px;
-  padding-top: 24px;
-}
-.catalog-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 120px;
-  gap: 24px;
-}
-.market-catalog .catalog-heading h1 {
-  font-size: 34px;
-  font-weight: 700;
-}
-.market-catalog .catalog-heading p {
-  font-size: 16px;
-  color: var(--ink-2);
-}
+
 .catalog-heading img {
   width: 280px;
   height: 120px;
@@ -218,14 +200,6 @@
   height: 30px;
   stroke-width: 1.6;
 }
-.catalog-resource-icon[data-category='智能练习'] {
-  color: #588bc7;
-  background: #eef4fc;
-}
-.catalog-resource-icon[data-category='知识讲解'] {
-  color: #a97927;
-  background: #fcf6e9;
-}
 .catalog-resource-body {
   flex: 1;
   min-width: 0;
@@ -329,16 +303,7 @@
   }
 }
 @media (max-width: 760px) {
-  .catalog-heading {
-    min-height: 92px;
-  }
-  .market-catalog .catalog-heading h1 {
-    font-size: 27px;
-  }
-  .market-catalog .catalog-heading p {
-    font-size: 14px;
-  }
-  .catalog-heading img {
+        .catalog-heading img {
     display: none;
   }
   .catalog-selects {

@@ -43,11 +43,11 @@ export function SkillDetailPage({
   const source = skillSourceText(entry);
   return (
     <main className="page-frame market-page">
-      <button className="back-link" onClick={onBack}>
-        <ArrowLeft />
-        {backLabel}
-      </button>
-      <header className="detail-heading">
+      <header className="detail-heading page-heading">
+        <button className="back-link" onClick={onBack}>
+          <ArrowLeft />
+          {backLabel}
+        </button>
         <div>
           <h1>{entry.skill.name}</h1>
           <p>{entry.skill.summary}</p>
@@ -57,7 +57,7 @@ export function SkillDetailPage({
           <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example)} />
           <small>{skillValidationLabel(entry)}</small>
         </div>
-        <div className="inline-actions">
+        <div className="inline-actions page-heading-actions">
           {onCheck && <Button onClick={onCheck}>方法检验</Button>}
           {!entry.assistantId && <Button disabled={added} onClick={onAdd}>{added ? '已添加' : '添加到我的 SKILL'}<ArrowRight /></Button>}
           {onPublish && <Button variant="outline" onClick={onPublish}>{shared ? '管理发布' : '发布到集市'}</Button>}

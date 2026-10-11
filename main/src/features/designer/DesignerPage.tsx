@@ -223,7 +223,7 @@ export function DesignerPage({
   }
   return (
     <main className="creation-flow page-frame">
-      <header className="creation-heading">
+      <header className="creation-heading page-heading">
         <button
           className="back-link"
           aria-label="返回"
@@ -236,13 +236,14 @@ export function DesignerPage({
         >
           <ArrowLeft />
         </button>
-        <h1 ref={headingRef} tabIndex={-1}>
+        <div><h1 ref={headingRef} tabIndex={-1}>
           {selectedSkillId ? '编辑教学方法' : '创建教学方法'}
         </h1>
-        <span className="creation-position">
+        <p className="creation-position">
           {draft.stage === 'idea' ? '1 · 教学想法' : '2 · 梳理方法'}
-        </span>
+        </p></div>
         <Button
+          className="page-heading-actions"
           variant="ghost"
           onClick={() => {
             if (retrySave()) onSaveExit();

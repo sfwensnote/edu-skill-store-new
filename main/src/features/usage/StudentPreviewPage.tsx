@@ -119,13 +119,13 @@ export function StudentPreviewPage({
     <Button onClick={onContinue}>返回方法编辑</Button></main>;
   return (
     <main className="student-preview-page page-frame">
-      <button className="back-link" onClick={onBack}>
-        <ArrowLeft />
-        {backText}
-      </button>
-      <header className="student-preview-heading">
-        <h1>学生视角预览</h1>
-        <p>{activeSkill.name}</p>
+      <header className="student-preview-heading page-heading">
+        <button className="back-link" onClick={onBack}>
+          <ArrowLeft />
+          {backText}
+        </button>
+        <div><h1>学生视角预览</h1>
+        <p>{activeSkill.name}</p></div>
       </header>
       <ViewTabs className="preview-view-tabs" label="学生预览视图" value={view} onChange={setView} items={[
         { value: 'chat', label: '体验引导', panelId: 'preview-experience' },

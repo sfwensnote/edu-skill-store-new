@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { maxTeachingTags, maxTagLength, storedTeachingCategories } from './teaching-tags';
+import { skillIconSchema } from './skill-icon';
 
 const text = (max = 2000) => z.string().trim().min(1).max(max);
 
@@ -12,6 +13,7 @@ export const skillSchema = z.object({
   summary: text(300),
   description: z.string().optional(),
   category: z.enum(storedTeachingCategories).nullable().optional(),
+  icon: skillIconSchema.optional(),
   tags: z.array(z.string().trim().min(1).max(maxTagLength)).max(maxTeachingTags).optional(),
   steps: z
     .array(z.object({ condition: text(500), action: text(500) }))

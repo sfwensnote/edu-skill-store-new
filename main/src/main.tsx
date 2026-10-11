@@ -18,6 +18,7 @@ import './styles/workbench.css';
 import './styles/workbench-resources.css';
 import './styles/workbench-spaces.css';
 import './styles/interaction.css';
+import './styles/page-layout.css';
 const root = createRoot(document.getElementById('root')!);
 function startApp() {
   try {

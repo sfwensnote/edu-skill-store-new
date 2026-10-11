@@ -1,32 +1,5 @@
 .creation-flow.page-frame {
-  width: 100%;
-  max-width: none;
-  padding: 0 0 32px;
-}
-.creation-heading {
-  position: sticky;
-  top: var(--header-height);
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: var(--workspace-toolbar-height);
-  padding: 4px 32px;
-  margin: 0;
-  border-bottom: 1px solid var(--line);
-  background: var(--card);
-}
-.creation-heading h1 {
-  font-size: 17px;
-  font-weight: 650;
-}
-.creation-position {
-  margin-left: auto;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-.creation-heading > [data-slot='button'] {
-  min-height: 32px;
+  padding-bottom: 32px;
 }
 .creation-flow > [role='alert'] {
   padding: 12px 32px;
@@ -49,7 +22,7 @@
 }
 .idea-form {
   max-width: 1040px;
-  margin: 32px auto;
+  margin: 0 auto 32px;
   padding: 32px 36px;
 }
 .idea-input {
@@ -120,7 +93,7 @@
 .guided-layout {
   display: grid;
   grid-template-columns: minmax(340px, 3fr) minmax(0, 7fr);
-  height: calc(100dvh - var(--header-height) - var(--workspace-toolbar-height));
+  height: calc(100dvh - var(--header-height) - var(--page-heading-height) - 44px);
   min-height: 560px;
   gap: 0;
   align-items: stretch;
@@ -489,7 +462,7 @@
 .creation-preview {
   max-width: 1100px;
   padding: 32px;
-  margin: 32px auto;
+  margin: 0 auto 32px;
 }
 .preview-intro {
   padding: 24px 0;
@@ -570,29 +543,14 @@
   .method-workarea {
     overflow: visible;
   }
-  .creation-heading {
-    top: var(--header-height);
-  }
-  .method-outline {
+    .method-outline {
     min-height: 0;
   }
 }
 @media (max-width: 760px) {
-  .creation-heading {
-    top: 0;
-    padding: 8px 16px;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .creation-heading h1 {
-    font-size: 16px;
-  }
-  .creation-position {
-    font-size: 12px;
-  }
-  .idea-form,
+        .idea-form,
   .creation-preview {
-    margin: 20px 16px;
+    margin: 0 0 20px;
     padding: 24px 20px;
   }
   .idea-context {

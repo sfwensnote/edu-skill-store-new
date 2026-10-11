@@ -95,7 +95,7 @@ export function HomePage({ navigate }: { navigate: (route: AppRoute) => void }) 
   return (
     <div className="home-surface">
       <main className="page-frame market-page home-page">
-        <header className="home-hero">
+        <header className="home-hero page-heading">
           <div>
             <h1>教学工坊</h1>
             <p>把教学经验整理成 SKILL。</p>

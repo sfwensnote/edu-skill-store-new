@@ -57,8 +57,8 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
   const missing = value.skillIds.filter(id => !skills.some(entry => entry.id === id));
   const currentStep = companionSteps[value.step - 1];
   return <main className="page-frame companion-page companion-creation">
-    <button className="back-link" disabled={reading} onClick={() => leave(onBack)}><ArrowLeft />返回我的学伴</button>
-    <header className="companion-creation-heading">
+    <header className="companion-creation-heading page-heading">
+      <button className="back-link" disabled={reading} onClick={() => leave(onBack)}><ArrowLeft />返回我的学伴</button>
       <div><h1>{editing ? '编辑我的学伴' : '创建我的学伴'}</h1><p>选择教学方法，设置学生的学习任务。</p></div>
       <img className="companion-hero-art" src={`${import.meta.env.BASE_URL}companion-hero.png`} alt="" aria-hidden="true" />
     </header>
@@ -73,6 +73,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
           disabled={reading || (item.step > value.step + 1 && !!companionIssue(value, skills, (item.step - 1) as CompanionStep))}
           onClick={() => moveTo(item.step)}><Icon /><span>{item.label}</span></button>;
       })}</nav>
+      {value.step === 4 && <CompanionPreview value={value} skills={skills} />}
       <section className="market-panel companion-editor" aria-labelledby="companion-step-title">
         <header className="companion-step-heading"><h2 id="companion-step-title" ref={headingRef} tabIndex={-1}>{currentStep.label}</h2><p>{stepHints[value.step - 1]}</p></header>
         {value.step === 1 && <CompanionProfile value={value} onChange={change} onBusy={setReading} />}
@@ -103,7 +104,6 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
           </Button>
         </footer>
       </section>
-      {value.step === 4 && <CompanionPreview value={value} skills={skills} />}
     </div>
     <SaveFailureExitGuard failed={unsaved} onRetry={() => persist(valueRef.current)} />
   </main>;

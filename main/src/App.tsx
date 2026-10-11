@@ -142,7 +142,7 @@ function SkillWorkspace() {
   }
   function openCompanion(value: LearningCompanion) {
     setMounting(null);
-    navigate({ page: value.status === 'draft' ? 'companion-edit' : 'companion-detail', companionId: value.id });
+    navigate({ page: 'companion-detail', companionId: value.id });
   }
   function organizeGuidance(source: ContextualDesign) {
     const id = crypto.randomUUID();
@@ -288,7 +288,8 @@ function SkillWorkspace() {
         />
       )}
       {(route.page === 'companions' || route.page === 'space') && <CompanionsPage items={companions.items} skills={mySkills}
-        onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion} />}
+        onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion}
+        onEdit={value => navigate({ page: 'companion-edit', companionId: value.id })} onCopy={companions.copy} onRemove={companions.remove} />}
       {route.page === 'companion-edit' && <CompanionEditor key={`companion-editor:${route.companionId}`}
         initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={mySkills} onSave={companions.save}
         onBack={() => goTo({ page: 'companions' })} onSkills={() => navigate({ page: 'workshop' })}

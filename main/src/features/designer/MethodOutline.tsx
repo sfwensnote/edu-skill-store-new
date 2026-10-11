@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { StepSection } from '@/components/Workbench';
 import { boundaryPrefix, type TeachingMethod } from '../../../shared/teaching-method';
 import { TeachingCategoryField, TeachingTagsField } from '@/components/TeachingTagsField';
+import { SkillIconField } from '@/components/SkillIconField';
 
 function EditableText({
   label,
@@ -61,10 +62,12 @@ export function MethodOutline({
   method,
   onChange,
   updatedSection,
+  onIconBusy,
 }: {
   method: TeachingMethod;
   onChange: (method: TeachingMethod, field?: string) => void;
   updatedSection: number | null;
+  onIconBusy?: (busy: boolean) => void;
 }) {
   const boundary =
     method.principles.find((item) => item.startsWith(boundaryPrefix))?.slice(boundaryPrefix.length) || '';
@@ -107,6 +110,7 @@ export function MethodOutline({
         {field('SKILL 名称', 'name', '为你的教学方法起一个名字')}
         {field('SKILL 简介', 'description', '用一句话说明这个方法的用途')}
         <TeachingCategoryField value={method.category} onChange={(category) => onChange({ ...method, category }, 'category')} />
+        <SkillIconField category={method.category} value={method.icon} onBusy={onIconBusy} onChange={icon => onChange({ ...method, icon }, 'icon')} />
         <TeachingTagsField required value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
       </StepSection>
       <StepSection number={2} title="教学目标框架" updated={updatedSection === 2}>

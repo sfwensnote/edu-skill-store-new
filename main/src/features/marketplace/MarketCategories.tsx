@@ -1,21 +1,10 @@
 import {
-  BookOpen,
-  ChartNoAxesColumnIncreasing,
-  CircleHelp,
   Compass,
-  MessageCircle,
   Star,
 } from 'lucide-react';
 import type { SkillEntry } from '../../../shared/marketplace';
 import { categoryOf, popularTags, teachingCategories, type CatalogFilters } from './market-catalog';
-
-export const categoryIcons = {
-  课堂提问: CircleHelp,
-  错因辅导: MessageCircle,
-  智能练习: ChartNoAxesColumnIncreasing,
-  知识讲解: BookOpen,
-  未分类: Compass,
-};
+import { skillCategoryIcons } from '@/components/SkillIcon';
 
 export function MarketCategories({
   base,
@@ -37,7 +26,7 @@ export function MarketCategories({
     { label: '我收藏的', icon: Star, count: base.filter((entry) => favorites.includes(entry.id)).length },
     ...teachingCategories.map((label) => ({
       label,
-      icon: categoryIcons[label],
+      icon: skillCategoryIcons[label],
       count: base.filter((entry) => categoryOf(entry) === label).length,
     })),
     ...(base.some((entry) => categoryOf(entry) === '未分类') ? [{ label: '未分类', icon: Compass, count: base.filter((entry) => categoryOf(entry) === '未分类').length }] : []),

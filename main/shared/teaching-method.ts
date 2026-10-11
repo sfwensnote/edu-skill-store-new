@@ -1,5 +1,6 @@
 import type { EducationalSkill } from './assistant';
 import { isTeachingCategory, normalizeTeachingTags, visibleTeachingTags, type TeachingCategory } from './teaching-tags';
+import { validSkillIcon, type SkillIconStyle } from './skill-icon';
 
 export const boundaryPrefix = '结束条件：';
 
@@ -7,6 +8,7 @@ export type TeachingMethod = {
   name?: string;
   description?: string;
   category?: TeachingCategory | null;
+  icon?: SkillIconStyle;
   tags?: string[];
   problem: string;
   expectedOutcome: string;
@@ -150,6 +152,7 @@ export function methodFromSkill(skill: EducationalSkill): TeachingMethod {
     name: skill.name,
     description: skill.description || skill.summary,
     category: skill.category,
+    icon: validSkillIcon(skill.icon),
     tags: skill.tags === undefined ? undefined : normalizeTeachingTags(skill.tags),
     problem: skill.problem || skill.purpose,
     expectedOutcome: skill.purpose,
@@ -204,6 +207,7 @@ export function packageTeachingMethod(method: TeachingMethod, id: string): Educa
     name: method.name!.trim(),
     description,
     category: method.category || null,
+    icon: validSkillIcon(method.icon),
     tags: normalizeTeachingTags(method.tags),
     summary: description.slice(0, 300),
     purpose: method.expectedOutcome,

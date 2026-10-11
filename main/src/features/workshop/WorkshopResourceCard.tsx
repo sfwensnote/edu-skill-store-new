@@ -20,7 +20,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { workshopIcons } from './WorkshopNavigation';
+import { SkillIcon } from '@/components/SkillIcon';
+import { teachingCategoryOf } from '../../../shared/teaching-tags';
 import { type WorkItem, type WorkshopTab } from './workshop-catalog';
 
 export type WorkActions = {
@@ -47,7 +48,8 @@ export function WorkshopResourceCard({
 }) {
   const moreRef = useRef<HTMLButtonElement>(null);
   const type = 'skills';
-  const Icon = workshopIcons[type];
+  const category = item.kind === 'skill' ? teachingCategoryOf(item.entry.skill, item.entry.scene, item.entry.area)
+    : teachingCategoryOf({ name: item.title, summary: item.summary }, item.assistant.activity, item.assistant.area);
   const own = item.kind !== 'skill' || Boolean(item.entry.assistantId);
   const updated =
     item.updatedAt && Number.isFinite(Date.parse(item.updatedAt))
@@ -56,9 +58,7 @@ export function WorkshopResourceCard({
   const viewLabel = item.kind === 'method-draft' ? '继续梳理' : '查看';
   return (
     <article className="workshop-item workshop-resource-card" data-kind={type} data-work-id={item.id}>
-      <div className="workshop-type-icon workshop-resource-icon">
-        <Icon aria-hidden="true" />
-      </div>
+      <SkillIcon className="workshop-type-icon workshop-resource-icon" category={category} icon={item.kind === 'skill' ? item.entry.skill.icon : undefined} />
       <div className="workshop-resource-body">
         <div className="workshop-resource-labels">
           <span>

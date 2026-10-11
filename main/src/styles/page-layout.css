@@ -1,0 +1,69 @@
+/* 页面外框、主标题与顶部区域共用首页的尺寸和配色。 */
+:root {
+  --page-width: 1460px;
+  --page-gutter: 32px;
+  --page-title-size: 36px;
+  --page-heading-height: 176px;
+  --page-heading-padding: 40px;
+  --page-background: linear-gradient(180deg, var(--blue-faint), var(--canvas) 70%);
+}
+body, .application { background-color: var(--canvas); background-image: var(--page-background); background-size: 100% 100dvh; background-attachment: fixed; background-repeat: no-repeat; }
+.home-surface, .testing-page { background: transparent; }
+.application .header-inner, .application :is(main, div).page-frame {
+  width: calc(100% - 2 * var(--page-gutter));
+  max-width: var(--page-width);
+}
+.application main.page-frame { padding-top: 24px; }
+.application main.page-frame h1, .application main .page-frame h1 {
+  margin: 0;
+  font-size: var(--page-title-size);
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.application .page-frame .page-heading {
+  position: relative;
+  top: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  min-height: var(--page-heading-height);
+  padding: var(--page-heading-padding) 0 24px;
+  margin: 0 0 20px;
+  background: transparent;
+  border: 0;
+  z-index: auto;
+}
+.page-heading > div { min-width: 0; }
+.application .page-heading p { margin: 8px 0 0; color: var(--ink-2); font-size: 16px; line-height: 1.7; }
+.application .page-heading > img { position: absolute; top: 0; right: 0; height: 160px; max-width: 38%; object-fit: contain; pointer-events: none; }
+.application .page-heading:has(.page-heading-actions) > img { right: 180px; }
+.page-heading > div:not(.page-heading-actions) { position: relative; flex: 1; }
+.application .page-heading .page-heading-actions { align-self: center; margin: 0 0 0 auto; flex: none; position: relative; }
+.application .detail-heading .page-heading-actions { flex-shrink: 1; flex-wrap: wrap; justify-content: flex-end; }
+.application .page-heading > .back-link { position: absolute; top: 0; left: 0; min-height: 32px; padding-left: 0; }
+.application .testing-toolbar { background: transparent; border: 0; }
+.application .testing-toolbar-inner { position: relative; min-height: calc(var(--page-heading-height) + 44px); padding-block: 64px 24px; }
+.application .testing-toolbar-inner .testing-previous { position: absolute; top: 24px; left: 0; }
+.application .testing-title h1 span { font-size: inherit; }
+.application .testing-title { min-height: 47px; }
+.application .testing-workspace { padding-top: 0; }
+.application .creation-heading { position: relative; }
+.application .creation-heading .creation-position { font-size: 14px; }
+.application .creation-heading > [data-slot='button'] { min-height: var(--control-height); }
+.application .companion-overview-heading > .companion-overview-image { flex: none; }
+.application .companion-overview-heading .companion-overview-meta { font-size: 14px; }
+@media (max-width: 1100px) { :root { --page-gutter: 20px; } }
+@media (max-width: 760px) {
+  :root { --page-gutter: 16px; --page-title-size: 28px; --page-heading-height: 144px; --page-heading-padding: 40px; --header-height: 101px; }
+  .application .app-header { height: var(--header-height); }
+  .application .page-frame .page-heading { gap: 16px; flex-wrap: wrap; padding-bottom: 20px; }
+  .application .page-heading > img { display: none; }
+  .application .page-heading p { font-size: 14px; }
+  .application .page-heading .page-heading-actions { align-self: flex-start; margin-left: 0; }
+  .application .page-heading > div:not(.companion-overview-image):not(.page-heading-actions) { flex-basis: 100%; }
+  .application .companion-overview-heading.page-heading { display: grid; grid-template-columns: 72px minmax(0, 1fr); }
+  .application .companion-overview-heading .page-heading-actions { grid-column: 2; }
+  .application .testing-title { min-height: 37px; }
+}

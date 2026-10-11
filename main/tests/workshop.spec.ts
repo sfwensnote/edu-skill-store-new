@@ -63,8 +63,8 @@ async function seedWorks(page: Page) {
 
 test('数量来自实际作品，组合筛选在详情返回和刷新后保留，草稿不冒充可用任务', async ({ page }) => {
   await seedWorks(page);
-  const stats = page.locator('.workshop-overview');
-  await expect(stats.getByRole('button', { name: '查看全部', exact: true })).toContainText('6');
+  await expect(page.getByRole('region', { name: 'SKILL 概览' })).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: 'SKILL 分类', exact: true }).getByRole('button', { name: '全部', exact: true })).toContainText('6');
   await page.getByLabel('搜索我的 SKILL').fill('反思');
   await page.getByLabel('作品学段').selectOption('高中');
   await page.getByLabel('作品学科').selectOption('英语');

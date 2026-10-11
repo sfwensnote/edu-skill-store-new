@@ -1,0 +1,23 @@
+.skill-icon { display: grid; place-items: center; flex-shrink: 0; width: 82px; height: 82px; border-radius: 10px; color: var(--primary); background: var(--blue-soft); overflow: hidden; }
+.skill-icon > svg { width: 38px; height: 38px; stroke-width: 1.6; }
+.skill-icon > img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.skill-icon-field { border: 0; padding: 0; margin: 20px 0; min-width: 0; }
+.skill-icon-field legend { font-weight: 550; margin-bottom: 12px; }
+.skill-icon-controls { display: flex; gap: 18px; align-items: center; }
+.skill-icon-controls > div { min-width: 0; }
+.skill-icon-colors, .skill-icon-upload-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.skill-icon-colors > button { width: 28px; height: 28px; border: 3px solid var(--card); outline: 1px solid transparent; border-radius: 50%; }
+.skill-icon-colors > button[aria-pressed='true'] { outline-color: var(--ink); }
+.skill-icon-colors > button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.skill-icon-color-picker { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; }
+.page-frame .skill-icon-color-picker input[type='color'] { width: 32px; min-height: 30px; height: 30px; padding: 2px; cursor: pointer; }
+.skill-icon-upload-actions { margin-top: 12px; }
+.skill-icon-field input[type='file'] { display: none; }
+.skill-icon-upload-actions small { color: var(--ink-2); font-size: 12px; }
+.skill-icon-field > [role='alert'] { color: var(--red); margin-top: 10px; }
+@media (max-width: 760px) {
+  .skill-icon-controls { align-items: flex-start; gap: 14px; }
+  .skill-icon-controls > .skill-icon { width: 60px; height: 60px; }
+  .skill-icon-controls > .skill-icon svg { width: 30px; height: 30px; }
+  .skill-icon-colors > button { width: 36px; height: 36px; }
+}
