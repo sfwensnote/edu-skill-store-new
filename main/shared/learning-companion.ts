@@ -49,7 +49,7 @@ export function readCompanions(raw: string | null): LearningCompanion[] {
   }));
   return z.array(z.union([companionSchema, legacySchema])).parse(JSON.parse(raw));
 }
-export function companionIssue(value: LearningCompanion, skills: SkillEntry[], throughStep: CompanionStep = 4) {
+export function companionIssue(value: LearningCompanion, skills: Pick<SkillEntry, 'id'>[], throughStep: CompanionStep = 4) {
   if (!value.name.trim()) return '请填写学伴名称。';
   if (!value.introduction.trim()) return '请填写学伴简介。';
   if (!value.grade.trim() || !value.subject.trim()) return '请选择学段和学科。';

@@ -10,6 +10,7 @@ import { MaterialFiles } from './MaterialFiles';
 import { CompanionProfile } from './CompanionProfile';
 import { CompanionConfirmation, CompanionPreview } from './CompanionPreview';
 import { useVerification } from '../execution/useVerification';
+import { serviceConfigured } from '../execution/api';
 
 const stepIcons = [UserRound, FileText, BookOpen, Save];
 const stepHints = ['设置学伴的名称、简介和适用范围。', '从我的 SKILL 中选择教学方法。', '选择学习对象与情境，写明任务和目标。', '确认学伴信息、教学方法与学习任务。'];
@@ -89,7 +90,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
           {verification.error && <p role="alert">{verification.error}</p>}
           <div className="companion-skill-list">{skills.map(entry => <label key={entry.id} className="companion-skill-option">
             <input type="checkbox" disabled={!verification.verified(entry) && !value.skillIds.includes(entry.id)} checked={value.skillIds.includes(entry.id)} onChange={event => change({ skillIds: event.target.checked ? [...value.skillIds, entry.id] : value.skillIds.filter(id => id !== entry.id) })} />
-            <span><strong>{entry.skill.name}</strong><small>{entry.grade} · {entry.subject} · {verification.verified(entry) ? '已验证' : '待检测'}</small><span>{entry.skill.summary}</span></span>
+            <span><strong>{entry.skill.name}</strong><small>{entry.grade} · {entry.subject} · {verification.verified(entry) ? serviceConfigured ? '已验证' : '教师已核对' : '待检测'}</small><span>{entry.skill.summary}</span></span>
           </label>)}</div>
           {!!missing.length && <p role="alert">有 {missing.length} 项 SKILL 已移除。<Button variant="link" onClick={() => change({ skillIds: value.skillIds.filter(id => !missing.includes(id)) })}>清除失效选择</Button></p>}
           {!skills.length && <EmptyState title="还没有可选择的 SKILL" action={<Button variant="outline" onClick={() => leave(onSkills)}>前往我的 SKILL</Button>} />}

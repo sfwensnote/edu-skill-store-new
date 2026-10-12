@@ -76,7 +76,7 @@ function SkillWorkspace() {
   const designId = route.page === 'inquiry-editor' ? route.designId : '';
   const design = market.designs.find((d) => d.id === designId);
   const personalSkills = assistantSkillEntries(platform.assistants).map(entry => ({ ...entry,
-    validation: verification.verified(entry) ? '已验证' : '待检测' }));
+    validation: verification.verified(entry) ? serviceConfigured ? '已验证' : '教师已核对' : '待检测' }));
   let publishedSkills: SkillEntry[] = [];
   let catalogError = '';
   try { publishedSkills = readPublishedSkills(localStorage, account.id); }

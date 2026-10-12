@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { SkillEntry } from '../../../shared/marketplace';
 import type { Verification } from '../../../shared/execution';
-import { executionApi, failureMessage, isVerified, serviceConfigured, serviceIssue } from './api';
+import { executionApi, failureMessage, isVerified } from './api';
 
 export function useVerification() {
   const [proofs, setProofs] = useState<Verification[]>([]);
-  const [error, setError] = useState(serviceConfigured ? '' : serviceIssue());
+  const [error, setError] = useState('');
   useEffect(() => {
-    if (!serviceConfigured) return;
     let disposed = false;
     function refresh() {
       void executionApi<Verification[]>('/verified').then(value => { if (!disposed) { setProofs(value); setError(''); } })

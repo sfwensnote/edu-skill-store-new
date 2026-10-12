@@ -2,15 +2,17 @@
 
 完整应用位于 [main/](main/)，产品说明、源码和测试均在其中。
 
+当前先做纯前端检测与学伴试运行，后端搭建暂停。后续服务器采用 FastAPI + PostgreSQL、前后端分离；[架构与接口](main/docs/FastAPI后端架构与接口设计.md)、[数据库设计](main/docs/PostgreSQL数据库设计.md)、[建表 SQL](main/docs/database/postgresql-schema.sql) 已整理为设计稿，尚未部署。当前功能和数据范围见 [前端验收](main/docs/前端检测与学伴试运行.md)。
+
 ```sh
 cd main
 npm ci
-npm run dev
+npm run dev:frontend
 ```
 
 本地预览：[教学工坊](http://127.0.0.1:5173/#/home)。使用 Node.js 24，已验证版本 24.13.0。
 
-Windows 真实前后端部署：双击仓库根目录的 **启动教学工坊.cmd**，首次在本机输入中转密钥，然后使用本机网页注册教师。配置、局域网试用和数据说明见 [Windows 本机部署](main/docs/Windows本机部署.md)。
+原 Windows／Express 启动入口保留作迁移参考，当前不执行后端部署；历史操作见 [Windows 本机部署](main/docs/Windows本机部署.md)。
 
 - [项目开发规则](AGENTS.md)
 - [当前功能与任务交接](HANDOFF.md)

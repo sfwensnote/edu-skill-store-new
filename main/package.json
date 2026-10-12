@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server/index.ts",
+    "dev:frontend": "vite --mode preview --host 127.0.0.1",
     "check:source": "node scripts/check-source.mjs",
     "build": "tsc --noEmit && vite build",
     "start": "node scripts/start.mjs",

@@ -4,11 +4,12 @@ import type { TrialSession } from '../../../shared/execution';
 import { Transcript } from './Transcript';
 import { failureMessage } from './api';
 
-export function TrialChat({ session, onSend, disabled = false }: {
+export function TrialChat({ session, onSend, disabled = false, traceLabel, inputLabel = '你的问题', initialInput = '' }: {
   session: TrialSession; onSend: (content: string, requestId: string) => Promise<TrialSession>; disabled?: boolean;
+  traceLabel?: string; inputLabel?: string; initialInput?: string;
 }) {
   const [value, setValue] = useState(session);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialInput);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const request = useRef<{ content: string; id: string } | null>(null);
@@ -22,11 +23,12 @@ export function TrialChat({ session, onSend, disabled = false }: {
     } catch (error) { setError(failureMessage(error)); }
     finally { setBusy(false); }
   }
-  return <div className="execution-chat"><Transcript messages={value.messages} />
+  return <div className="execution-chat"><Transcript messages={value.messages} traceLabel={traceLabel} />
     {busy && <p role="status">学伴正在回复…</p>}
     {(error || value.error) && <p className="execution-error" role="alert">{error || value.error}</p>}
-    {disabled ? <p className="subtle">本次试用已结束，对话记录仍保留。</p> : <form onSubmit={event => { event.preventDefault(); void send(); }}>
-      <label className="form-field">你的问题<textarea rows={3} value={input} maxLength={2000} disabled={disabled || busy} onChange={event => setInput(event.target.value)} /></label>
+    {disabled ? <p className="subtle">本次对话已结束，记录仍保留。</p> : <form onSubmit={event => { event.preventDefault(); void send(); }}>
+      <label className="form-field">{inputLabel}<textarea rows={3} value={input} maxLength={2000} disabled={disabled || busy} onChange={event => setInput(event.target.value)} /></label>
+      {initialInput && <Button type="button" variant="ghost" disabled={busy} onClick={() => setInput(initialInput)}>填入当前情境的学生输入</Button>}
       <Button type="submit" disabled={disabled || busy || !input.trim()}>{busy ? '正在回复…' : '发送'}</Button>
     </form>}
   </div>;

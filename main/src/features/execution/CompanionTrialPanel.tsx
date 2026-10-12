@@ -8,12 +8,17 @@ import { useVerification } from './useVerification';
 import { TrialChat } from './TrialChat';
 import { TrialReportView } from './TrialReportView';
 import { Transcript } from './Transcript';
+import { CompanionPracticePanel } from './CompanionPracticePanel';
 import './execution.css';
 
 type TrialDetail = { trial: Trial; sessions: TrialSession[]; reports: TrialReport[] };
-export function CompanionTrialPanel({ value, skills, onEdit, onCheck, onMethods }: {
+type PanelProps = {
   value: LearningCompanion; skills: SkillEntry[]; onEdit: () => void; onCheck: (entry: SkillEntry) => void; onMethods: () => void;
-}) {
+};
+export function CompanionTrialPanel(props: PanelProps) {
+  return serviceConfigured ? <RemoteCompanionTrialPanel {...props} /> : <CompanionPracticePanel {...props} />;
+}
+function RemoteCompanionTrialPanel({ value, skills, onEdit, onCheck, onMethods }: PanelProps) {
   const verification = useVerification();
   const selected = skills.filter(entry => value.skillIds.includes(entry.id));
   const [trials, setTrials] = useState<Trial[]>([]);
