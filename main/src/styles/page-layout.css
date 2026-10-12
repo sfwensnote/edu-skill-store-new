@@ -1,7 +1,7 @@
 /* 页面外框、主标题与顶部区域共用首页的尺寸和配色。 */
 :root {
-  --page-width: 1460px;
-  --page-gutter: 32px;
+  --page-width: 1920px;
+  --page-gutter: 24px;
   --page-title-size: 36px;
   --page-heading-height: 176px;
   --page-heading-padding: 40px;

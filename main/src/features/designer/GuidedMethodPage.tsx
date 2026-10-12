@@ -145,7 +145,7 @@ export function GuidedMethodPage({
                 </small>
               </div>
               <h4>{question.question}</h4>
-              <label className="sr-only" htmlFor="guided-answer">
+              <label className="guided-answer-label" htmlFor="guided-answer">
                 你的回答
               </label>
               <Textarea

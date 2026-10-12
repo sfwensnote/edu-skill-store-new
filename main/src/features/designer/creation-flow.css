@@ -205,11 +205,29 @@
   line-height: 1.55;
   margin: 14px 0 18px;
 }
+.guided-answer-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
 .creation-flow.page-frame .guided-conversation .current-question textarea {
   min-height: 144px;
+  border: 2px solid var(--line-strong);
   background: var(--blue-faint);
+  padding: 14px 16px;
   resize: none;
   line-height: 1.75;
+}
+.creation-flow.page-frame .guided-conversation .current-question textarea:hover {
+  border-color: var(--ring);
+}
+.creation-flow.page-frame .guided-conversation .current-question textarea:focus {
+  border-color: var(--ring);
+  background: var(--card);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--blue-soft);
 }
 .answer-count {
   display: block;
