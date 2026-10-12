@@ -1,6 +1,6 @@
 # Windows 运行与双平台开发
 
-检查日期：2026-10-10。当前尚未在 Windows 实机验收。应用代码保留原样，本文提供现有脚本的兼容运行方式。
+更新日期：2026-10-12。用户已选择在当前 Windows PC 同源运行前后端。优先使用仓库根目录的 **启动教学工坊.cmd**；真实模型配置、教师注册、局域网试用和数据边界见 [Windows 本机部署](main/docs/Windows本机部署.md)。当前工具仍连接云端工作区，实际 PC 启动结果不能由云端检查代替。
 
 ## 首次准备
 
@@ -43,7 +43,7 @@ $env:NODE_ENV = 'production'
 node --import tsx server/index.ts
 ```
 
-现有 `npm start` 用 Unix 的 `NODE_ENV=production` 写法，Windows 不直接使用。停止生产预览后，在同一终端恢复开发前执行：
+`npm start` 已改成跨平台生产入口，Windows 可直接使用。真实前后端本机部署使用 `npm run pc:start`，它同时构建同源根路径网页。停止生产预览后，在同一终端恢复开发前执行：
 
 ```powershell
 Remove-Item Env:NODE_ENV -ErrorAction SilentlyContinue
@@ -54,9 +54,9 @@ npm run dev
 
 ## 环境变量与平台依赖
 
-- 当前没有实际 .env；前端演示不需要模型密钥。需要模板时才执行下方复制命令，不覆盖已有配置。
+- 真实本机服务通过 `npm run pc:setup` 创建或补全私有 `.env`；已有凭据和数据库设置保留。
 - 保留 PORT=5173；localhost、127.0.0.1 及不同端口属于不同浏览器存储来源。
-- DESIGN_MODEL_*、TEACHING_MODEL_* 是保留后台的模型配置。不要为了迁移填写或启用真实服务；密钥只能私下迁移到服务端配置。
+- DESIGN_MODEL_*、TEACHING_MODEL_* 用于已授权的真实检测和学伴对话；模型中转密钥仅在本机服务端私有配置，不进入 VITE 变量或 Git。
 - DATABASE_PATH 默认 data/workspace.sqlite。迁移时使用当前机器上的相对路径，不沿用 Mac 绝对路径；自定义路径的父目录须存在。
 - package-lock.json 包含 darwin、win32 等可选原生包，属于正常跨平台锁定。npm ci 在各平台安装适用版本，不更换锁文件或复制本机安装目录。
 - .gitattributes 统一源码 LF，二进制不换行转换。不得创建大小写冲突或依赖大小写错误的文件引用。

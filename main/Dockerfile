@@ -16,6 +16,7 @@ RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; npm ci --omit=dev --strict-ssl=true && mkdir data && chown node:node data
 COPY --from=build --chown=node:node /app/server ./server
 COPY --from=build --chown=node:node /app/shared ./shared
+COPY --from=build --chown=node:node /app/scripts/start.mjs ./scripts/start.mjs
 COPY --from=build --chown=node:node /app/dist ./dist
 USER node
 EXPOSE 5173

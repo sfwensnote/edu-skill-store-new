@@ -7,9 +7,13 @@
     "dev": "tsx server/index.ts",
     "check:source": "node scripts/check-source.mjs",
     "build": "tsc --noEmit && vite build",
-    "start": "NODE_ENV=production tsx server/index.ts",
+    "start": "node scripts/start.mjs",
+    "pc:setup": "tsx scripts/pc-setup.ts",
+    "pc:start": "tsx scripts/pc-start.ts",
+    "pc:check": "tsx scripts/pc-check.ts",
     "admin:create": "tsx server/admin.ts",
     "test": "tsx --test tests/*.test.ts",
+    "test:pc": "node --import tsx --test tests/pc-config.test.ts tests/pc-launch.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

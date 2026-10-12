@@ -1,6 +1,6 @@
 # AGENTS.md
 
-更新日期：2026-10-11。适用于整个项目。先阅读本文件、HANDOFF.md 和 main/PRODUCT.md；跨平台运行见 WINDOWS.md，迁移状态见 MIGRATION_REPORT.md。
+更新日期：2026-10-12。适用于整个项目。先阅读本文件、HANDOFF.md 和 main/PRODUCT.md；跨平台运行见 WINDOWS.md，迁移状态见 MIGRATION_REPORT.md。
 
 ## 协作规则
 
@@ -14,6 +14,8 @@
 8. 2026-10-11 用户明确要求真实 LLM 的 SKILL 检测、受控学生试用及有对话证据的回收报告，此要求替代此前演示限制。已获授权实现服务端身份和真实记录，仍沿用原布局、不改一次性清理标记。模型中转不是项目后端；不得把 Pages 发布或协议夹具测试说成真实模型、后端已经上线。密钥仅在服务端私有环境配置。
 
 ## 当前产品与架构
+
+2026-10-12 用户已指定当前 Windows PC 同源运行前后端。仓库根启动教学工坊.cmd 与 pc:setup／pc:start／pc:check 提供私有配置、根路径正式构建、端口占用保护和真实模型连通检查；既有凭据和数据库路径保留。默认仅本机，--lan 才开放局域网并提示教师使用学生可访问的地址。npm start 已跨平台，Docker 同步包含该入口；Windows Actions 使用隔离协议服务器和数据库验证启动与持久化。当前工具仍在云端、没有用户 PC 的终端或本机目录，不能假报 PC 部署完成。详见 main/docs/Windows本机部署.md。
 
 2026-10-11 真实闭环：shared/execution.ts 与 server/execution/ 定义真实检测、内容／模型绑定的验证门槛、受控试用快照、学生凭据、记录和报告。src/features/execution/ 接入原界面；旧手动确认式检测组件和独占样式已移除。真实服务启用服务端教师／管理员身份，检测通过后还需教师确认才可挂载；失败或证据不足不得降级为样例。报告证据编号与逐字原文必须对应实际学生对话，不据此宣称学习效果提升。服务端持久化身份、检测、试用和报告；原编辑工作区、收藏与集市仍按账号存在浏览器，不能宣称全站跨设备同步。Docker／Compose／Caddy 部署文件与 Pages API_BASE_URL 公开变量接线已提供；模型密钥不能写入前端。真实中转被当前出站策略阻止，后端部署位置尚未提供。详情与验证边界见 main/docs/真实检测与受控试用.md；下方旧演示阶段描述保留为历史。
 
@@ -89,7 +91,7 @@ npm run test:e2e
 
 npm run build 执行 tsc --noEmit 后运行 Vite。npm test 是 tsx --test tests/*.test.ts。沙箱禁止 tsx IPC 或本机监听时，可使用 node --import tsx --test，并只为本机协议夹具申请所需运行权限，不删除测试或调用付费模型。
 
-macOS 生产预览可 npm start。现有 start 使用 NODE_ENV=production，Windows cmd／PowerShell 不兼容该赋值语法；按 WINDOWS.md 设置环境变量并执行 node --import tsx server/index.ts。本次不修改 package.json 脚本。
+生产入口 npm start 已跨平台；Windows 本机完整启动使用 npm run pc:start，配置与同源构建见 WINDOWS.md。不要恢复 Unix 专用环境变量赋值。
 
 早期客户流程的浏览器基线（本轮完整检查以 `npm run test:e2e` 为准）：
 ```sh

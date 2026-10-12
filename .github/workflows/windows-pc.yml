@@ -1,0 +1,38 @@
+name: 验证 Windows 本机部署
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '启动教学工坊.cmd'
+      - 'main/scripts/**'
+      - 'main/server/**'
+      - 'main/shared/**'
+      - 'main/src/**'
+      - 'main/package*.json'
+      - 'main/tests/pc-*.test.ts'
+      - '.github/workflows/windows-pc.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: 检查本机生产启动与持久化
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: '教师工坊 workspace/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: '教师工坊 workspace'
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '教师工坊 workspace/.nvmrc'
+          cache: npm
+          cache-dependency-path: '教师工坊 workspace/main/package-lock.json'
+      - run: npm ci
+      - name: 配置保护、生产启动和数据库重启检查
+        run: npm run test:pc
