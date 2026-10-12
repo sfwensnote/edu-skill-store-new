@@ -19,6 +19,7 @@ playwright-report/
 /data/
 /main/data/
 migration-private/
+/backups/
 *.sqlite
 *.sqlite-*
 *.sqlite3

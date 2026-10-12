@@ -25,7 +25,7 @@ export type CompanionDesign = z.infer<typeof designSchema>;
 export const companionSchema = z.object({
   version: z.literal(2), id: z.string(), name: z.string(), introduction: z.string(), grade: z.string(), subject: z.string(), year: z.string(),
   avatar: z.enum(['default', 'lively', 'simple', 'custom']), avatarImage: z.string(),
-  skillIds: z.array(z.string()), step: stepSchema,
+  skillIds: z.array(z.string()), caseId: z.string().optional(), step: stepSchema,
   status: z.enum(['draft', 'ready']), task: taskSchema, design: designSchema,
   materials: z.array(materialSchema), updatedAt: z.string(),
 });

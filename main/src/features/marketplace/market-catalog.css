@@ -1,25 +1,25 @@
-
 .catalog-heading img {
-  width: 280px;
-  height: 120px;
+  width: 264px;
+  height: 116px;
   object-fit: contain;
 }
 .catalog-filters {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 8px 0 24px;
+  gap: 10px;
+  margin: 0 0 16px;
   flex-wrap: wrap;
 }
 .catalog-search {
   display: flex;
   align-items: center;
-  flex: 1 1 300px;
+  flex: 1 1 280px;
+  min-width: 0;
   gap: 10px;
-  height: 46px;
+  height: 42px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0 14px;
 }
 .catalog-search:focus-within {
@@ -33,7 +33,7 @@
 .market-catalog.page-frame .catalog-filters .catalog-search input {
   border: 0;
   padding: 0;
-  min-height: 38px;
+  min-height: 36px;
   width: 100%;
   outline: none;
   box-shadow: none;
@@ -41,7 +41,8 @@
 .catalog-selects {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 .catalog-selects label {
   display: flex;
@@ -52,20 +53,21 @@
   white-space: nowrap;
 }
 .market-catalog.page-frame .catalog-selects select {
-  padding: 6px 8px;
-  min-height: 38px;
-  max-width: 132px;
+  min-height: 40px;
+  max-width: 140px;
+  padding: 6px 10px;
+  border-radius: 10px;
 }
 .catalog-layout {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 244px minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
 }
 .market-categories {
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--card);
 }
 .market-categories > nav + nav,
@@ -84,10 +86,10 @@
   align-items: center;
   width: 100%;
   gap: 10px;
-  min-height: 39px;
+  min-height: 40px;
   padding: 7px 10px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   color: var(--ink-2);
   text-align: left;
@@ -117,8 +119,9 @@
 }
 .catalog-tags button {
   border: 1px solid transparent;
-  border-radius: 5px;
-  padding: 4px 7px;
+  border-radius: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
   color: var(--ink-2);
   background: var(--muted);
   font-size: 12px;
@@ -136,7 +139,7 @@
   align-items: center;
   gap: 12px;
   min-height: 34px;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--ink-2);
   font-size: 13px;
 }
@@ -161,8 +164,8 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  margin: 0 0 10px;
-  font-size: 12px;
+  margin: 0 0 12px;
+  font-size: 13px;
   color: var(--primary);
 }
 .market-resource-list {
@@ -171,14 +174,13 @@
   gap: 10px;
 }
 .market-catalog .catalog-results .market-resource-card {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 18px;
+  gap: 8px 16px;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 18px;
-  min-height: 116px;
+  border-radius: 12px;
+  padding: 16px;
   background: var(--card);
   transition: border-color 180ms;
 }
@@ -188,16 +190,16 @@
 .catalog-resource-icon {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   flex: none;
-  border-radius: 9px;
+  border-radius: 10px;
   color: var(--primary);
   background: var(--blue-soft);
 }
 .catalog-resource-icon svg {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   stroke-width: 1.6;
 }
 .catalog-resource-body {
@@ -206,27 +208,58 @@
 }
 .catalog-resource-title {
   display: flex;
-  gap: 10px;
-  align-items: baseline;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.catalog-resource-title h2 {
+  min-width: 0;
 }
 .market-catalog .catalog-resource-title h2 {
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 600;
   line-height: 1.45;
 }
 .catalog-resource-title h2 button {
   background: transparent;
   border: 0;
+  padding: 0;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
-.market-catalog .skill-practice {
+.catalog-resource-title h2 button:hover {
+  color: var(--primary);
+}
+.catalog-resource-favorite[data-slot='button'] {
+  flex: none;
+  color: var(--ink-2);
+}
+.catalog-resource-favorite[aria-pressed='true'] {
+  color: var(--primary);
+}
+.catalog-resource-summary {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font-size: 14px;
-  margin: 6px 0 8px;
-  line-height: 1.65;
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.market-catalog .skill-practice {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  font-size: 13px;
+  margin: 4px 0 0;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.market-catalog .market-resource-card .teaching-tag-list {
+  margin-top: 8px;
 }
 .market-catalog .card-meta {
   display: flex;
@@ -235,33 +268,37 @@
   gap: 6px 14px;
   padding: 0;
   border: 0;
-  margin: 0;
+  margin: 8px 0 0;
   color: var(--ink-2);
-  font-size: 12px;
+  font-size: 13px;
 }
 .market-catalog .card-meta > span {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-width: 0;
 }
 .market-catalog .card-meta svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 .catalog-resource-actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   flex: none;
   gap: 8px;
-  flex-wrap: wrap;
-  max-width: 340px;
+  width: 172px;
   color: var(--primary);
+}
+.market-catalog .catalog-resource-actions [data-slot='button'] {
+  min-height: 40px;
+  justify-content: center;
+  white-space: nowrap;
 }
 .market-catalog .catalog-resource-actions [data-variant='outline'] {
   color: var(--primary);
   border-color: color-mix(in srgb, var(--primary) 45%, white);
-  min-height: 40px;
-  white-space: nowrap;
 }
 .market-filter-dialog .market-categories {
   border: 0;
@@ -271,15 +308,31 @@
 }
 @media (max-width: 1200px) {
   .catalog-layout {
-    grid-template-columns: 220px minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: 16px;
   }
   .catalog-search {
     flex-basis: 100%;
   }
   .catalog-resource-icon {
-    width: 54px;
-    height: 54px;
+    width: 48px;
+    height: 48px;
+  }
+  .catalog-resource-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+@media (max-width: 1024px) {
+  .market-catalog .catalog-results .market-resource-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+  .catalog-resource-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: auto;
   }
 }
 @media (max-width: 900px) {
@@ -295,7 +348,7 @@
   }
 }
 @media (max-width: 760px) {
-        .catalog-heading img {
+  .catalog-heading img {
     display: none;
   }
   .catalog-selects {
@@ -304,15 +357,16 @@
     gap: 8px;
   }
   .catalog-selects label {
-    flex: 1;
-    min-width: 96px;
+    flex: 1 1 96px;
+    min-width: 0;
     gap: 4px;
     font-size: 12px;
   }
   .market-catalog.page-frame .catalog-selects select {
     width: 100%;
     min-width: 0;
-    padding-inline: 4px;
+    max-width: none;
+    padding-inline: 6px;
     font-size: 12px;
   }
   .catalog-list-toolbar {
@@ -323,19 +377,19 @@
     gap: 4px;
   }
   .market-catalog .catalog-results .market-resource-card {
-    display: grid;
     grid-template-columns: 44px minmax(0, 1fr);
-    padding: 16px;
+    padding: 14px;
     gap: 10px 12px;
     align-items: start;
   }
   .catalog-resource-icon {
     width: 44px;
     height: 44px;
+    border-radius: 8px;
   }
   .catalog-resource-icon svg {
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
   }
   .catalog-resource-title {
     gap: 4px;
@@ -343,13 +397,27 @@
   .market-catalog .catalog-resource-title h2 {
     font-size: 17px;
   }
+  .catalog-resource-summary {
+    font-size: 15px;
+  }
   .catalog-resource-actions {
     grid-column: 1 / -1;
     justify-content: flex-end;
-    max-width: none;
+  }
+  .market-catalog .catalog-resource-actions [data-slot='button'] {
+    min-height: 42px;
   }
   .market-filter-dialog .market-categories nav button,
   .market-filter-dialog .catalog-tags button {
     min-height: 44px;
+  }
+}
+@media (max-width: 400px) {
+  .market-catalog .catalog-results .market-resource-card {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+  .catalog-resource-icon {
+    width: 40px;
+    height: 40px;
   }
 }

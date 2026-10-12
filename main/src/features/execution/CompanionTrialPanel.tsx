@@ -16,9 +16,9 @@ type PanelProps = {
   value: LearningCompanion; skills: SkillEntry[]; onEdit: () => void; onCheck: (entry: SkillEntry) => void; onMethods: () => void;
 };
 export function CompanionTrialPanel(props: PanelProps) {
-  return serviceConfigured ? <RemoteCompanionTrialPanel {...props} /> : <CompanionPracticePanel {...props} />;
+  return serviceConfigured ? <ServerCompanionTrialPanel {...props} /> : <CompanionPracticePanel {...props} />;
 }
-function RemoteCompanionTrialPanel({ value, skills, onEdit, onCheck, onMethods }: PanelProps) {
+export function ServerCompanionTrialPanel({ value, skills, onEdit, onCheck, onMethods }: PanelProps) {
   const verification = useVerification();
   const selected = skills.filter(entry => value.skillIds.includes(entry.id));
   const [trials, setTrials] = useState<Trial[]>([]);

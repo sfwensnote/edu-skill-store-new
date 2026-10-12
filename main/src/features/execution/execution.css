@@ -72,3 +72,56 @@
   .execution-verdicts, .execution-trial-settings { grid-template-columns: 1fr; }
   .execution-trial-panel .inline-actions { flex-wrap: wrap; }
 }
+
+.companion-practice-heading { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-block: 8px 20px; }
+.companion-practice-heading .back-link { flex-basis: 100%; }
+.companion-practice-identity { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+.companion-practice-avatar { display: grid; place-items: center; flex-shrink: 0; width: 72px; height: 72px; border-radius: 16px; background: var(--secondary); }
+.companion-practice-avatar .companion-avatar { width: 64px; height: 64px; }
+.companion-practice-identity h1 { font-size: 26px; overflow-wrap: anywhere; }
+.companion-practice-identity p { margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+.companion-practice-name { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.companion-practice-mode { flex: none; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--secondary); color: var(--ink-2); font-size: 12px; font-weight: 500; line-height: 1.7; }
+.companion-practice-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.companion-practice-context.market-panel { margin: 0 0 18px; padding: 18px 22px; }
+.companion-practice-context summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.companion-practice-context-body { display: grid; gap: 10px; margin-top: 16px; }
+.companion-practice-context-body .companion-task-summary > div { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding-block: 10px; }
+.companion-practice-context-body .companion-task-summary > div:last-child { border: 0; }
+.companion-practice-history { max-width: 460px; margin-bottom: 18px; }
+.companion-practice-chat.market-panel { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.companion-practice-empty { display: grid; justify-items: center; gap: 16px; padding: 48px 24px; text-align: center; color: var(--ink-2); }
+.companion-chat { display: flex; flex-direction: column; min-width: 0; }
+.companion-chat-log { list-style: none; display: flex; flex-direction: column; gap: 16px; max-height: min(62vh, 620px); margin: 0; padding: 22px; overflow-x: hidden; overflow-y: auto; }
+.companion-chat-message { display: flex; flex-direction: column; gap: 6px; max-width: min(78%, 680px); min-width: 0; }
+.companion-chat-message[data-role='user'] { align-self: flex-end; align-items: flex-end; }
+.companion-chat-meta { font-size: 12px; color: var(--ink-2); }
+.companion-chat-bubble { padding: 12px 16px; border-radius: 4px 14px 14px; background: var(--secondary); line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.companion-chat-message[data-role='user'] .companion-chat-bubble { border-radius: 14px 4px 14px 14px; background: var(--blue-faint); }
+.companion-chat-trace { max-width: 100%; font-size: 12px; color: var(--ink-2); }
+.companion-chat-trace summary { cursor: pointer; }
+.companion-chat-trace p { margin-top: 6px; overflow-wrap: anywhere; }
+.companion-chat-hint { color: var(--ink-3); }
+.companion-chat-status { padding: 0 22px 8px; font-size: 13px; color: var(--ink-2); }
+.companion-chat .execution-error { margin: 0; padding: 0 22px 8px; }
+.companion-chat-composer { display: grid; gap: 12px; padding: 18px 22px 22px; border-top: 1px solid var(--line); background: var(--card); }
+.companion-chat-composer .form-field { width: 100%; }
+.companion-chat-actions { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.application .page-frame .companion-practice-heading.page-heading { padding-top: calc(var(--page-heading-padding, 20px) + 34px); }
+@media (max-width: 600px) {
+  .application .page-frame .companion-practice-heading.page-heading { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .application .page-frame .companion-practice-heading > .companion-practice-identity,
+  .application .page-frame .companion-practice-heading > .companion-practice-actions { grid-column: 1 / -1; min-width: 0; margin-left: 0; }
+  .companion-practice-identity { flex-wrap: wrap; }
+  .companion-practice-identity > div { min-width: 0; }
+  .companion-practice-heading { gap: 12px; }
+  .companion-practice-avatar { width: 56px; height: 56px; border-radius: 12px; }
+  .companion-practice-avatar .companion-avatar { width: 50px; height: 50px; }
+  .companion-practice-identity h1 { font-size: 21px; }
+  .companion-practice-actions { width: 100%; }
+  .companion-practice-actions > button { flex: 1 1 auto; }
+  .companion-practice-context-body .companion-task-summary > div { grid-template-columns: 1fr; gap: 4px; }
+  .companion-chat-log { padding: 16px; }
+  .companion-chat-message { max-width: 92%; }
+  .companion-chat-composer { padding: 14px 16px 18px; }
+}

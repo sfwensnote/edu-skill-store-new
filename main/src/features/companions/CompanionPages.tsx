@@ -14,9 +14,12 @@ import './companions.css';
 import './companion-library.css';
 import './companion-overview.css';
 import { CompanionTrialPanel } from '../execution/CompanionTrialPanel';
+import { serviceConfigured } from '../execution/api';
+import { withCompanionCaseSkills } from '../../../shared/companion-cases';
 
-export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy, onRemove }: {
+export function CompanionsPage({ items, skills, onCreate, onOpen, onPractice, onEdit, onCopy, onRemove }: {
   items: LearningCompanion[]; skills: SkillEntry[]; onCreate: () => void; onOpen: (value: LearningCompanion) => void;
+  onPractice: (value: LearningCompanion) => void;
   onEdit: (value: LearningCompanion) => void; onCopy: (id: string) => boolean; onRemove: (id: string) => boolean | Promise<boolean>;
 }) {
   const [query, setQuery] = useState('');
@@ -29,12 +32,13 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy
   const [message, setMessage] = useState('');
   const headingRef = useRef<HTMLHeadingElement>(null);
   const originRef = useRef<HTMLButtonElement | null>(null);
+  const withCases = items.map(item => ({ value: item, skills: withCompanionCaseSkills(item, skills) }));
   const subjects = [...new Set(items.map(item => item.subject).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
   const search = query.trim().toLocaleLowerCase();
-  const filtered = items.filter(item => (status === 'all' || item.status === status) && (subject === 'all' || item.subject === subject) &&
+  const filtered = withCases.filter(({ value: item, skills: itemSkills }) => (status === 'all' || item.status === status) && (subject === 'all' || item.subject === subject) &&
     [item.name, item.introduction, ...Object.values(item.task), ...item.materials.map(material => material.name),
-      ...item.skillIds.map(id => skills.find(entry => entry.id === id)?.skill.name || '')].join(' ').toLocaleLowerCase().includes(search))
-    .sort((a, b) => sort === 'name' ? a.name.localeCompare(b.name, 'zh-CN') : (Date.parse(b.updatedAt) || 0) - (Date.parse(a.updatedAt) || 0));
+      ...item.skillIds.map(id => itemSkills.find(entry => entry.id === id)?.skill.name || '')].join(' ').toLocaleLowerCase().includes(search))
+    .sort((a, b) => sort === 'name' ? a.value.name.localeCompare(b.value.name, 'zh-CN') : (Date.parse(b.value.updatedAt) || 0) - (Date.parse(a.value.updatedAt) || 0));
   function clearFilters() { setQuery(''); setStatus('all'); setSubject('all'); setSort('updated'); }
   return <main className="page-frame market-page companion-page companion-library">
     <header className="companion-library-heading page-heading">
@@ -51,8 +55,8 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy
     {message && <p className="companion-library-message" role="status">{message}</p>}
     {!items.length ? <EmptyState title="还没有学伴">创建学伴后，会显示在这里。</EmptyState> : !filtered.length ?
       <EmptyState title="没有找到符合条件的学伴" action={<Button variant="outline" onClick={clearFilters}>清除筛选</Button>} /> :
-      <div className="companion-list">{filtered.map(item => <CompanionCard key={item.id} value={item} skills={skills}
-        onOpen={() => onOpen(item)} onEdit={() => onEdit(item)} onCopy={() => {
+      <div className="companion-list">{filtered.map(({ value: item, skills: itemSkills }) => <CompanionCard key={item.id} value={item} skills={itemSkills}
+        onOpen={() => onOpen(item)} onPractice={() => onPractice(item)} onEdit={() => onEdit(item)} onCopy={() => {
           setMessage(''); if (onCopy(item.id)) { clearFilters(); setMessage('已复制为草稿'); }
         }} onRemove={trigger => { originRef.current = trigger; setError(''); setPending(item); }} />)}</div>}
     <Dialog open={!!pending} onOpenChange={open => { if (!open && !removing) { setPending(null); setError(''); } }}>
@@ -70,9 +74,9 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onEdit, onCopy
     </Dialog>
   </main>;
 }
-export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMethods }: {
+export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMethods, onPractice }: {
   value: LearningCompanion; skills: SkillEntry[]; onBack: () => void; onEdit: () => void;
-  onCheck: (entry: SkillEntry) => void; onMethods: () => void;
+  onCheck: (entry: SkillEntry) => void; onMethods: () => void; onPractice: () => void;
 }) {
   const selected = value.skillIds.map(id => skills.find(entry => entry.id === id));
   return <main className="page-frame market-page companion-page companion-overview">
@@ -103,6 +107,10 @@ export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMeth
         <section className="market-panel companion-overview-panel"><h2><FileText aria-hidden="true" />教学材料 <small>{value.materials.length} 份</small></h2>{value.materials.length ? <ul className="companion-files">{value.materials.map(item => <li key={item.id}><span>{item.name}</span><Button variant="link" onClick={() => downloadMaterial(item)}>下载材料</Button></li>)}</ul> : <p className="subtle">未添加材料</p>}</section>
       </aside>
     </div>
-    <CompanionTrialPanel value={value} skills={skills} onEdit={onEdit} onCheck={onCheck} onMethods={onMethods} />
+    {serviceConfigured ? <CompanionTrialPanel value={value} skills={skills} onEdit={onEdit} onCheck={onCheck} onMethods={onMethods} /> :
+      <section className="market-panel execution-trial-panel companion-practice-entry">
+        <h2>学伴试运行</h2><p className="subtle">进入独立对话页，以学生身份连续体验挂载方法。</p>
+        <Button onClick={onPractice}>开始试运行</Button>
+      </section>}
   </main>;
 }

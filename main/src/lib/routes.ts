@@ -6,6 +6,7 @@ type RoutePage =
   | { page: 'companions' }
   | { page: 'companion-edit'; companionId: string; skillId?: string }
   | { page: 'companion-detail'; companionId: string }
+  | { page: 'companion-practice'; companionId: string }
   | { page: 'space'; selection?: string; draftId?: string }
   | { page: 'workshop'; tab?: string }
   | {
@@ -46,6 +47,7 @@ function parseRoute(hash: string): RoutePage {
   if (parts[0] === 'skill-check' && parts[1]) return { page: 'skill-check', skillId: parts[1] };
   if (parts[0] === 'companions') {
     if (!parts[1]) return { page: 'companions' };
+    if (parts[2] === 'practice') return { page: 'companion-practice', companionId: parts[1] };
     return parts[2] === 'edit' ? { page: 'companion-edit', companionId: parts[1], skillId: params.get('skill') || undefined } : { page: 'companion-detail', companionId: parts[1] };
   }
   if (parts[0] === 'space')
@@ -122,7 +124,7 @@ export function activeNavigationPage(
   // 方法详情在不同工作空间中复用，导航高亮应跟随来源，而不是一律指向集市。
   for (let depth = 0; depth < 16 && context.page === 'skill-detail' && context.returnTo; depth++)
     context = readRoute(context.returnTo);
-  if (['companions', 'companion-edit', 'companion-detail'].includes(context.page)) return 'companions';
+  if (['companions', 'companion-edit', 'companion-detail', 'companion-practice'].includes(context.page)) return 'companions';
   if (context.page === 'space' && (
     context.selection?.startsWith('skill:') ||
     (context.draftId && applicationDraftIds.includes(context.draftId))
@@ -158,6 +160,7 @@ export function navigationRoute(current: AppRoute, next: AppRoute): AppRoute {
   const drilldown = [
     'companion-edit',
     'companion-detail',
+    'companion-practice',
     'skill-detail',
     'inquiry-editor',
     'task-preview',
@@ -178,7 +181,7 @@ export function navigationRoute(current: AppRoute, next: AppRoute): AppRoute {
 }
 export function returnLabel(route: AppRoute, fallback: AppRoute): string {
   const parent = returnRoute(route, fallback);
-  return `返回${({ companions: '我的学伴', 'companion-edit': '学伴设计', 'companion-detail': '学伴', home: '首页', daily: '日常教学', inquiry: '情境探究', workshop: '我的 SKILL', mine: '我的 SKILL', market: '集市', space: '教学任务', create: '方法编辑', test: '方法核对', logs: '教学预览', report: '核对摘要', 'log-detail': '方法步骤', 'skill-detail': '方法详情', 'inquiry-editor': '探究设计', library: '集市', 'library-detail': '助手详情' } as Record<string, string>)[parent.page] || '上一页'}`;
+  return `返回${({ companions: '我的学伴', 'companion-edit': '学伴设计', 'companion-detail': '学伴', 'companion-practice': '学伴试运行', home: '首页', daily: '日常教学', inquiry: '情境探究', workshop: '我的 SKILL', mine: '我的 SKILL', market: '集市', space: '教学任务', create: '方法编辑', test: '方法核对', logs: '教学预览', report: '核对摘要', 'log-detail': '方法步骤', 'skill-detail': '方法详情', 'inquiry-editor': '探究设计', library: '集市', 'library-detail': '助手详情' } as Record<string, string>)[parent.page] || '上一页'}`;
 }
 function pageHash(route: AppRoute): string {
   switch (route.page) {
@@ -190,6 +193,8 @@ function pageHash(route: AppRoute): string {
       return `#/companions/${encodeURIComponent(route.companionId)}/edit${route.skillId ? `?skill=${encodeURIComponent(route.skillId)}` : ''}`;
     case 'companion-detail':
       return `#/companions/${encodeURIComponent(route.companionId)}`;
+    case 'companion-practice':
+      return `#/companions/${encodeURIComponent(route.companionId)}/practice`;
     case 'companions':
     case 'home':
     case 'daily':

@@ -13,8 +13,8 @@
     color: var(--ink);
     background: var(--canvas);
     font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: var(--text-body);
+    line-height: 1.6;
     font-synthesis: none;
     -webkit-font-smoothing: antialiased;
   }
@@ -26,13 +26,13 @@
   svg { flex: 0 0 auto; }
   textarea { resize: none; }
   button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible {
-    outline: 2px solid var(--blue);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
 }
 
 button:disabled { opacity: .5; cursor: not-allowed; }
-button:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 [data-slot='button'] { min-height: var(--control-height); height: auto; padding-block: 8px; font-size: var(--text-body); line-height: 1.5; white-space: normal; }
 [data-slot='button'][data-size='lg'] { min-height: var(--control-primary-height); font-size: var(--text-reading); }
 [data-slot='button'][data-size='icon'] { width: var(--control-height); height: var(--control-height); padding: 0; }

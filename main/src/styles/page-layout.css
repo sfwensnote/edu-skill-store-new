@@ -1,25 +1,27 @@
-/* 页面外框、主标题与顶部区域共用首页的尺寸和配色。 */
+/* 页面外框、主标题与顶部区域共用一套紧凑尺寸和配色。 */
 :root {
-  --page-width: 1920px;
-  --page-gutter: 24px;
-  --page-title-size: 36px;
-  --page-heading-height: 176px;
-  --page-heading-padding: 40px;
-  --page-background: linear-gradient(180deg, var(--blue-faint), var(--canvas) 70%);
+  --page-width: 1440px;
+  --page-gutter: 32px;
+  --page-title-size: 30px;
+  --page-heading-height: 112px;
+  --page-heading-padding: 20px;
 }
-body, .application { background-color: var(--canvas); background-image: var(--page-background); background-size: 100% 100dvh; background-attachment: fixed; background-repeat: no-repeat; }
+body, .application { background-color: var(--canvas); background-image: none; }
 .home-surface, .testing-page { background: transparent; }
 .application .header-inner, .application :is(main, div).page-frame {
   width: calc(100% - 2 * var(--page-gutter));
   max-width: var(--page-width);
 }
+/* 教学编辑、学伴创建、聊天与检测工作台保留宽屏空间，公共页头按同一可用宽度和间距对齐。 */
+.application:has(.creation-flow), .application:has(.companion-creation), .application:has(.companion-practice-page), .application:has(.execution-page),
+.creation-flow, .companion-creation, .companion-practice-page, .execution-page { --page-width: 1800px; }
 .application main.page-frame { padding-top: 24px; }
 .application main.page-frame h1, .application main .page-frame h1 {
   margin: 0;
   font-size: var(--page-title-size);
   line-height: 1.3;
-  letter-spacing: -.02em;
-  font-weight: 700;
+  letter-spacing: -.01em;
+  font-weight: 600;
   overflow-wrap: anywhere;
 }
 .application .page-frame .page-heading {
@@ -27,41 +29,42 @@ body, .application { background-color: var(--canvas); background-image: var(--pa
   top: auto;
   display: flex;
   align-items: flex-start;
-  gap: 24px;
+  gap: 20px;
   min-height: var(--page-heading-height);
-  padding: var(--page-heading-padding) 0 24px;
-  margin: 0 0 20px;
+  padding: var(--page-heading-padding) 0 20px;
+  margin: 0 0 18px;
   background: transparent;
   border: 0;
   z-index: auto;
 }
 .page-heading > div { min-width: 0; }
-.application .page-heading p { margin: 8px 0 0; color: var(--ink-2); font-size: 16px; line-height: 1.7; }
-.application .page-heading > img { position: absolute; top: 0; right: 0; height: 160px; max-width: 38%; object-fit: contain; pointer-events: none; }
+.application .page-heading p { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; line-height: 1.7; }
+.application .page-heading > img { position: absolute; top: 0; right: 0; height: 104px; max-width: 32%; object-fit: contain; pointer-events: none; }
 .application .page-heading:has(.page-heading-actions) > img { right: 180px; }
 .page-heading > div:not(.page-heading-actions) { position: relative; flex: 1; }
 .application .page-heading .page-heading-actions { align-self: center; margin: 0 0 0 auto; flex: none; position: relative; }
 .application .detail-heading .page-heading-actions { flex-shrink: 1; flex-wrap: wrap; justify-content: flex-end; }
 .application .page-heading > .back-link { position: absolute; top: 0; left: 0; min-height: 32px; padding-left: 0; }
 .application .testing-toolbar { background: transparent; border: 0; }
-.application .testing-toolbar-inner { position: relative; min-height: calc(var(--page-heading-height) + 44px); padding-block: 64px 24px; }
+.application .testing-toolbar-inner { position: relative; min-height: calc(var(--page-heading-height) + 40px); padding-block: 56px 20px; }
 .application .testing-toolbar-inner .testing-previous { position: absolute; top: 24px; left: 0; }
 .application .testing-title h1 span { font-size: inherit; }
 .application .testing-title { min-height: 47px; }
 .application .testing-workspace { padding-top: 0; }
-.creation-flow { --page-heading-height: 112px; }
-.home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 140px; --page-heading-padding: 28px; }
+.creation-flow { --page-heading-height: 100px; --page-heading-padding: 16px; }
+.home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 112px; --page-heading-padding: 16px; }
 .application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading { padding-bottom: 16px; margin-bottom: 16px; }
-.application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading > img { top: 4px; height: 132px; }
+.application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading > img { top: 4px; height: calc(var(--page-heading-height) - 8px); }
 .application .creation-flow .creation-heading.page-heading { flex-wrap: nowrap; padding-bottom: 16px; margin-bottom: 16px; }
 .application .creation-flow .creation-heading > div { flex-basis: auto; }
 .application .creation-heading > [data-slot='button'] { min-height: var(--control-height); }
 .application .companion-overview-heading > .companion-overview-image { flex: none; }
 .application .companion-overview-heading .companion-overview-meta { font-size: 14px; }
-@media (max-width: 1100px) { :root { --page-gutter: 20px; } }
+@media (max-width: 1100px) { :root { --page-gutter: 24px; } }
 @media (max-width: 760px) {
-  .home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 124px; --page-heading-padding: 16px; }
-  :root { --page-gutter: 16px; --page-title-size: 28px; --page-heading-height: 144px; --page-heading-padding: 40px; --header-height: 101px; }
+  /* 手机资源页页头保留紧凑下限；标题或操作控件换行时按真实内容自然增高，不裁切。 */
+  .home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 100px; --page-heading-padding: 12px; }
+  :root { --page-gutter: 16px; --page-title-size: 26px; --page-heading-height: 104px; --page-heading-padding: 16px; --header-height: 101px; }
   .application .app-header { height: var(--header-height); }
   .application .page-frame .page-heading { gap: 16px; flex-wrap: wrap; padding-bottom: 20px; }
   .application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading { gap: 8px; padding-bottom: 12px; }

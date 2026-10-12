@@ -1,13 +1,13 @@
-import { BookOpen, Clock3, Copy, FileText, Link, Trash2 } from 'lucide-react';
+import { BookOpen, Clock3, Copy, FileText, Link, Play, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { LearningCompanion } from '../../../shared/learning-companion';
 import type { SkillEntry } from '../../../shared/marketplace';
 import { CompanionAvatar } from './CompanionProfile';
 import { downloadMaterial } from './MaterialFiles';
 
-export function CompanionCard({ value, skills, onOpen, onEdit, onCopy, onRemove }: {
+export function CompanionCard({ value, skills, onOpen, onPractice, onEdit, onCopy, onRemove }: {
   value: LearningCompanion; skills: SkillEntry[];
-  onOpen: () => void; onEdit: () => void; onCopy: () => void;
+  onOpen: () => void; onPractice: () => void; onEdit: () => void; onCopy: () => void;
   onRemove: (trigger: HTMLButtonElement | null) => void;
 }) {
   const selected = [...new Set(value.skillIds)].map(id => ({ id, entry: skills.find(entry => entry.id === id) }));
@@ -32,11 +32,7 @@ export function CompanionCard({ value, skills, onOpen, onEdit, onCopy, onRemove 
       </div>
       <div className="companion-card-actions">
         <Button onClick={onOpen}>查看学伴</Button>
-        <Button variant="outline" onClick={onEdit}>{value.status === 'draft' ? '继续创建' : '编辑'}</Button>
-        <Button variant="outline" onClick={onCopy}><Copy data-icon="inline-start" />复制</Button>
-        <Button variant="destructive" aria-label={`删除学伴：${value.name || '未命名学伴'}`} onClick={event => onRemove(event.currentTarget)}>
-          <Trash2 data-icon="inline-start" />删除
-        </Button>
+        <Button variant="outline" onClick={onPractice}><Play data-icon="inline-start" />试运行</Button>
       </div>
     </div>
     <div className="companion-card-sections">
@@ -53,6 +49,13 @@ export function CompanionCard({ value, skills, onOpen, onEdit, onCopy, onRemove 
           <Button variant="outline" size="sm" title={material.name} onClick={() => downloadMaterial(material)}><FileText data-icon="inline-start" /><span>{material.name}</span></Button>
         </li>)}</ul> : <p>未添加材料</p>}
       </section>
+    </div>
+    <div className="companion-card-secondary">
+      <Button variant="ghost" size="sm" onClick={onEdit}>{value.status === 'draft' ? '继续创建' : '编辑'}</Button>
+      <Button variant="ghost" size="sm" onClick={onCopy}><Copy data-icon="inline-start" />复制</Button>
+      <Button variant="destructive" size="sm" aria-label={`删除学伴：${value.name || '未命名学伴'}`} onClick={event => onRemove(event.currentTarget)}>
+        <Trash2 data-icon="inline-start" />删除
+      </Button>
     </div>
   </article>;
 }

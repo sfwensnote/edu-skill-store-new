@@ -1,5 +1,6 @@
 .companion-overview-heading { display: flex; align-items: center; gap: 24px; margin-block: 24px 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
-.companion-overview-image { display: grid; place-items: center; flex-shrink: 0; width: 104px; height: 104px; border-radius: 18px; background: var(--blue-faint); }
+.application .page-frame .companion-overview-heading.page-heading { padding-top: calc(var(--page-heading-padding, 20px) + 34px); }
+.companion-overview-image { display: grid; place-items: center; flex-shrink: 0; width: 104px; height: 104px; border-radius: var(--radius); background: var(--accent); }
 .companion-overview-image .companion-avatar { width: 94px; height: 94px; }
 .companion-overview-profile { flex: 1; min-width: 0; }
 .companion-overview-profile p { color: var(--ink-2); overflow-wrap: anywhere; line-height: 1.7; }
@@ -7,8 +8,8 @@
 .companion-overview .companion-activity { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 22px; }
 .companion-overview-main, .companion-overview-side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .companion-overview-panel.market-panel { margin: 0; padding: 26px; }
-.companion-overview-panel h2 { display: flex; align-items: center; gap: 10px; font-size: 21px; margin-bottom: 20px; }
-.companion-overview-panel h2 > svg { width: 20px; height: 20px; color: var(--blue); flex-shrink: 0; }
+.companion-overview-panel h2 { display: flex; align-items: center; gap: 10px; font-size: var(--text-section); font-weight: 600; margin-bottom: 20px; }
+.companion-overview-panel h2 > svg { width: 20px; height: 20px; color: var(--primary); flex-shrink: 0; }
 .companion-overview-panel h2 small { margin-left: auto; }
 .companion-overview-panel h3 { font-size: 14px; font-weight: 600; margin-top: 18px; color: var(--ink-2); }
 .companion-overview-panel p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; margin-top: 8px; }
@@ -18,6 +19,7 @@
 .companion-overview-skill { padding: 16px 0; border-top: 1px solid var(--line); }
 .companion-overview-skill:last-child { padding-bottom: 0; }
 .companion-overview-skill summary, .companion-overview-requirements > summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.companion-overview .back-link:focus-visible, .companion-overview-skill summary:focus-visible, .companion-overview-requirements > summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 4px; }
 .companion-overview-skill p { font-size: 14px; color: var(--ink-2); }
 .requirements-content { display: grid; gap: 24px; margin-top: 20px; }
 .requirements-content > section + section { border-top: 1px solid var(--line); padding-top: 20px; }

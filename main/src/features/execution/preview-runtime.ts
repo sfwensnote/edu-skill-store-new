@@ -4,10 +4,11 @@ import { companionIssue } from '../../../shared/learning-companion';
 import { boundaryPrefix } from '../../../shared/teaching-method';
 import { compileSkillInstructions } from '../../../shared/skill-preview';
 import { previewCases, previewMessage, previewModel, previewReply } from '../../../shared/execution-preview';
-import { activationSchema, methodInputSchema, testSituationSchema, trialInputSchema, verdictSchema, type Detection, type DetectionCase, type Trial, type TrialSession, type Verification } from '../../../shared/execution';
+import { activationSchema, methodInputSchema, testSituationSchema, trialInputSchema, verdictSchema, type Detection, type DetectionCase, type MethodInput, type Trial, type TrialSession, type Verification } from '../../../shared/execution';
 import { reviewProgress, reviewSchema, updateCaseReview, type ReviewedDetection } from './case-review';
 import type { TeachingMethod } from '../../../shared/teaching-method';
 import { practiceReply } from '../../../shared/companion-practice';
+import { isCompanionCaseMethod } from '../../../shared/companion-cases';
 
 type Prepared = { value: ReviewedDetection; prepared: DetectionCase[] };
 type Receipt = { sessionId: string; requestId: string; userId: string; replyId: string; entryId: string; caseId: string };
@@ -121,15 +122,19 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       if (body === undefined) result = data.trials.filter(item => !url.searchParams.get('companionId') || item.companion.id === url.searchParams.get('companionId'));
       else {
         const input = trialInputSchema.parse(body), proofs = proofList(data);
+        // 内置案例方法走案例专用途径，其余方法仍必须由教师核对确认。
+        const confirmed = (method: MethodInput) => proofs.some(proof => proof.entryId === method.entryId &&
+          compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill));
         if (new Set(input.methods.map(method => method.entryId)).size !== input.methods.length ||
           input.companion.skillIds.length !== input.methods.length || input.methods.some(method => !input.companion.skillIds.includes(method.entryId) ||
-          !proofs.some(proof => proof.entryId === method.entryId && compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill))))
+          (!confirmed(method) && !isCompanionCaseMethod(input.companion, method))))
           throw new Error('挂载的方法需要先核对并由教师确认。');
         const issue = companionIssue(input.companion, input.methods.map(method => ({ id: method.entryId })));
         if (issue) throw new Error(issue);
         const trial: Trial = { id: crypto.randomUUID(), ownerId, companion: { ...input.companion,
           materials: input.companion.materials.map(item => ({ ...item, data: '' })) }, methods: input.methods,
-          verifications: input.methods.map(method => proofs.find(proof => proof.entryId === method.entryId)!.detectionId),
+          verifications: input.methods.flatMap(method => confirmed(method)
+            ? [proofs.find(proof => proof.entryId === method.entryId && compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill))!.detectionId] : []),
           model: previewModel, status: 'open', createdAt: new Date(clock()).toISOString(), expiresAt: new Date(clock() + input.hours * 3600000).toISOString(), capacity: 1 };
         for (const previous of data.trials) if (previous.companion.id === trial.companion.id && previous.status === 'open') previous.status = 'closed';
         data.trials.unshift(trial); save(data); result = { trial };

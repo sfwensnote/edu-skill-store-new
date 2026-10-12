@@ -188,7 +188,18 @@ export function MarketPage({
                       <h2>
                         <button onClick={() => onOpen(entry.id)}>{entry.skill.name}</button>
                       </h2>
+                      <Button
+                        className="catalog-resource-favorite"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`${favorite ? '取消收藏' : '收藏'}${entry.skill.name}`}
+                        aria-pressed={favorite}
+                        onClick={() => onFavorite(entry.id)}
+                      >
+                        <Heart fill={favorite ? 'currentColor' : 'none'} />
+                      </Button>
                     </div>
+                    {entry.skill.summary && <p className="catalog-resource-summary">{entry.skill.summary}</p>}
                     <p className="skill-practice">{entry.example}</p>
                     <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example).filter((tag) => tag !== category)} />
                     <div className="card-meta">
@@ -215,20 +226,11 @@ export function MarketPage({
                     </div>
                   </div>
                   <div className="catalog-resource-actions">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`${favorite ? '取消收藏' : '收藏'}${entry.skill.name}`}
-                      aria-pressed={favorite}
-                      onClick={() => onFavorite(entry.id)}
-                    >
-                      <Heart fill={favorite ? 'currentColor' : 'none'} />
-                    </Button>
-                    <Button variant="outline" onClick={() => onOpen(entry.id)}>
+                    <Button onClick={() => onOpen(entry.id)}>
                       查看与试用
                       <ArrowRight data-icon="inline-end" />
                     </Button>
-                    <Button disabled={addedIds.includes(entry.id)} onClick={() => onAdd(entry)}>
+                    <Button variant="outline" disabled={addedIds.includes(entry.id)} onClick={() => onAdd(entry)}>
                       {addedIds.includes(entry.id) ? '已添加' : '添加到我的 SKILL'}
                     </Button>
                   </div>

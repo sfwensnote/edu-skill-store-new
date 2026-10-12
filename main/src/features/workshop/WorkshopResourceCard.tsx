@@ -95,7 +95,7 @@ export function WorkshopResourceCard({
         </div>
       </div>
       <div className="workshop-card-actions">
-        <Button variant="outline" onClick={() => actions.view(item)}>
+        <Button onClick={() => actions.view(item)}>
           {viewLabel}
         </Button>
         {own && item.kind !== 'method-draft' && (

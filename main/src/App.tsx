@@ -47,10 +47,12 @@ import { readPublishedSkills } from '@/lib/account-workspace';
 import { useCompanions } from '@/features/companions/useCompanions';
 import { CompanionsPage, CompanionDetail } from '@/features/companions/CompanionPages';
 import { CompanionEditor } from '@/features/companions/CompanionEditor';
+import { CompanionPracticePage } from '@/features/execution/CompanionPracticePage';
 import { LegacyTaskCleanup } from '@/features/companions/LegacyTaskCleanup';
 import { MountSkillDialog } from '@/features/companions/MountSkillDialog';
 import { PublishSkillDialog } from '@/features/workshop/PublishSkillDialog';
 import { newCompanion, type LearningCompanion } from '../shared/learning-companion';
+import { withCompanionCaseSkills } from '../shared/companion-cases';
 
 export default function App() {
   const route = useAppRoute();
@@ -190,6 +192,7 @@ function SkillWorkspace() {
   const mountableSkill = selectedSkill && mySkills.find(entry =>
     entry.id === selectedSkill.id || entry.addedFrom?.id === selectedSkill.id);
   const selectedCompanion = 'companionId' in route ? companions.items.find(item => item.id === route.companionId) : undefined;
+  const companionSkills = selectedCompanion ? withCompanionCaseSkills(selectedCompanion, mySkills) : mySkills;
 
   return (
     <div className="application">
@@ -302,6 +305,7 @@ function SkillWorkspace() {
       )}
       {(route.page === 'companions' || route.page === 'space') && <CompanionsPage items={companions.items} skills={mySkills}
         onCreate={() => navigate({ page: 'companion-edit', companionId: crypto.randomUUID() })} onOpen={openCompanion}
+        onPractice={value => navigate({ page: 'companion-practice', companionId: value.id })}
         onEdit={value => navigate({ page: 'companion-edit', companionId: value.id })} onCopy={companions.copy} onRemove={async id => {
           if (serviceConfigured) {
             const trials = await executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(id)}`);
@@ -311,12 +315,19 @@ function SkillWorkspace() {
           return companions.remove(id);
         }} />}
       {route.page === 'companion-edit' && <CompanionEditor key={`companion-editor:${route.companionId}`}
-        initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={mySkills} onSave={companions.save}
+        initial={selectedCompanion || newCompanion(route.companionId, route.skillId)} skills={companionSkills} onSave={companions.save}
         onBack={() => goTo({ page: 'companions' })} onSkills={() => navigate({ page: 'workshop' })}
         onDone={() => goTo({ page: 'companion-detail', companionId: route.companionId })} />}
-      {route.page === 'companion-detail' && (selectedCompanion ? <CompanionDetail value={selectedCompanion} skills={mySkills}
+      {route.page === 'companion-detail' && (selectedCompanion ? <CompanionDetail value={selectedCompanion} skills={companionSkills}
         onCheck={checkSkill} onMethods={() => navigate({ page: 'workshop' })}
-        onBack={() => goTo({ page: 'companions' })} onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })} /> :
+        onBack={() => goTo({ page: 'companions' })} onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })}
+        onPractice={() => navigate({ page: 'companion-practice', companionId: selectedCompanion.id })} /> :
+        <main className="page-frame not-found"><h1>没有找到这个学伴</h1><button onClick={() => goTo({ page: 'companions' })}>返回我的学伴</button></main>)}
+      {route.page === 'companion-practice' && (selectedCompanion ? <CompanionPracticePage key={`companion-practice:${selectedCompanion.id}`}
+        value={selectedCompanion} skills={companionSkills}
+        onBack={() => goTo({ page: 'companion-detail', companionId: selectedCompanion.id })}
+        onEdit={() => navigate({ page: 'companion-edit', companionId: selectedCompanion.id })}
+        onCheck={checkSkill} onMethods={() => navigate({ page: 'workshop' })} /> :
         <main className="page-frame not-found"><h1>没有找到这个学伴</h1><button onClick={() => goTo({ page: 'companions' })}>返回我的学伴</button></main>)}
       {mounting && <MountSkillDialog key={`mount-skill:${mounting.id}`} entry={mounting} items={companions.items} onSave={companions.save}
         onCheck={() => checkSkill(mounting)}
