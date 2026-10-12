@@ -71,7 +71,7 @@ export function companionContext(value: LearningCompanion, skills: SkillEntry[])
     `适用范围：${[value.grade, value.subject, value.year].filter(Boolean).join(' · ')}`,
     ...taskFields.map(([key, label]) => `${label}：${value.task[key]}`),
     ...selected.map(entry => [`教学方法：${entry.skill.name}`, `开始条件：${entry.skill.trigger}`,
-      ...(entry.skill.steps || []).map(step => `${step.condition}：${step.action}`),
+      ...(entry.skill.steps || []).map(step => `情况：${step.condition}\n教师做法：${step.action}`),
       ...entry.skill.constraints].join('\n')),
     ...(value.design.contextual ? [`教学情景：${value.design.context}`, `情景题目：${value.design.question}`] : []),
     ...(value.design.pbl ? [`驱动问题：${value.design.drivingQuestion}`, `项目成果：${value.design.product}`, `活动阶段：${value.design.stages}`] : []),

@@ -5,8 +5,11 @@ import { boundaryPrefix } from '../../../shared/teaching-method';
 import { compileSkillInstructions } from '../../../shared/skill-preview';
 import { previewCases, previewMessage, previewModel, previewReply } from '../../../shared/execution-preview';
 import { activationSchema, methodInputSchema, testSituationSchema, trialInputSchema, verdictSchema, type Detection, type DetectionCase, type Trial, type TrialSession, type Verification } from '../../../shared/execution';
+import { reviewProgress, reviewSchema, updateCaseReview, type ReviewedDetection } from './case-review';
+import type { TeachingMethod } from '../../../shared/teaching-method';
+import { practiceReply } from '../../../shared/companion-practice';
 
-type Prepared = { value: Detection; prepared: DetectionCase[] };
+type Prepared = { value: ReviewedDetection; prepared: DetectionCase[] };
 type Receipt = { sessionId: string; requestId: string; userId: string; replyId: string; entryId: string; caseId: string };
 type State = { version: 1; detections: Prepared[]; trials: Trial[]; sessions: TrialSession[]; requests: Receipt[] };
 type StoragePort = Pick<Storage, 'getItem' | 'setItem'>;
@@ -19,7 +22,7 @@ const stateSchema = z.object({
   detections: z.array(z.object({ prepared: z.array(caseSchema), value: z.object({
     id: z.string(), ownerId: z.string(), method: methodInputSchema, fingerprint: z.string(), model: z.literal(previewModel),
     status: z.enum(['running', 'review', 'failed', 'verified']), cases: z.array(caseSchema), error: z.string(),
-    createdAt: z.string(), confirmedAt: z.string().optional(),
+    createdAt: z.string(), confirmedAt: z.string().optional(), review: reviewSchema.optional(),
   }) })),
   trials: z.array(trialInputSchema.pick({ companion: true, methods: true }).extend({
     id: z.string(), ownerId: z.string(), verifications: z.array(z.string()), model: z.literal(previewModel),
@@ -35,7 +38,9 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
     try {
       const raw = storage.getItem(key); if (!raw) return initial();
       const data = stateSchema.parse(JSON.parse(raw));
-      if (data.detections.some(item => item.value.ownerId !== ownerId) || data.trials.some(item => item.ownerId !== ownerId) ||
+      if (data.detections.some(item => item.value.ownerId !== ownerId || (item.value.review &&
+        (item.value.review.confirmed > item.value.cases.length || item.value.review.cursor > Math.min(item.value.review.confirmed, item.value.cases.length - 1) ||
+        (item.value.status === 'verified' && item.value.review.confirmed !== item.value.cases.length)))) || data.trials.some(item => item.ownerId !== ownerId) ||
         data.sessions.some(item => !data.trials.some(trial => trial.id === item.trialId)) ||
         data.requests.some(item => !data.sessions.some(session => session.id === item.sessionId &&
           session.messages.some(message => message.id === item.userId && message.role === 'user') &&
@@ -67,7 +72,7 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
   function requireOpen(trial: Trial) {
     if (trial.status !== 'open' || Date.parse(trial.expiresAt) <= clock()) throw new Error('本次试运行已结束，请开始新的试运行。');
   }
-  return async function request<T>(path: string, body?: unknown): Promise<T> {
+  return async function request<T>(path: string, body?: unknown, commitMethod?: (method: TeachingMethod) => boolean): Promise<T> {
     const url = new URL(path, 'https://browser.invalid'), parts = url.pathname.split('/').filter(Boolean);
     const data = read(); advance(data);
     let result: unknown;
@@ -86,8 +91,29 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       }
     } else if (parts[0] === 'detections' && parts[1]) {
       const item = data.detections.find(item => item.value.id === parts[1]); if (!item) throw new Error('没有找到这项方法的核对记录。');
-      if (parts[2] === 'confirm' && body !== undefined) {
+      if (['view-case', 'confirm-case', 'revise-case'].includes(parts[2]) && body !== undefined) {
+        const { next, method } = updateCaseReview(item.value, parts[2], body);
+        if (method && !commitMethod) throw new Error('这项方法是只读内容，不能修改。');
+        const previous = JSON.stringify(data);
+        item.value = next;
+        if (method) item.prepared = next.cases;
+        if (reviewProgress(next).confirmed === next.cases.length) {
+          next.status = 'verified'; next.confirmedAt ||= new Date(clock()).toISOString();
+        }
+        // 先写核对记录，再提交原方法；原方法保存失败时恢复记录，避免只改动一边。
+        save(data);
+        if (method) {
+          let committed = false;
+          try { committed = commitMethod!(method); } catch { /* 原方法未保存，恢复核对记录。 */ }
+          if (!committed) {
+            try { storage.setItem(key, previous); }
+            catch { throw new Error('方法未保存，核对记录未能恢复。请恢复存储后重新检测。'); }
+            throw new Error('方法未保存，原方法和核对进度已保留。请释放存储空间后重试。');
+          }
+        }
+      } else if (parts[2] === 'confirm' && body !== undefined) {
         if (item.value.status !== 'review') throw new Error('请先完成情境准备，再核对回复。');
+        if (reviewProgress(item.value).confirmed !== item.value.cases.length) throw new Error('请逐个确认所有情况。');
         item.value.status = 'verified'; item.value.confirmedAt = new Date(clock()).toISOString(); save(data);
       }
       result = item.value;
@@ -119,14 +145,16 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       } else if (parts[2] === 'stop' && body !== undefined) { trial.status = 'closed'; save(data); result = trial; }
       else if (parts.length === 2 && body === undefined) result = { trial, sessions: data.sessions.filter(item => item.trialId === trial.id), reports: [] };
       else throw new Error('该入口暂不可用，请返回学伴试运行。');
-    } else if (parts[0] === 'sessions' && parts[2] === 'turn') {
-      const input = z.object({ content: z.string().trim().min(1).max(2000), requestId: z.uuid(), entryId: z.string(), caseId: z.string() }).parse(body);
+    } else if (parts[0] === 'sessions' && ['turn', 'practice-turn'].includes(parts[2])) {
+      const practice = parts[2] === 'practice-turn';
+      const input = z.object({ content: z.string().trim().min(1).max(2000), requestId: z.uuid(), entryId: z.string().default(''), caseId: z.string().default('') }).parse(body);
+      if (practice && (input.entryId || input.caseId)) throw new Error('学伴试运行根据学生表达使用方法，无需指定步骤。');
       const session = data.sessions.find(item => item.id === parts[1]); if (!session) throw new Error('没有找到本次对话。');
       requireOpen(trialOf(data, session.trialId));
       const method = trialOf(data, session.trialId).methods.find(item => item.entryId === input.entryId);
-      if (!method) throw new Error('请选择本次挂载的教学方法。');
-      const chosen = previewCases(method).find(item => item.id === input.caseId);
-      if (!chosen) throw new Error('教学情境已变化，请重新选择。');
+      if (!practice && !method) throw new Error('请选择本次挂载的教学方法。');
+      const chosen = method && previewCases(method).find(item => item.id === input.caseId);
+      if (!practice && !chosen) throw new Error('教学情境已变化，请重新选择。');
       const receipt = data.requests.find(item => item.sessionId === session.id && item.requestId === input.requestId);
       if (receipt) {
         if (session.messages.find(message => message.id === receipt.userId)?.content !== input.content ||
@@ -135,13 +163,13 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       } else if (session.requestId === input.requestId) {
         const activation = session.messages.at(-1)?.activations[0];
         if (session.messages.at(-2)?.content !== input.content || activation?.entryId !== input.entryId ||
-          activation.step !== chosen.target || activation.ended !== (chosen.kind === 'ending')) throw new Error('请求内容已变化，请重新发送。');
+          activation.step !== chosen?.target || activation.ended !== (chosen?.kind === 'ending')) throw new Error('请求内容已变化，请重新发送。');
         result = session;
       } else {
         if (session.messages.length >= 40 || session.messages.reduce((n, item) => n + item.content.length, 0) + input.content.length > 20000)
           throw new Error('本次对话较长，请开始新的试运行。');
         const message = previewMessage('user', input.content);
-        const reply = previewReply(method, input.caseId, message);
+        const reply = practice ? practiceReply(trialOf(data, session.trialId), message, session.messages) : previewReply(method!, input.caseId, message);
         session.messages.push(message, reply); session.requestId = input.requestId;
         data.requests.push({ sessionId: session.id, requestId: input.requestId, userId: message.id, replyId: reply.id, entryId: input.entryId, caseId: input.caseId });
         save(data); result = session;
@@ -150,8 +178,8 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
     return structuredClone(result) as T;
   };
 }
-export async function browserPreviewApi<T>(path: string, body?: unknown): Promise<T> {
+export async function browserPreviewApi<T>(path: string, body?: unknown, commitMethod?: (method: TeachingMethod) => boolean): Promise<T> {
   const account = readAccountSession(localStorage, sessionStorage);
   if (!account) throw new Error('登录已失效，请重新登录。');
-  return createPreviewRuntime(localStorage, account.id)<T>(path, body);
+  return createPreviewRuntime(localStorage, account.id)<T>(path, body, commitMethod);
 }

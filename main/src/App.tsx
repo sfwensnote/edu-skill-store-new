@@ -392,6 +392,7 @@ function SkillWorkspace() {
       )}
       {route.page === 'test' && current && (
         <MethodDetectionPage
+          onRevise={(entry, method) => platform.saveReviewedMethod(current.id, entry.skill.id, method)}
           entries={personalSkills.filter(entry => entry.assistantId === current.id && platform.isSkillIncluded(current.id, entry.skill.id))}
           onBack={() => back({ page: 'create', assistantId: current.id })}
           onAdjust={() => {

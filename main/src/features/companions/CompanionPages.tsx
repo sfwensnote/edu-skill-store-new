@@ -3,12 +3,13 @@ import { ArrowLeft, BookOpen, FileText, Link, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/Workbench';
-import { companionContext, type LearningCompanion } from '../../../shared/learning-companion';
+import type { LearningCompanion } from '../../../shared/learning-companion';
 import type { SkillEntry } from '../../../shared/marketplace';
 import { downloadMaterial } from './MaterialFiles';
 import { TaskSummary } from './TaskElements';
 import { CompanionCard } from './CompanionCard';
 import { CompanionAvatar } from './CompanionProfile';
+import { CompanionRequirements, MethodRequirements } from './CompanionRequirements';
 import './companions.css';
 import './companion-library.css';
 import './companion-overview.css';
@@ -92,11 +93,11 @@ export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMeth
         </section>
         {value.design.contextual && <section className="market-panel companion-overview-panel"><h2>情景题</h2><h3>教学情景</h3><p>{value.design.context}</p><h3>题目</h3><p>{value.design.question}</p></section>}
         {value.design.pbl && <section className="market-panel companion-overview-panel"><h2>PBL 学习活动</h2><h3>驱动问题</h3><p>{value.design.drivingQuestion}</p><h3>项目成果</h3><p>{value.design.product}</p><h3>活动阶段</h3><p>{value.design.stages}</p></section>}
-        <details className="market-panel companion-overview-panel companion-overview-requirements"><summary>学伴教学要求</summary><p>{companionContext(value, skills)}</p></details>
+        <CompanionRequirements value={value} skills={skills} />
       </div>
       <aside className="companion-overview-side" aria-label="学伴的 SKILL 与材料">
         <section className="market-panel companion-overview-panel"><h2><Link aria-hidden="true" />挂载的 SKILL <small>{selected.filter(Boolean).length} 个</small></h2>
-          {selected.filter((entry): entry is SkillEntry => !!entry).map(entry => <details className="companion-overview-skill" key={entry.id}><summary>{entry.skill.name}</summary><p>{entry.skill.summary}</p><p>{entry.skill.trigger}</p>{entry.skill.steps?.map((step, index) => <p key={index}>{step.condition}：{step.action}</p>)}</details>)}
+          {selected.filter((entry): entry is SkillEntry => !!entry).map(entry => <details className="companion-overview-skill" key={entry.id}><summary>{entry.skill.name}</summary><p>{entry.skill.summary}</p><MethodRequirements entry={entry} /></details>)}
           {!selected.some(Boolean) && <p className="subtle">尚未挂载可用 SKILL</p>}
         </section>
         <section className="market-panel companion-overview-panel"><h2><FileText aria-hidden="true" />教学材料 <small>{value.materials.length} 份</small></h2>{value.materials.length ? <ul className="companion-files">{value.materials.map(item => <li key={item.id}><span>{item.name}</span><Button variant="link" onClick={() => downloadMaterial(item)}>下载材料</Button></li>)}</ul> : <p className="subtle">未添加材料</p>}</section>

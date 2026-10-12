@@ -7,6 +7,7 @@ import { previewCases, previewModel } from '../shared/execution-preview';
 import { createPreviewRuntime, previewStorageKey } from '../src/features/execution/preview-runtime';
 import { compileSkillInstructions } from '../shared/skill-preview';
 import type { Detection, Trial, TrialSession, Verification } from '../shared/execution';
+import type { ReviewedDetection } from '../src/features/execution/case-review';
 
 function setup() {
   const values = new Map<string, string>(); let full = false, now = Date.now();
@@ -23,10 +24,67 @@ function setup() {
   async function confirm() {
     const detection = await request<Detection>('/detections', method); now += 10000;
     await request(`/detections/${detection.id}`);
-    return request<Detection>(`/detections/${detection.id}/confirm`, {});
+    let result = detection;
+    for (const item of detection.cases) result = await request<Detection>(`/detections/${detection.id}/confirm-case`, { caseId: item.id, fingerprint: detection.fingerprint });
+    return result;
   }
-  return { request, method, companion, confirm, storage, values, fill: () => { full = true; }, restore: () => { full = false; } };
+  return { request, method, companion, confirm, storage, values, advance: () => { now += 10000; }, fill: () => { full = true; }, restore: () => { full = false; } };
 }
+test('逐个核对不可跳过，返回与刷新恢复进度，修改当前方法后重新确认', async () => {
+  const s = setup();
+  let d = await s.request<ReviewedDetection>('/detections', s.method); s.advance();
+  d = await s.request(`/detections/${d.id}`);
+  const send = (operation: string, index: number, extra = {}) => s.request<ReviewedDetection>(`/detections/${d.id}/${operation}`, { caseId: d.cases[index].id, fingerprint: d.fingerprint, ...extra });
+  await assert.rejects(send('confirm-case', 1), /前面的情况/);
+  await assert.rejects(s.request(`/detections/${d.id}/confirm`, {}), /逐个确认/);
+  d = await send('confirm-case', 0);
+  assert.deepEqual(d.review, { cursor: 1, confirmed: 1 });
+  d = await send('view-case', 0);
+  assert.deepEqual(d.review, { cursor: 0, confirmed: 1 });
+  d = await send('confirm-case', 0);
+  const restored = await createPreviewRuntime(s.storage, 'teacher-a')<ReviewedDetection>(`/detections/${d.id}`);
+  assert.deepEqual(restored.review, { cursor: 1, confirmed: 1 });
+  const body = { caseId: d.cases[1].id, fingerprint: d.fingerprint, edit: { scenario: '学生回顾后仍没有找到问题', action: '我会问：“你最不确定的是哪一步？”' } };
+  await assert.rejects(s.request(`/detections/${d.id}/revise-case`, body), /只读/);
+  const original = s.values.get(previewStorageKey('teacher-a'));
+  await assert.rejects(s.request(`/detections/${d.id}/revise-case`, body, () => false), /原方法和核对进度已保留/);
+  assert.equal(s.values.get(previewStorageKey('teacher-a')), original);
+  let committed = false; s.fill();
+  await assert.rejects(s.request(`/detections/${d.id}/revise-case`, body, () => { committed = true; return true; }), /未保存/);
+  assert.equal(committed, false); s.restore();
+  d = await s.request(`/detections/${d.id}/revise-case`, body, method => { assert.equal(method.teachingSteps[1].action, body.edit.action); return true; });
+  assert.deepEqual(d.review, { cursor: 1, confirmed: 1 });
+  assert.equal(d.cases[1].messages[1].content, '你最不确定的是哪一步？');
+  await assert.rejects(s.request(`/detections/${d.id}/confirm-case`, { ...body, edit: undefined }), /其他页面修改/);
+  d = await send('confirm-case', 1); d = await send('confirm-case', 2);
+  assert.equal(d.status, 'verified');
+  d = await s.request(`/detections/${d.id}/revise-case`, { caseId: d.cases[2].id, fingerprint: d.fingerprint, edit: { scenario: '学生能独立完成两道题', action: d.cases[2].expected } }, () => true);
+  assert.deepEqual(d.review, { cursor: 0, confirmed: 0 });
+  assert.deepEqual(await s.request('/verified'), []);
+});
+test('学伴整场试运行按学生表达匹配挂载方法，不按轮次推进，未知输入追问且历史场景保留', async () => {
+  const s = setup(); await s.confirm();
+  const { trial } = await s.request<{ trial: Trial }>('/trials', { companion: s.companion, methods: [s.method], hours: 24, capacity: 1 });
+  const session = await s.request<TrialSession>(`/trials/${trial.id}/teacher-session`, {});
+  const send = (content: string) => s.request<TrialSession>(`/sessions/${session.id}/practice-turn`, { content, requestId: crypto.randomUUID() });
+  let result = await send('今天下雨了');
+  assert.deepEqual(result.messages.at(-1)?.activations, []);
+  assert.match(result.messages.at(-1)!.content, /解释并改正错误/);
+  result = await send('我的答案不对，但我还不知道问题出在哪里。');
+  assert.equal(result.messages.at(-1)?.activations[0].step, 0);
+  result = await send('我的答案不对，但我还不知道问题出在哪里。');
+  assert.equal(result.messages.at(-1)?.activations[0].step, 0);
+  result = await send('我已经回顾了自己的思路，但还是没有找到哪里出了问题。');
+  assert.equal(result.messages.at(-1)?.activations[0].step, 1);
+  result = await send('我已经完成这次任务，能说清自己的做法。');
+  assert.equal(result.messages.at(-1)?.activations[0].ended, true);
+  await assert.rejects(s.request(`/sessions/${session.id}/practice-turn`, { content: '指定步骤', requestId: crypto.randomUUID(), caseId: 'step1' }), /无需指定/);
+  const body = { content: '还需要帮助', requestId: crypto.randomUUID() };
+  const once = await s.request<TrialSession>(`/sessions/${session.id}/practice-turn`, body);
+  assert.deepEqual(await s.request(`/sessions/${session.id}/practice-turn`, body), once);
+  s.companion.task.audience = '全班学生';
+  assert.equal((await s.request<{ trial: Trial }>(`/trials/${trial.id}`)).trial.companion.task.audience, '个别学生');
+});
 test('前端情境使用教师自己的步骤，第二种情况和结束方式对应原方法', () => {
   const { method } = setup(), cases = previewCases(method);
   assert.equal(cases.length, 3);

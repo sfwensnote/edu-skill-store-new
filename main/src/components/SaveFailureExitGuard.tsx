@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onRetry: () => boolean }) {
+export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onRetry: () => boolean | Promise<boolean> }) {
   const latest = useRef({ failed, onRetry });
   latest.current = { failed, onRetry };
   const currentHash = useRef(window.location.hash);
   const [destination, setDestination] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
   useEffect(() => {
     function beforeUnload(event: BeforeUnloadEvent) {
       if (!latest.current.failed) return;
@@ -36,18 +37,19 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
       window.removeEventListener('hashchange', guard, true);
     };
   }, []);
-  function leave(retry: boolean) {
-    if (!destination) return;
-    if (retry && !latest.current.onRetry()) {
-      setError('保存仍未成功，请释放存储空间后重试。');
-      return;
-    }
-    currentHash.current = destination;
-    window.location.hash = destination;
-    setDestination(null);
+  async function leave(retry: boolean) {
+    if (!destination || saving) return;
+    setSaving(true);
+    try {
+      if (retry && !await latest.current.onRetry()) throw new Error();
+      currentHash.current = destination;
+      window.location.hash = destination;
+      setDestination(null);
+    } catch { setError('保存仍未成功，请释放存储空间后重试。'); }
+    finally { setSaving(false); }
   }
   return (
-    <Dialog open={destination !== null} onOpenChange={(open) => !open && setDestination(null)}>
+    <Dialog open={destination !== null} onOpenChange={(open) => !open && !saving && setDestination(null)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>还有未保存的修改</DialogTitle>
@@ -55,13 +57,13 @@ export function SaveFailureExitGuard({ failed, onRetry }: { failed: boolean; onR
         </DialogHeader>
         {error && <p role="alert">{error}</p>}
         <div className="inline-actions">
-          <Button variant="outline" onClick={() => setDestination(null)}>
+          <Button variant="outline" disabled={saving} onClick={() => setDestination(null)}>
             继续编辑
           </Button>
-          <Button variant="ghost" onClick={() => leave(false)}>
+          <Button variant="ghost" disabled={saving} onClick={() => void leave(false)}>
             仍然离开
           </Button>
-          <Button onClick={() => leave(true)}>保存后离开</Button>
+          <Button disabled={saving} onClick={() => void leave(true)}>{saving ? '正在保存…' : '保存后离开'}</Button>
         </div>
       </DialogContent>
     </Dialog>

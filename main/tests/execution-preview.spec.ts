@@ -22,10 +22,13 @@ async function createMethod(page: Page) {
 }
 async function confirm(page: Page) {
   await page.getByRole('button', { name: '开始检测', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '教师确认', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '确认检测结果' })).toBeDisabled();
-  await page.getByRole('checkbox', { name: '我已核对情境和回复，确认符合我的教学方法。' }).check();
-  await page.getByRole('button', { name: '确认检测结果' }).click();
+  await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
+  await expect(page.locator('.execution-case')).toHaveCount(1);
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '情况 2', exact: true })).toBeVisible();
+  await expect(page.locator('.execution-case')).toContainText('已经回顾过思路');
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await page.getByRole('button', { name: '确认并完成检测', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: '可将这项方法挂载到学伴' })).toBeVisible();
 }
 test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行，刷新与手机显示可用', async ({ page }, info) => {
@@ -36,8 +39,7 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
   await createMethod(page);
   await expect(page.getByRole('button', { name: '开始检测', exact: true })).toBeEnabled();
   await confirm(page);
-  await expect(page.locator('.execution-case')).toHaveCount(3);
-  await expect(page.locator('.execution-case').nth(1)).toContainText('已经回顾过思路');
+  await expect(page.locator('.execution-case')).toHaveCount(1);
   await expect(page.locator('main')).not.toContainText(/服务尚未连接|Demo|演示|调用模型/);
   await page.goto('/#/workshop');
   await page.locator('.workshop-item').getByRole('button', { name: '发布到集市', exact: true }).click();
@@ -56,17 +58,34 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
   await page.getByRole('button', { name: '创建学伴', exact: true }).click();
   await expect(page).toHaveURL(/companions\/practice-buddy$/);
   await expect(page.getByRole('heading', { name: '学伴试运行', exact: true })).toBeVisible();
+  await expect(page.locator('.practice-setup').getByLabel('学习对象')).toHaveValue('个别学生');
+  await expect(page.locator('.practice-setup').getByLabel('学习情境')).toHaveValue('课后练习');
+  await page.locator('.practice-setup').getByLabel('学习对象').selectOption('学习小组');
+  await page.locator('.practice-setup').getByLabel('学习情境').selectOption('课堂学习');
+  await page.locator('.companion-overview-requirements > summary').click();
+  await expect(page.locator('.requirements-content')).toContainText('教师做法');
+  await expect(page.locator('.requirements-content')).not.toContainText(/。：|。\s+：/);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.locator('.companion-overview-requirements').screenshot({ path: info.outputPath('requirements-desktop.png') });
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator('.companion-overview-requirements').screenshot({ path: info.outputPath('requirements-mobile.png') });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole('button', { name: '开始试运行', exact: true }).click();
+  await expect(page.locator('.practice-context')).toContainText('学习小组');
+  await expect(page.locator('.practice-context')).toContainText('课堂学习');
+  await expect(page.getByRole('combobox', { name: '教学情境', exact: true })).toHaveCount(0);
   const field = page.getByRole('textbox', { name: '以学生身份输入', exact: true });
-  await field.fill('我不知道哪里错了'); await page.getByRole('button', { name: '发送', exact: true }).click();
+  await expect(field).toHaveValue(/学习任务：解释错误原因/);
+  await page.getByRole('button', { name: '发送', exact: true }).click();
   await expect(page.locator('.execution-chat')).toContainText('请把你目前的做法和理由写出来');
-  await page.getByRole('combobox', { name: '教学情境', exact: true }).selectOption({ label: '错因反思 · 情况 2' });
-  await page.getByRole('button', { name: '填入当前情境的学生输入', exact: true }).click();
+  await page.locator('.practice-suggestions > summary').click();
+  await page.getByRole('button', { name: '我已经回顾了自己的思路，但还是没有找到哪里出了问题。', exact: true }).click();
   await page.getByRole('button', { name: '发送', exact: true }).click();
   await expect(page.locator('.execution-chat')).toContainText('你已经回顾过思路');
   await page.reload();
   await expect(page.locator('.execution-chat')).toContainText('你已经回顾过思路');
-  await expect(page.getByRole('combobox', { name: '教学情境', exact: true })).toHaveValue(/:step:1$/);
+  await expect(page.locator('.practice-context')).toContainText('学习小组');
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -86,18 +105,59 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
 test('核对保存失败保留原记录和确认操作，恢复存储后可以重试', async ({ page }) => {
   await createMethod(page);
   await page.getByRole('button', { name: '开始检测', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '教师确认', exact: true })).toBeVisible();
-  await page.getByRole('checkbox', { name: '我已核对情境和回复，确认符合我的教学方法。' }).check();
+  await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
   const key = previewStorageKey(primaryTeacherId);
   await page.evaluate(key => {
     const write = Storage.prototype.setItem;
     (window as unknown as { restoreWrite: () => void }).restoreWrite = () => { Storage.prototype.setItem = write; };
     Storage.prototype.setItem = function(name, value) { if (name === key) throw new DOMException('full', 'QuotaExceededError'); write.call(this, name, value); };
   }, key);
-  await page.getByRole('button', { name: '确认检测结果' }).click();
+  await page.getByRole('button', { name: '确认并继续' }).click();
   await expect(page.getByRole('alert')).toContainText('记录未保存');
-  await expect(page.getByRole('heading', { name: '教师确认', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
   await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
-  await page.getByRole('button', { name: '确认检测结果' }).click();
+  await page.getByRole('button', { name: '确认并继续' }).click();
+  await page.getByRole('button', { name: '确认并继续' }).click();
+  await page.getByRole('button', { name: '确认并完成检测' }).click();
   await expect(page.getByRole('status').filter({ hasText: '可将这项方法挂载到学伴' })).toBeVisible();
+});
+test('情况 2 现场修改同步原方法；刷新、回看、保存失败和重新核对均保留进度', async ({ page }, info) => {
+  await createMethod(page);
+  await page.getByRole('button', { name: '开始检测', exact: true }).click();
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '情况 2', exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('heading', { name: '情况 2', exact: true })).toBeVisible();
+  await page.locator('.execution-case-actions').getByRole('button', { name: '返回上一步', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await page.getByRole('button', { name: '修改描述', exact: true }).click();
+  await page.getByLabel('教师做法', { exact: true }).fill('我会问：“你最不确定的是哪一步？”');
+  const before = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
+  await page.evaluate(() => {
+    const write = Storage.prototype.setItem;
+    (window as unknown as { restoreWrite: () => void }).restoreWrite = () => { Storage.prototype.setItem = write; };
+    Storage.prototype.setItem = function(key, value) { if (key === 'teaching-assistant.frontend-demo.v2') throw new DOMException('full', 'QuotaExceededError'); write.call(this, key, value); };
+  });
+  await page.getByRole('button', { name: '保存并重新核对', exact: true }).click();
+  await expect(page.getByRole('alert').filter({ hasText: '原方法和核对进度已保留' })).toBeVisible();
+  await expect(page.getByLabel('教师做法', { exact: true })).toHaveValue('我会问：“你最不确定的是哪一步？”');
+  expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(before);
+  await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
+  await page.getByRole('button', { name: '保存并重新核对', exact: true }).click();
+  await expect(page.locator('.execution-transcript')).toContainText('你最不确定的是哪一步？');
+  await expect(page.locator('.execution-progress')).toContainText('已确认 1 / 3');
+  expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toContain('你最不确定的是哪一步');
+  await page.reload();
+  await expect(page.locator('.execution-transcript')).toContainText('你最不确定的是哪一步？');
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.screenshot({ path: info.outputPath('case-review-mobile.png'), fullPage: true });
+  await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+  await page.getByRole('button', { name: '确认并完成检测', exact: true }).click();
+  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await expect(page.locator('.workshop-item')).toHaveCount(1);
+  await expect(page.locator('.workshop-item').getByRole('button', { name: '发布到集市', exact: true })).toBeEnabled();
 });

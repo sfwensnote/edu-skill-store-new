@@ -105,7 +105,7 @@ test('草稿可查看或继续创建，详情保留头像、场景、方法与�
   await expect(page).toHaveURL(/#\/companions\/custom\/edit(?:\?|$)/);
   await page.getByRole('button', { name: '返回我的学伴', exact: true }).click();
   await page.locator('[data-companion-id="math"]').getByRole('button', { name: '查看学伴', exact: true }).click();
-  await expect(page.locator('.companion-task-summary')).toContainText('检查解题步骤，说明理由');
+  await expect(page.locator('.companion-overview-main > section .companion-task-summary')).toContainText('检查解题步骤，说明理由');
   await expect(page.locator('summary').filter({ hasText: '错因追问' })).toBeVisible();
   await expect(page.getByRole('button', { name: '下载材料', exact: true })).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1000 });

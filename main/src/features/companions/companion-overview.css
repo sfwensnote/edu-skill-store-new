@@ -19,8 +19,23 @@
 .companion-overview-skill:last-child { padding-bottom: 0; }
 .companion-overview-skill summary, .companion-overview-requirements > summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
 .companion-overview-skill p { font-size: 14px; color: var(--ink-2); }
-.companion-overview-requirements { color: var(--ink-2); }
-.companion-overview-requirements p { font-size: 13px; }
+.requirements-content { display: grid; gap: 24px; margin-top: 20px; }
+.requirements-content > section + section { border-top: 1px solid var(--line); padding-top: 20px; }
+.requirements-content h3 { color: var(--ink); font-size: 17px; margin: 0 0 16px; }
+.method-requirements { margin-top: 16px; font-size: 14px; line-height: 1.75; }
+.requirements-fields { margin: 0; }
+.requirements-fields > div { display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 16px; padding: 8px 0; }
+.requirements-fields dt { color: var(--ink-2); }
+.requirements-fields dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.requirements-steps { list-style: none; padding: 0; display: grid; gap: 12px; margin: 16px 0; }
+.requirements-steps > li { padding: 10px 16px; background: var(--secondary); border-radius: 8px; }
+.requirements-principles { margin: 16px 0; }
+.requirements-principles h4 { font-weight: 600; margin-bottom: 8px; }
+.requirements-principles ul { padding-left: 20px; list-style: disc; }
+.requirements-principles li { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .requirements-fields > div { grid-template-columns: 1fr; gap: 4px; }
+}
 .companion-overview-panel .companion-files { margin: 0; }
 .companion-overview-panel .companion-files li { flex-wrap: wrap; gap: 4px 12px; }
 .companion-overview-panel .companion-files li:last-child { border: 0; }
