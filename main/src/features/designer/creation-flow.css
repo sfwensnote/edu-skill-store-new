@@ -96,7 +96,7 @@
   grid-template-columns: minmax(340px, 3fr) minmax(0, 7fr);
   height: calc(100dvh - var(--header-height) - var(--page-heading-height) - 44px);
   min-height: 560px;
-  gap: 0;
+  gap: 32px;
   align-items: stretch;
 }
 .guided-panel {
@@ -111,7 +111,8 @@
 .guided-heading {
   margin: 0 0 18px;
 }
-.guided-heading h2 {
+.guided-heading h2,
+.method-outline > header h3 {
   font-size: 27px;
   font-weight: 650;
   line-height: 1.4;
@@ -311,7 +312,7 @@
 .method-workarea {
   min-width: 0;
   overflow-y: auto;
-  padding: 32px;
+  padding: 0;
   background: var(--canvas);
 }
 .method-outline {
@@ -329,10 +330,6 @@
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 4px;
-}
-.method-outline > header h3 {
-  font-size: 23px;
-  font-weight: 650;
 }
 .method-outline > header p {
   color: var(--ink-2);
@@ -481,12 +478,10 @@
 @media (max-width: 1200px) {
   .guided-layout {
     grid-template-columns: minmax(330px, 35fr) minmax(0, 65fr);
+    gap: 24px;
   }
   .guided-conversation {
     padding: 22px;
-  }
-  .method-workarea {
-    padding: 24px;
   }
   .method-outline {
     padding: 22px 22px 0;
@@ -509,6 +504,7 @@
   }
   .method-workarea {
     overflow: visible;
+    padding: 24px 0 0;
   }
     .method-outline {
     min-height: 0;
@@ -526,20 +522,18 @@
   .guided-conversation {
     padding: 22px 16px;
   }
-  .guided-heading h2 {
+  .guided-heading h2,
+  .method-outline > header h3 {
     font-size: 25px;
   }
   .method-workarea {
-    padding: 18px 12px;
+    padding: 18px 0 0;
   }
   .method-outline {
-    padding: 20px 16px 0;
+    padding: 22px 16px 0;
   }
   .method-outline > header {
     flex-wrap: wrap;
-  }
-  .method-outline > header h3 {
-    font-size: 21px;
   }
   .outline-field {
     grid-template-columns: 1fr;
