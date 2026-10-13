@@ -1,356 +1,40 @@
-import { Textarea } from '@/components/ui/textarea';
-import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Lightbulb, Check, Eye } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SaveStatus, StickyActions } from '@/components/Workbench';
 import { MethodOutline } from './MethodOutline';
+import { MethodBasicInfo } from './IdeaForm';
 import { MethodPreview } from './MethodPreview';
-import {
-  demoIdea,
-  boundaryPrefix,
-  methodError,
-  mockQuestions,
-  recordAnswer,
-  type CreationDraft,
-  type TeachingMethod,
-} from '../../../shared/teaching-method';
+import { directDraftError, prepareDirectMethod } from '../../../shared/direct-method';
+import type { CreationDraft, TeachingMethod } from '../../../shared/teaching-method';
 
-export function GuidedMethodPage({
-  draft,
-  onChange,
-  onEditIdea,
-  onConfirm,
-  savedAt,
-  saveFailed,
-}: {
-  draft: CreationDraft;
-  onChange: (draft: CreationDraft) => void;
-  onEditIdea: () => void;
-  onConfirm: () => void;
-  savedAt?: string;
-  saveFailed?: boolean;
+export function GuidedMethodPage({ draft, onChange, onConfirm, savedAt, saveFailed }: {
+  draft: CreationDraft; onChange: (draft: CreationDraft) => void; onConfirm: () => void; savedAt?: string; saveFailed?: boolean;
 }) {
-  const [error, setError] = useState('');
   const [iconBusy, setIconBusy] = useState(false);
   const [preview, setPreview] = useState(false);
-  const previewButtonRef = useRef<HTMLButtonElement>(null);
-  const [updated, setUpdated] = useState<{ section: number; at: number } | null>(null);
-  const question = mockQuestions[draft.questionIndex];
-  const answerLimit = question?.id === 'boundary' ? 500 - boundaryPrefix.length : 500;
-  const answer =
-    question && draft.pendingAnswer?.questionId === question.id
-      ? draft.pendingAnswer.value
-      : draft.originalIdea === demoIdea
-        ? question?.example || ''
-        : '';
-  const method = draft.method;
-  const supplement = draft.pendingSupplement;
-  const full = method.teachingSteps.length >= 8;
-  function openSupplement() {
-    if (full) {
-      setError('已达八种情况，请直接修改或合并现有做法。');
-      return;
-    }
-    onChange({ ...draft, pendingSupplement: supplement || { condition: '', action: '' } });
-    setError('');
+  const previewButton = useRef<HTMLButtonElement>(null);
+  const issue = directDraftError(draft);
+  function updateMethod(method: TeachingMethod, field?: string) {
+    onChange({ ...draft, method, teachingScene: method.category || '', stage: 'method', manualEdits: field && !draft.manualEdits.includes(field) ? [...draft.manualEdits, field] : draft.manualEdits });
   }
-  useEffect(() => {
-    if (!updated) return;
-    const timer = window.setTimeout(() => setUpdated(null), 1600);
-    return () => window.clearTimeout(timer);
-  }, [updated]);
-
-  function updateMethod(next: TeachingMethod, field?: string) {
-    onChange({
-      ...draft,
-      method: next,
-      teachingScene: next.category || '',
-      manualEdits:
-        field && !draft.manualEdits.includes(field) ? [...draft.manualEdits, field] : draft.manualEdits,
-    });
-    setError('');
-  }
-  function submitAnswer() {
-    if (!answer.trim() || !question) return;
-    const next = recordAnswer(draft, answer);
-    const section = question.id === 'boundary' ? 5 : question.id === 'principle' ? 4 : ['outcome', 'trigger'].includes(question.id) ? 2 : 3;
-    if (JSON.stringify(next.method) !== JSON.stringify(method)) setUpdated({ section, at: Date.now() });
-    onChange(next);
-    setError('');
-  }
-  function confirm() {
-    if (iconBusy) return;
-    if (supplement && (supplement.condition.trim() || supplement.action.trim())) {
-      setError('请先保存补充，或取消补充后确认。');
-      return;
-    }
-    const message = methodError(method);
-    if (message) {
-      setError(message);
-      return;
-    }
-    onConfirm();
-  }
-  function addExtra() {
-    if (full) {
-      setError('已达八种情况，请直接修改或合并现有做法。');
-      return;
-    }
-    if (!supplement?.condition.trim() || !supplement.action.trim()) {
-      setError('请补充这种情况和你的做法。');
-      return;
-    }
-    onChange({
-      ...draft,
-      pendingSupplement: undefined,
-      method: {
-        ...method,
-        teachingSteps: [
-          ...method.teachingSteps,
-          { condition: supplement.condition.trim(), action: supplement.action.trim() },
-        ],
-      },
-    });
-    setError('');
-  }
-  return (
-    <div className="guided-creation">
-      <div className="guided-layout">
-        <section className="guided-panel guided-conversation" aria-label="引导对话">
-          <header className="guided-heading">
-            <h2>梳理我的教学方法</h2>
-          </header>
-          <div className="initial-idea">
-            <div>
-              <strong>你的初步想法</strong>
-              <Button variant="link" size="sm" onClick={onEditIdea}>
-                修改
-              </Button>
-            </div>
-            <p>{draft.originalIdea}</p>
-          </div>
-          <details className="guidance-tips" aria-label="梳理小提示">
-            <summary>
-              <Lightbulb aria-hidden="true" />
-              填写提示
-            </summary>
-            <p>用具体情境、对话或操作说明你的做法。</p>
-          </details>
-          {question ? (
-            <div className="current-question">
-              <div className="question-top">
-                <span className="question-label">当前问题</span>
-                <small>
-                  {draft.questionIndex + 1} / {mockQuestions.length}
-                </small>
-              </div>
-              <h4>{question.question}</h4>
-              <label className="guided-answer-label" htmlFor="guided-answer">
-                你的回答
-              </label>
-              <Textarea
-                id="guided-answer"
-                value={answer}
-                maxLength={answerLimit}
-                placeholder={question.placeholder}
-                onChange={(event) =>
-                  onChange({
-                    ...draft,
-                    pendingAnswer: { questionId: question.id, value: event.target.value },
-                  })
-                }
-              />
-              {answer.length >= answerLimit - 50 && (
-                <span className="answer-count">还可输入 {answerLimit - answer.length} 字</span>
-              )}
-              <div className="answer-actions">
-                <button
-                  className="example-answer"
-                  type="button"
-                  onClick={() =>
-                    onChange({
-                      ...draft,
-                      pendingAnswer: { questionId: question.id, value: question.example },
-                    })
-                  }
-                >
-                  填入参考回答
-                </button>
-                {question.id === 'principle' && (
-                  <Button type="button" variant="ghost" onClick={() => {
-                    onChange({ ...draft, questionIndex: draft.questionIndex + 1, pendingAnswer: undefined });
-                    setError('');
-                  }}>跳过</Button>
-                )}
-                <Button type="button" aria-label="提交" disabled={!answer.trim()} onClick={submitAnswer}>
-                  提交并继续
-                  <ArrowRight data-icon="inline-end" />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="current-question final-question">
-              <span className="question-label">最后确认</span>
-              <h4>另一位教师按这套方法去做，能否复现你的做法？</h4>
-              {supplement && (
-                <div className="extra-method">
-                  <label>
-                    如果学生……
-                    <Textarea
-                      aria-label="补充情况"
-                      value={supplement.condition}
-                      onChange={(event) =>
-                        onChange({
-                          ...draft,
-                          pendingSupplement: { ...supplement, condition: event.target.value },
-                        })
-                      }
-                      placeholder="描述这种情况"
-                      maxLength={500}
-                    />
-                  </label>
-                  <label>
-                    我会……
-                    <Textarea
-                      aria-label="补充做法"
-                      value={supplement.action}
-                      onChange={(event) =>
-                        onChange({
-                          ...draft,
-                          pendingSupplement: { ...supplement, action: event.target.value },
-                        })
-                      }
-                      placeholder="写下你通常的做法"
-                      maxLength={500}
-                    />
-                  </label>
-                  <Button size="sm" disabled={full} onClick={addExtra}>
-                    保存补充
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      onChange({ ...draft, pendingSupplement: undefined });
-                      setError('');
-                    }}
-                  >
-                    取消补充
-                  </Button>
-                </div>
-              )}
-              <div className="final-actions">
-                <Button
-                  variant="outline"
-                  disabled={full}
-                  title={full ? '已达八种情况，请修改或合并现有做法' : undefined}
-                  onClick={openSupplement}
-                >
-                  还需要补充
-                </Button>
-                <Button disabled={iconBusy} onClick={confirm}>
-                  这就是我的教学方法
-                  <ArrowRight data-icon="inline-end" />
-                </Button>
-              </div>
-            </div>
-          )}
-          {error && (
-            <p className="method-error" role="alert">
-              {error}
-            </p>
-          )}
-          {draft.conversation.length > 0 && (
-            <section className="guided-history" aria-label="刚刚的梳理记录">
-              <h3>回答记录</h3>
-              {draft.conversation.map((item) => (
-                <details className="history-item" key={item.questionId}>
-                  <summary>
-                    <Check aria-hidden="true" />
-                    <span>{item.question}</span>
-                  </summary>
-                  <p>{item.answer}</p>
-                </details>
-              ))}
-            </section>
-          )}
-        </section>
-        <div className="method-workarea">
-          <section className="guided-panel method-outline" aria-label="我的教学方法">
-            <header>
-              <div>
-                <h3>我的教学方法</h3>
-                <p>点击内容可修改</p>
-              </div>
-              <SaveStatus failed={saveFailed} time={savedAt} />
-            </header>
-            <MethodOutline
-              method={method}
-              onChange={updateMethod}
-              updatedSection={updated?.section ?? null}
-              onIconBusy={setIconBusy}
-            />
-            <StickyActions
-              status={
-                <>
-                  <strong>
-                    {methodError(method) || '必填内容已完整'}
-                  </strong>
-                </>
-              }
-            >
-              <Button
-                variant="outline"
-                onClick={() => {
-                  if (question) document.getElementById('guided-answer')?.focus();
-                  else openSupplement();
-                }}
-              >
-                继续梳理
-              </Button>
-              <Button ref={previewButtonRef} variant="outline" onClick={() => setPreview(true)}>
-                <Eye data-icon="inline-start" />
-                预览教学方法
-              </Button>
-              <Button disabled={iconBusy || Boolean(methodError(method))} onClick={confirm}>
-                完成整理
-              </Button>
-            </StickyActions>
-          </section>
-        </div>
-      </div>
-      <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent
-          className="method-preview-dialog"
-          onCloseAutoFocus={(event) => {
-            if (previewButtonRef.current?.isConnected) {
-              event.preventDefault();
-              previewButtonRef.current.focus();
-            }
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>教学方法预览</DialogTitle>
-            <DialogDescription className="sr-only">查看已填写的教学方法。</DialogDescription>
-          </DialogHeader>
-          <MethodPreview method={method} />
-          <div className="guided-preview-actions">
-            <Button variant="outline" onClick={() => setPreview(false)}>
-              返回编辑
-            </Button>
-            <Button
-              disabled={iconBusy || Boolean(methodError(method))}
-              onClick={() => {
-                setPreview(false);
-                confirm();
-              }}
-            >
-              确认完成整理
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+  return <div className="direct-method-editor">
+    <div className="direct-method-layout">
+      <MethodBasicInfo draft={draft} onChange={onChange} onIconBusy={setIconBusy} />
+      <section className="creation-panel direct-expression" aria-label="教学方法的自然语言表达">
+        <header><div><h2>教学方法的自然语言表达</h2><p>用自己的语言，写清教学目标和具体做法。</p></div><SaveStatus failed={saveFailed} time={savedAt} /></header>
+        <MethodOutline method={draft.method} onChange={updateMethod} />
+      </section>
     </div>
-  );
+    <StickyActions status={<span>{issue || '必填内容已完整'}</span>}>
+      <Button ref={previewButton} variant="outline" disabled={iconBusy} onClick={() => setPreview(true)}><Eye />预览教学方法</Button>
+      <Button disabled={iconBusy || !!issue} onClick={onConfirm}>完成整理</Button>
+    </StickyActions>
+    <Dialog open={preview} onOpenChange={setPreview}><DialogContent className="method-preview-dialog" onCloseAutoFocus={event => { event.preventDefault(); previewButton.current?.focus(); }}>
+      <DialogHeader><DialogTitle>教学方法预览</DialogTitle><DialogDescription className="sr-only">查看教师填写的教学方法，返回后可继续修改。</DialogDescription></DialogHeader>
+      <MethodPreview method={prepareDirectMethod(draft.method)} />
+      <div className="guided-preview-actions"><Button variant="outline" onClick={() => setPreview(false)}>返回编辑</Button><Button disabled={iconBusy || !!issue} onClick={() => { setPreview(false); onConfirm(); }}>确认完成整理</Button></div>
+    </DialogContent></Dialog>
+  </div>;
 }

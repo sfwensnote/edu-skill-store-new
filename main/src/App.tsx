@@ -408,7 +408,7 @@ function SkillWorkspace() {
           selectedSkillId={route.skillId}
           sourceTags={market.designs.find((item) => item.id === current.sourceDesignId)?.tags}
           sourceCategory={market.designs.find((item) => item.id === current.sourceDesignId)?.category}
-          onBack={() => back({ page: 'daily' })}
+          onBack={() => back({ page: 'workshop' })}
           onSaveExit={() =>
             navigate({
               page: 'workshop',

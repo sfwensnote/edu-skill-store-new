@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { ArrowLeft, LoaderCircle } from 'lucide-react';
 import type { TeachingAssistant } from '../../../shared/assistant';
 import {
@@ -7,7 +8,6 @@ import {
   mockQuestions,
   methodFromSkill,
   packageTeachingMethod,
-  prepareMethod,
   upsertMethodSkill,
   type CreationDraft,
   type TeachingMethod,
@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SaveFailureExitGuard } from '@/components/SaveFailureExitGuard';
-import { IdeaForm } from './IdeaForm';
+import { directCreationDraft, directDraftError, prepareDirectMethod } from '../../../shared/direct-method';
 import { GuidedMethodPage } from './GuidedMethodPage';
 import { visibleTeachingTags, isTeachingCategory, teachingCategoryOf, teachingTagsOf, type TeachingCategory } from '../../../shared/teaching-tags';
 import './creation-flow.css';
@@ -95,7 +95,7 @@ function restore(storage: WorkspaceStorage, assistant: TeachingAssistant, skillI
   } catch {
     /* 本地草稿损坏时仍可重新填写。 */
   }
-  if (!assistant.goal && !assistant.skills.length) return defaultCreationDraft();
+  if (!assistant.goal && !assistant.skills.length) return directCreationDraft();
   const selected = assistant.skills.find((s) => s.id === skillId) || assistant.skills[0];
   const category = selected ? teachingCategoryOf(selected, assistant.activity, assistant.area) : isTeachingCategory(sourceCategory) ? sourceCategory : '未分类';
   const method = selected ? methodFromSkill(selected) : emptyMethod();
@@ -108,7 +108,7 @@ function restore(storage: WorkspaceStorage, assistant: TeachingAssistant, skillI
     grade: assistant.grade,
     subject: assistant.subject,
     teachingScene: method.category || '',
-    stage: selected ? 'method' : 'idea',
+    stage: 'method',
     method,
     questionIndex: selected ? mockQuestions.length : 0,
     editingSkillId: selected?.id,
@@ -136,7 +136,11 @@ export function DesignerPage({
   onUpdate: (patch: Partial<TeachingAssistant>) => boolean;
   onStartTest: () => boolean;
 }) {
-  const [draft, setDraft] = useState(() => restore(storage, assistant, selectedSkillId, sourceTags, sourceCategory));
+  const [draft, setDraft] = useState<CreationDraft>(() => {
+    const restored = restore(storage, assistant, selectedSkillId, sourceTags, sourceCategory);
+    return { ...restored, stage: 'method' as const, method: { ...restored.method,
+      teachingSteps: restored.method.teachingSteps.length ? restored.method.teachingSteps : [{ condition: '', action: '' }] } };
+  });
   const [storageError, setStorageError] = useState('');
   const [savedAt, setSavedAt] = useState('');
   const [forming, setForming] = useState(false);
@@ -175,8 +179,8 @@ export function DesignerPage({
     const saved = onUpdate({
       status: 'DRAFT',
       isPublic: false,
-      name: assistant.name || `${next.grade}${next.subject}教学方法`,
-      goal: next.stage === 'idea' ? next.originalIdea : next.method.expectedOutcome || next.originalIdea,
+      name: next.method.name?.trim() || assistant.name || '未完成的教学方法',
+      goal: next.method.expectedOutcome || next.originalIdea,
       grade: next.grade,
       subject: next.subject,
       activity: next.teachingScene || '教学实践',
@@ -186,7 +190,7 @@ export function DesignerPage({
   function retrySave() {
     if (!save(draft)) return false;
     const saved = onUpdate({
-      goal: draft.stage === 'idea' ? draft.originalIdea : draft.method.expectedOutcome || draft.originalIdea,
+      goal: draft.method.expectedOutcome || draft.originalIdea,
       grade: draft.grade,
       subject: draft.subject,
       activity: draft.teachingScene || '教学实践',
@@ -197,11 +201,14 @@ export function DesignerPage({
   }
   function confirmMethod() {
     if (forming) return;
+    const issue = directDraftError(draft);
+    if (issue) { setStorageError(issue); return; }
+    const method = prepareDirectMethod(draft.method);
     const skill = packageTeachingMethod(
-      draft.method,
+      method,
       draft.editingSkillId || `method-${assistant.id}`,
     );
-    if (!save({ ...draft, stage: 'method', editingSkillId: skill.id })) return;
+    if (!save({ ...draft, method, stage: 'method', editingSkillId: skill.id })) return;
     const saved = onUpdate({
       skills: upsertMethodSkill(assistant.skills, skill),
       revision: (assistant.revision || 1) + 1,
@@ -225,12 +232,7 @@ export function DesignerPage({
         <button
           className="back-link"
           aria-label="返回"
-          onClick={
-            draft.stage === 'idea'
-              ? onBack
-              : () =>
-                  save({ ...draft, stage: 'idea' })
-          }
+          onClick={onBack}
         >
           <ArrowLeft />
         </button>
@@ -242,7 +244,9 @@ export function DesignerPage({
           className="page-heading-actions"
           variant="outline"
           onClick={() => {
-            if (retrySave()) onSaveExit();
+            let saved = false;
+            flushSync(() => { saved = retrySave(); });
+            if (saved) onSaveExit();
           }}
         >
           保存并退出
@@ -250,29 +254,13 @@ export function DesignerPage({
       </header>
       {storageError && <p role="alert">{storageError}</p>}
       <SaveFailureExitGuard failed={Boolean(storageError)} onRetry={retrySave} />
-      {draft.stage === 'idea' && (
-        <IdeaForm
+      <GuidedMethodPage
           draft={draft}
           onChange={edit}
-          onContinue={() =>
-            edit({
-              ...draft,
-              method: prepareMethod(draft.originalIdea, draft.method),
-              stage: 'method',
-            })
-          }
-        />
-      )}
-      {draft.stage === 'method' && (
-        <GuidedMethodPage
-          draft={draft}
-          onChange={edit}
-          onEditIdea={() => save({ ...draft, stage: 'idea' })}
           onConfirm={confirmMethod}
           savedAt={savedAt}
           saveFailed={Boolean(storageError)}
-        />
-      )}
+      />
       <Dialog open={forming}>
         <DialogContent className="skill-creation-transition" showCloseButton={false} onEscapeKeyDown={(event) => event.preventDefault()}
           onInteractOutside={(event) => event.preventDefault()}>

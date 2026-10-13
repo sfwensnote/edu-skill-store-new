@@ -40,10 +40,7 @@ export function MethodPreview({ method }: { method: TeachingMethod }) {
             <span className="step-number">{index + 1}</span>
             <div className="preview-method-step-body">
               <p className="preview-method-step-line">
-                <strong>当</strong>：{step.condition || '待补充'}
-              </p>
-              <p className="preview-method-step-line">
-                <strong>我会</strong>：{step.action || '待补充'}
+                <strong>步骤 {index + 1}</strong>：{step.action || '待补充'}
               </p>
             </div>
           </div>
