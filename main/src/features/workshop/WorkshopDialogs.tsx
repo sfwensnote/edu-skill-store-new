@@ -31,7 +31,7 @@ export function WorkshopDialogs({
           }}
         >
           <DialogHeader>
-            <DialogTitle>{pending?.removalOnly ? '从我的 SKILL 移除？' : '删除这项内容？'}</DialogTitle>
+            <DialogTitle>{pending?.removalOnly ? '从我的教学方法移除？' : '删除这项内容？'}</DialogTitle>
             <DialogDescription>
               “{pending?.name}”将被{pending?.removalOnly ? '移除' : '删除'}。{pending?.description}
             </DialogDescription>
@@ -51,7 +51,7 @@ export function WorkshopDialogs({
                 const removalOnly = pending.removalOnly;
                 setError('');
                 onPending(null);
-                onMessage(removalOnly ? '已从我的 SKILL 移除' : '已删除');
+                onMessage(removalOnly ? '已从我的教学方法移除' : '已删除');
               }}
             >
               {pending?.removalOnly ? '确认移除' : '确认删除'}

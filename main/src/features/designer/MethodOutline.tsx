@@ -107,8 +107,8 @@ export function MethodOutline({
       }}
     >
       <StepSection number={1} title="基础概况" updated={updatedSection === 1}>
-        {field('SKILL 名称', 'name', '为你的教学方法起一个名字')}
-        {field('SKILL 简介', 'description', '用一句话说明这个方法的用途')}
+        {field('教学方法名称', 'name', '为你的教学方法起一个名字')}
+        {field('教学方法简介', 'description', '用一句话说明这个方法的用途')}
         <TeachingCategoryField value={method.category} onChange={(category) => onChange({ ...method, category }, 'category')} />
         <SkillIconField category={method.category} value={method.icon} onBusy={onIconBusy} onChange={icon => onChange({ ...method, icon }, 'icon')} />
         <TeachingTagsField required value={method.tags} onChange={(tags) => onChange({ ...method, tags }, 'tags')} />
@@ -167,7 +167,7 @@ export function MethodOutline({
           variant="ghost"
           size="sm"
           disabled={method.teachingSteps.length >= 8}
-          title={method.teachingSteps.length >= 8 ? '一项 SKILL 最多保留八种情况' : undefined}
+          title={method.teachingSteps.length >= 8 ? '一项教学方法最多保留八种情况' : undefined}
           onClick={() =>
             onChange({ ...method, teachingSteps: [...method.teachingSteps, { condition: '', action: '' }] })
           }
@@ -221,7 +221,7 @@ export function MethodOutline({
           variant="ghost"
           size="sm"
           disabled={method.principles.length >= 8}
-          title={method.principles.length >= 8 ? '一项 SKILL 最多保留八条原则（含结束条件）' : undefined}
+          title={method.principles.length >= 8 ? '一项教学方法最多保留八条原则（含结束条件）' : undefined}
           onClick={() => onChange({ ...method, principles: [...method.principles, ''] }, 'principles')}
         >
           <Plus data-icon="inline-start" />

@@ -27,6 +27,8 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
   }
   const [assistants, setAssistantState] = useState<TeachingAssistant[]>(() => loadAssistants(storage));
   const assistantsRef = useRef(assistants);
+  // 本次会话中已确认删除的学伴，避免浏览器返回旧地址时被 ensureAssistant 复活为空草稿。
+  const removedIds = useRef<Set<string>>(new Set());
   const [excludedByAssistant, setExcludedByAssistant] = useState<Record<string, string[]>>(() => {
     try {
       const saved = JSON.parse(storage.getItem(excludedKey) || '{}');
@@ -79,6 +81,7 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
   }
 
   function ensureAssistant(id: string) {
+    if (removedIds.current.has(id)) return undefined;
     const found = getAssistant(id);
     if (found) return found;
     const created: TeachingAssistant = {
@@ -214,6 +217,7 @@ export function useDemoPlatform(storage: WorkspaceStorage, accountId: string) {
       .forEach((key) => discardCache(key));
     const nextExcluded = withoutKey(excludedByAssistant, id);
     if (persist(excludedKey, nextExcluded)) setExcludedByAssistant(nextExcluded);
+    removedIds.current.add(id);
     return true;
   }
 

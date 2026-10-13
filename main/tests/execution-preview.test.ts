@@ -144,3 +144,57 @@ test('存储失败不假报确认或回复成功，损坏记录不覆盖，恢�
   await assert.rejects(s.request('/verified'), /无法读取/);
   assert.equal(s.values.get(previewStorageKey('teacher-a')), '{invalid');
 });
+test('preview 学伴试运行与教师会话一次落盘，保存失败保留原记录并可重试恢复', async () => {
+  const s = setup(); await s.confirm();
+  const settled = await s.request<{ trial: Trial; session: TrialSession }>('/practice-trials',
+    { companion: s.companion, methods: [s.method], hours: 168, capacity: 1 });
+  assert.equal(settled.session.trialId, settled.trial.id);
+  assert.equal(settled.session.audience, 'teacher');
+  const stored = JSON.parse(s.values.get(previewStorageKey('teacher-a'))!) as { trials: Trial[]; sessions: TrialSession[] };
+  assert.equal(stored.trials.length, 1);
+  assert.equal(stored.sessions.length, 1);
+  assert.equal(stored.sessions[0].trialId, stored.trials[0].id);
+  // 再次创建在同一次保存内关闭旧试运行并写入新试运行与会话。
+  const again = await s.request<{ trial: Trial; session: TrialSession }>('/practice-trials',
+    { companion: s.companion, methods: [s.method], hours: 168, capacity: 1 });
+  const afterCreate = s.values.get(previewStorageKey('teacher-a'))!;
+  const second = JSON.parse(afterCreate) as { trials: Trial[]; sessions: TrialSession[] };
+  assert.equal(second.trials.length, 2);
+  assert.equal(second.trials.find(item => item.id === settled.trial.id)?.status, 'closed');
+  assert.equal(second.trials.find(item => item.id === again.trial.id)?.status, 'open');
+  // 落盘失败时原子路径整体失败，原试运行与会话保留，界面与实际状态不出现 open/closed 不一致。
+  s.fill();
+  await assert.rejects(s.request('/practice-trials', { companion: s.companion, methods: [s.method], hours: 168, capacity: 1 }), /未保存/);
+  assert.equal(s.values.get(previewStorageKey('teacher-a')), afterCreate);
+  const preserved = await s.request<{ trial: Trial; sessions: TrialSession[] }>(`/trials/${again.trial.id}`);
+  assert.equal(preserved.trial.status, 'open');
+  assert.equal(preserved.sessions.length, 1);
+  s.restore();
+  // 释放空间后重试成功，刷新仍恢复正确的试运行与会话。
+  const retried = await s.request<{ trial: Trial; session: TrialSession }>('/practice-trials',
+    { companion: s.companion, methods: [s.method], hours: 168, capacity: 1 });
+  const loaded = await createPreviewRuntime(s.storage, 'teacher-a')<{ trial: Trial; sessions: TrialSession[] }>(`/trials/${retried.trial.id}`);
+  assert.equal(loaded.sessions.length, 1);
+  assert.equal(loaded.sessions[0].trialId, retried.trial.id);
+  assert.equal(loaded.trial.status, 'open');
+});
+
+test('运行与试运行独立筛选、结束和保存，兼容未带类型的历史试运行', async () => {
+  const s = setup(); await s.confirm();
+  const input = { companion: s.companion, methods: [s.method], hours: 24, capacity: 1 };
+  const run = await s.request<{ trial: Trial }>('/trials', input);
+  const practice = await s.request<{ trial: Trial; session: TrialSession }>('/practice-trials', input);
+  assert.equal((await s.request<{ trial: Trial }>(`/trials/${run.trial.id}`)).trial.status, 'open');
+  assert.deepEqual((await s.request<Trial[]>('/trials?purpose=run')).map(item => item.id), [run.trial.id]);
+  assert.deepEqual((await s.request<Trial[]>('/trials?purpose=practice')).map(item => item.id), [practice.trial.id]);
+  const again = await s.request<{ trial: Trial }>('/trials', input);
+  assert.equal((await s.request<{ trial: Trial }>(`/trials/${run.trial.id}`)).trial.status, 'closed');
+  assert.equal((await s.request<{ trial: Trial }>(`/trials/${practice.trial.id}`)).trial.status, 'open');
+  await s.request(`/trials/${practice.trial.id}/stop`, {});
+  assert.equal((await s.request<{ trial: Trial }>(`/trials/${again.trial.id}`)).trial.status, 'open');
+  const data = JSON.parse(s.values.get(previewStorageKey('teacher-a'))!);
+  delete data.trials.find((trial: Trial) => trial.id === practice.trial.id).purpose;
+  s.values.set(previewStorageKey('teacher-a'), JSON.stringify(data));
+  assert.equal((await s.request<Trial[]>('/trials?purpose=practice'))[0].id, practice.trial.id);
+  assert.equal((await s.request<Trial[]>('/trials?purpose=run')).length, 2);
+});

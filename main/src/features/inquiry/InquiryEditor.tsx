@@ -191,7 +191,7 @@ export function InquiryEditor({
       )}
       <footer className="editor-footer">
         <Button variant="outline" onClick={onWorkshop}>
-          返回我的 SKILL
+          返回我的教学方法
         </Button>
         <div className="inline-actions">
           <Button variant="outline" onClick={() => save()}>
@@ -206,7 +206,7 @@ export function InquiryEditor({
             <h3>项目指导方法</h3>
           </div>
           <Button variant="outline" onClick={onGuidance}>
-            整理项目指导方法为 SKILL
+            整理项目指导的教学方法
           </Button>
         </section>
       )}

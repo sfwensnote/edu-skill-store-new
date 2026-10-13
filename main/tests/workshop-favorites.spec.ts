@@ -8,7 +8,7 @@ test('集市收藏在我的收藏中显示，查看返回与刷新保留，取�
   const source = marketSkills[0];
   await page.goto('/#/market');
   await page.getByRole('button', { name: `收藏${source.skill.name}`, exact: true }).click();
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '我的教学方法', exact: true }).click();
   await page.getByRole('button', { name: '我的收藏', exact: true }).click();
   const card = page.locator('.workshop-item');
   await expect(card).toHaveCount(1);
@@ -18,16 +18,16 @@ test('集市收藏在我的收藏中显示，查看返回与刷新保留，取�
   await page.keyboard.press('Escape');
   await card.getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.getByRole('heading', { name: source.skill.name, exact: true })).toBeVisible();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toHaveCount(0);
   await page.reload();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await expect(page).toHaveURL(/workshop\?tab=favorites$/);
   await expect(card).toHaveCount(1);
   await page.reload();
   await card.getByRole('button', { name: /更多操作/ }).click();
   await page.getByRole('menuitem', { name: '取消收藏', exact: true }).click();
   await expect(card).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: '还没有收藏 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '还没有收藏教学方法', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '全部', exact: true }).click();
   await expect(card).toHaveCount(0);
   await page.goto('/#/market');
@@ -46,21 +46,21 @@ test('自己的方法与集市收藏共用列表，只读快照保留来源，�
   await page.goto('/#/workshop?tab=favorites');
   await expect(page.locator('.workshop-item')).toHaveCount(2);
   const card = page.locator(`[data-work-id="${source.id}"]`);
-  await card.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('已添加到我的 SKILL');
-  await expect(card.getByRole('button', { name: '添加到我的 SKILL', exact: true })).toHaveCount(0);
+  await card.getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已添加到我的教学方法');
+  await expect(card.getByRole('button', { name: '添加到我的教学方法', exact: true })).toHaveCount(0);
   await page.reload();
   await card.getByRole('button', { name: '查看', exact: true }).click();
-  await page.getByRole('button', { name: '挂载到学伴', exact: true }).click();
+  await page.getByRole('button', { name: '添加教学方法', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText(source.skill.name);
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await card.getByRole('button', { name: /更多操作/ }).click();
-  await page.getByRole('menuitem', { name: '挂载到学伴', exact: true }).click();
+  await page.getByRole('menuitem', { name: '添加教学方法', exact: true }).click();
   await expect(page.getByRole('button', { name: '创建新学伴', exact: true })).toBeDisabled();
-  await page.getByRole('button', { name: '前往 SKILL 检测', exact: true }).click();
+  await page.getByRole('button', { name: '前往教学方法验证', exact: true }).click();
   await expect(page).toHaveURL(/skill-check\//);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('方法检测');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('教学方法验证');
   const stored = await page.evaluate(({ market, owners }) => ({
     workspace: JSON.parse(localStorage.getItem(market)!), owners: JSON.parse(localStorage.getItem(owners)!),
   }), { market: marketWorkspaceKey, owners: ownersStorageKey });
@@ -90,7 +90,7 @@ test('取消收藏保存失败时保留列表，恢复写入后可重试，手�
   await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
-    await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true })).toHaveValue('favorites');
+    await expect(page.getByRole('combobox', { name: '教学方法分类', exact: true })).toHaveValue('favorites');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.locator('.workshop-item').getByRole('button', { name: /更多操作/ }).click();

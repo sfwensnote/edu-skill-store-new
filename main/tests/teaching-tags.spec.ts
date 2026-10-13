@@ -44,7 +44,7 @@ test('教学分类必选并与集市一致，标签可恢复；SKILL 核对和�
   expect(tasks).toHaveLength(0);
 });
 
-test('旧 PBL 标签不出现在我的 SKILL 和试用详情，来源资料与有效标签保留', async ({ page }) => {
+test('旧 PBL 标签不出现在我的教学方法 和试用详情，来源资料与有效标签保留', async ({ page }) => {
   const oldEntry = {
     ...marketSkills[4], area: 'inquiry' as const, scene: 'PBL 项目反思',
     skill: { ...marketSkills[4].skill, category: '项目式学习' as const, tags: ['PBL 项目反思', '任务链设计', '证据追问'] },
@@ -111,7 +111,7 @@ test('情境探究的分类和标签可恢复，手机表单不横向溢出', as
   await expect(page.getByRole('button', { name: '移除标签 一次函数应用' })).toBeVisible();
 });
 
-test('旧方法体验保留资料，不混入我的 SKILL 或教学任务', async ({ page }) => {
+test('旧方法体验保留资料，不混入我的教学方法 或教学任务', async ({ page }) => {
   const trial = { id: 'old-method-trial', title: '旧方法体验', kind: 'skill', level: 1, skill: marketSkills[0], instructions: '体验方法', feedback: '旧提示',
     submissions: [{ answers: { 回答: '我还没有发现错误' }, submittedAt: '2026-10-09T00:00:00.000Z', feedback: '旧提示' }], createdAt: '2026-10-09T00:00:00.000Z' };
   await page.addInitScript((task) => {
@@ -120,11 +120,11 @@ test('旧方法体验保留资料，不混入我的 SKILL 或教学任务', asyn
   await page.goto('/#/space');
   await expect(page.getByRole('heading', { name: '还没有教学任务' })).toBeVisible();
   await expect(page.getByText('旧方法体验', { exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '我的教学方法', exact: true }).click();
   await expect(page.getByText('历史方法试用', { exact: true })).toHaveCount(0);
   await page.goto('/#/task/old-method-trial');
   await expect(page.getByText('我还没有发现错误', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '提交学习记录' })).toHaveCount(0);
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await expect(page).toHaveURL(/#\/workshop/);
 });

@@ -63,17 +63,18 @@ async function seedWorks(page: Page) {
 
 test('数量来自实际作品，组合筛选在详情返回和刷新后保留，草稿不冒充可用任务', async ({ page }) => {
   await seedWorks(page);
-  await expect(page.getByRole('region', { name: 'SKILL 概览' })).toHaveCount(0);
-  await expect(page.getByRole('navigation', { name: 'SKILL 分类', exact: true }).getByRole('button', { name: '全部', exact: true })).toContainText('6');
-  await page.getByLabel('搜索我的 SKILL').fill('反思');
+  await expect(page.getByRole('region', { name: '教学方法概览' })).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: '教学方法分类', exact: true }).getByRole('button', { name: '全部', exact: true })).toContainText('6');
+  await page.getByLabel('搜索我的教学方法').fill('反思');
   await page.getByLabel('作品学段').selectOption('高中');
   await page.getByLabel('作品学科').selectOption('英语');
   await page.getByLabel('作品排序').selectOption('name');
   await expect(page.locator('.workshop-item')).toHaveCount(1);
   await page.getByRole('button', { name: '查看', exact: true }).click();
   await page.reload();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
-  await expect(page.getByLabel('搜索我的 SKILL')).toHaveValue('反思');
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
+  await expect(page).toHaveURL(/#\/workshop(?:\?|$)/);
+  await expect(page.getByLabel('搜索我的教学方法')).toHaveValue('反思');
   await expect(page.getByLabel('作品学段')).toHaveValue('高中');
   await expect(page.getByLabel('作品学科')).toHaveValue('英语');
   await expect(page.getByLabel('作品排序')).toHaveValue('name');
@@ -83,11 +84,11 @@ test('数量来自实际作品，组合筛选在详情返回和刷新后保留�
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await expect(page.locator('[data-kind="pbl"], [data-kind="chains"], [data-kind="problems"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '设计情境作品' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '试用教学方法', exact: true })).toHaveCount(0);
   await page.locator('[data-work-id="personal:assistant-demo-active:reflect"]').getByRole('button', { name: '查看', exact: true }).click();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '我的教学方法', exact: true })).toBeVisible();
 });
 
 test('创建分类的发布管理和收藏保留，更多菜单支持键盘关闭及独立复制', async ({ page }) => {
@@ -102,7 +103,7 @@ test('创建分类的发布管理和收藏保留，更多菜单支持键盘关�
   await page.getByRole('menuitem', { name: '收藏', exact: true }).click();
   await source.getByRole('button', { name: '发布到集市', exact: true }).click();
   await page.getByRole('button', { name: '确认发布', exact: true }).click();
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '我的教学方法', exact: true }).click();
   await page.getByRole('button', { name: '我创建的', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await expect(source).toContainText('已发布');
@@ -123,7 +124,7 @@ test('创建分类的发布管理和收藏保留，更多菜单支持键盘关�
   expect(stored[0].skills[0].id).not.toBe('reflect');
 });
 
-test('旧 PBL 分类退回 SKILL，旧任务清空，项目与收藏不进入个人方法列表', async ({ page }) => {
+test('旧 PBL 分类退回教学方法，旧任务清空，项目与收藏不进入个人方法列表', async ({ page }) => {
   await seedWorks(page);
   await page.evaluate(() => {
     const key = 'teaching-method.market-workspace.v1';
@@ -133,7 +134,7 @@ test('旧 PBL 分类退回 SKILL，旧任务清空，项目与收藏不进入个
     localStorage.setItem(key, JSON.stringify(data));
   });
   await page.goto('/#/workshop?tab=pbl');
-  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的教学方法', exact: true })).toBeVisible();
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await expect(page.locator('main')).not.toContainText(/PBL|我的情境题目|我的任务链|我的助手|应用配置|历史方法试用/);
   await page.getByRole('button', { name: '从集市添加', exact: true }).click();
@@ -150,7 +151,7 @@ test('作品页在桌面、平板和手机无溢出，手机分类及白色菜�
   await seedWorks(page);
   for (const width of [1440, 1280, 768, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
-    await page.getByRole('heading', { name: '我的 SKILL', exact: true }).scrollIntoViewIfNeeded();
+    await page.getByRole('heading', { name: '我的教学方法', exact: true }).scrollIntoViewIfNeeded();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({
       path: `docs/assets/我的作品-${width}.png`,
@@ -158,8 +159,8 @@ test('作品页在桌面、平板和手机无溢出，手机分类及白色菜�
       animations: 'disabled',
     });
   }
-  await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true })).toBeVisible();
-  await page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).selectOption('skills');
+  await expect(page.getByRole('combobox', { name: '教学方法分类', exact: true })).toBeVisible();
+  await page.getByRole('combobox', { name: '教学方法分类', exact: true }).selectOption('skills');
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await page
     .locator('.workshop-item')
@@ -171,6 +172,6 @@ test('作品页在桌面、平板和手机无溢出，手机分类及白色菜�
   const box = await menu.boundingBox();
   expect(box && box.x >= 0 && box.x + box.width <= 390).toBe(true);
   await page.keyboard.press('Escape');
-  await page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).selectOption('added');
-  await page.screenshot({ path: 'docs/assets/我的SKILL集市添加手机.png', fullPage: true, animations: 'disabled' });
+  await page.getByRole('combobox', { name: '教学方法分类', exact: true }).selectOption('added');
+  await page.screenshot({ path: 'docs/assets/我的教学方法集市添加手机.png', fullPage: true, animations: 'disabled' });
 });

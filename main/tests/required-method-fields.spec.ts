@@ -31,7 +31,7 @@ test('名称、简介与结束条件缺失不能形成，原则可跳过；手�
   await page.getByLabel('教学想法').fill('学生答错后，我想让他先自己回顾思路。');
   await page.getByRole('checkbox', { name: '标签 错因辅导', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  const form = page.getByRole('button', { name: '形成 SKILL', exact: true });
+  const form = page.getByRole('button', { name: '完成整理', exact: true });
   for (const question of mockQuestions.slice(0, 5)) {
     await page.getByLabel('你的回答').fill(question.example);
     await page.getByRole('button', { name: '提交', exact: true }).click();
@@ -39,10 +39,10 @@ test('名称、简介与结束条件缺失不能形成，原则可跳过；手�
   await page.getByRole('button', { name: '跳过', exact: true }).click();
   await expect(page.getByRole('button', { name: '编辑原则 1', exact: true })).toHaveCount(0);
   await expect(form).toBeDisabled();
-  await expect(page.locator('.sticky-actions')).toContainText('请填写 SKILL 名称');
-  await editMethodField(page, 'SKILL 名称', '解题思路追问');
+  await expect(page.locator('.sticky-actions')).toContainText('请填写 教学方法名称');
+  await editMethodField(page, '教学方法名称', '解题思路追问');
   await expect(form).toBeDisabled();
-  await editMethodField(page, 'SKILL 简介', '让学生先回顾自己的解题步骤');
+  await editMethodField(page, '教学方法简介', '让学生先回顾自己的解题步骤');
   await expect(form).toBeDisabled();
   await expect(page.locator('.sticky-actions')).toContainText('请填写结束条件');
   await expect(page.getByRole('heading', { name: mockQuestions[6].question, exact: true })).toBeVisible();
@@ -54,7 +54,7 @@ test('名称、简介与结束条件缺失不能形成，原则可跳过；手�
   await page.getByRole('button', { name: '提交', exact: true }).click();
   await expect(page.getByRole('button', { name: '编辑结束条件', exact: true })).toContainText('学生能独立说明正确思路时结束');
   await expect(form).toBeEnabled();
-  await editMethodField(page, 'SKILL 简介', '  ');
+  await editMethodField(page, '教学方法简介', '  ');
   await expect(form).toBeDisabled();
   await page.reload();
   await expect(form).toBeDisabled();

@@ -178,7 +178,7 @@ test('未完成的补充可恢复，确认方法不会悄悄丢弃补充内容',
   await expect(page.getByLabel('补充情况', { exact: true })).toHaveValue('学生已找到证据');
   await expect(page.getByLabel('补充做法', { exact: true })).toHaveValue('请学生解释证据如何支持观点');
   await page.getByRole('button', { name: '这就是我的教学方法', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '教学 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '教学方法', exact: true })).toHaveCount(0);
   await expect(page.locator('.method-error')).toContainText('先保存补充');
   await page.getByRole('button', { name: '保存补充', exact: true }).click();
   await page.getByRole('button', { name: '这就是我的教学方法', exact: true }).click();

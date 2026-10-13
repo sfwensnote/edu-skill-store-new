@@ -61,7 +61,7 @@ test('空账号用内置案例创建学伴，详情进入独立试运行页并�
   await expect(page.getByRole('combobox', { name: '案例', exact: true })).toHaveValue('fraction-error-review');
   await page.getByRole('button', { name: '填入案例', exact: true }).click();
   await expect(page.getByRole('textbox', { name: '学伴名称', exact: true })).toHaveValue(caseName);
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await expect(page.locator('.companion-case-skill')).toContainText('案例配套方法 · 仅用于试运行');
   await expect(page.locator('.companion-case-skill').getByRole('checkbox')).toBeChecked();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
@@ -79,8 +79,12 @@ test('空账号用内置案例创建学伴，详情进入独立试运行页并�
     expect(detailBack, '详情返回按钮应可见').not.toBeNull();
     expect(detailTitle, '详情标题区域应可见').not.toBeNull();
     expect(overlaps(detailBack!, detailTitle!), '详情返回按钮与标题区域不应重叠').toBe(false);
+    const detailActions = await page.locator('.companion-overview-actions').boundingBox();
+    expect(overlaps(detailActions!, detailTitle!), '详情操作组不能覆盖标题').toBe(false);
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
+
+  await page.screenshot({ path: info.outputPath('companion-detail-desktop.png'), fullPage: true, animations: 'disabled' });
 
   // 案例配套方法不写入个人 SKILL，也不进入集市。
   const skills = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
@@ -106,6 +110,11 @@ test('空账号用内置案例创建学伴，详情进入独立试运行页并�
   for (const width of [1440, 768, 640, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const studentBubble = await page.locator('.companion-chat-message[data-role="user"] .companion-chat-bubble').first().boundingBox();
+    const companionBubble = await page.locator('.companion-chat-message[data-role="assistant"] .companion-chat-bubble').first().boundingBox();
+    expect(studentBubble, '学生对话气泡应可见').not.toBeNull();
+    expect(companionBubble, '学伴对话气泡应可见').not.toBeNull();
+    expect(studentBubble!.x, '新版试运行保留学生右侧、学伴左侧的对话').toBeGreaterThan(companionBubble!.x);
     const back = await page.locator('.companion-practice-heading .back-link').boundingBox();
     const identity = await page.locator('.companion-practice-heading .companion-practice-identity').boundingBox();
     const actions = await page.locator('.companion-practice-heading .companion-practice-actions').boundingBox();
@@ -201,7 +210,7 @@ test('结束试运行后只读，新对话与历史记录保留旧对话', async
   await expect(input(page)).toHaveCount(0);
 });
 
-test('案例填入可取消覆盖，复制为独立草稿且不写入我的 SKILL，手改任务后新对话按新任务引导', async ({ page }) => {
+test('案例填入可取消覆盖，复制为独立草稿且不写入我的教学方法，手改任务后新对话按新任务引导', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/#/companions/case-edit/edit');
   await page.getByRole('textbox', { name: '学伴名称', exact: true }).fill('我自己起的名字');
@@ -212,7 +221,7 @@ test('案例填入可取消覆盖，复制为独立草稿且不写入我的 SKIL
   await page.getByRole('button', { name: '填入案例', exact: true }).click();
   await page.getByRole('button', { name: '确认覆盖并填入', exact: true }).click();
   await expect(page.getByRole('textbox', { name: '学伴名称', exact: true })).toHaveValue(caseName);
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await page.getByRole('button', { name: '下一步：预览与保存', exact: true }).click();
   await page.getByRole('button', { name: '创建学伴', exact: true }).click();
@@ -229,7 +238,7 @@ test('案例填入可取消覆盖，复制为独立草稿且不写入我的 SKIL
   expect((await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))) ?? '').not.toContain('分数错因追问');
 
   await page.goto('/#/companions/case-edit/edit');
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await page.getByRole('textbox', { name: '学习任务与目标', exact: true }).fill('用身边的例子说明什么是通分。');
   await page.getByRole('button', { name: '下一步：预览与保存', exact: true }).click();

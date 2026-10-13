@@ -97,8 +97,8 @@ test('未完成方法可以在我的 SKILL 中恢复，但不会当作已形成�
     assistants: [assistant],
   });
   assert.equal(c.skills[0].kind, 'method-draft');
-  assert.equal(c.skills[0].status, '尚未形成 SKILL');
-  assert.equal(c.skills[0].status, '尚未形成 SKILL');
+  assert.equal(c.skills[0].status, '尚未形成教学方法');
+  assert.equal(c.skills[0].status, '尚未形成教学方法');
   assert.equal(c.added.length, 0);
   assert.equal(c.created[0].kind, 'method-draft');
   const empty = workshopCollections({

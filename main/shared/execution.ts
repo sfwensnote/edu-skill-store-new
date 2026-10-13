@@ -37,6 +37,7 @@ export const trialInputSchema = z.object({
   hours: z.number().int().min(1).max(168), capacity: z.number().int().min(1).max(30),
 });
 export type Trial = {
+  purpose?: 'run' | 'practice';
   id: string; ownerId: string; companion: z.infer<typeof companionSchema>; methods: MethodInput[];
   verifications: string[]; model: string; status: 'open' | 'closed' | 'revoked';
   createdAt: string; expiresAt: string; capacity: number;

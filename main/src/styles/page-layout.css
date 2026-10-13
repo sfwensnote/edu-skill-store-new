@@ -1,10 +1,11 @@
 /* 页面外框、主标题与顶部区域共用一套紧凑尺寸和配色。 */
 :root {
-  --page-width: 1440px;
-  --page-gutter: 32px;
+  --page-width: none;
+  --page-gutter: 24px;
   --page-title-size: 30px;
   --page-heading-height: 112px;
   --page-heading-padding: 20px;
+  --page-art-width: clamp(160px, 14vw, 220px);
 }
 body, .application { background-color: var(--canvas); background-image: none; }
 .home-surface, .testing-page { background: transparent; }
@@ -14,7 +15,7 @@ body, .application { background-color: var(--canvas); background-image: none; }
 }
 /* 教学编辑、学伴创建、聊天与检测工作台保留宽屏空间，公共页头按同一可用宽度和间距对齐。 */
 .application:has(.creation-flow), .application:has(.companion-creation), .application:has(.companion-practice-page), .application:has(.execution-page),
-.creation-flow, .companion-creation, .companion-practice-page, .execution-page { --page-width: 1800px; }
+.creation-flow, .companion-creation, .companion-practice-page, .execution-page { --page-width: none; }
 .application main.page-frame { padding-top: 24px; }
 .application main.page-frame h1, .application main .page-frame h1 {
   margin: 0;
@@ -39,8 +40,8 @@ body, .application { background-color: var(--canvas); background-image: none; }
 }
 .page-heading > div { min-width: 0; }
 .application .page-heading p { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; line-height: 1.7; }
-.application .page-heading > img { position: absolute; top: 0; right: 0; height: 104px; max-width: 32%; object-fit: contain; pointer-events: none; }
-.application .page-heading:has(.page-heading-actions) > img { right: 180px; }
+.application .page-heading > img { position: absolute; top: 4px; left: 80%; right: auto; transform: translateX(-50%); width: var(--page-art-width); height: 104px; max-width: none; object-fit: contain; pointer-events: none; }
+.application .page-frame .page-heading:has(> img) { padding-right: calc(20% + clamp(80px, 7vw, 110px) + 24px); }
 .page-heading > div:not(.page-heading-actions) { position: relative; flex: 1; }
 .application .page-heading .page-heading-actions { align-self: center; margin: 0 0 0 auto; flex: none; position: relative; }
 .application .detail-heading .page-heading-actions { flex-shrink: 1; flex-wrap: wrap; justify-content: flex-end; }
@@ -55,12 +56,79 @@ body, .application { background-color: var(--canvas); background-image: none; }
 .home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 112px; --page-heading-padding: 16px; }
 .application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading { padding-bottom: 16px; margin-bottom: 16px; }
 .application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading > img { top: 4px; height: calc(var(--page-heading-height) - 8px); }
-.application .creation-flow .creation-heading.page-heading { flex-wrap: nowrap; padding-bottom: 16px; margin-bottom: 16px; }
+.application .creation-flow .creation-heading.page-heading { flex-wrap: nowrap; align-items: center; gap: 12px; padding-bottom: 16px; margin-bottom: 16px; }
 .application .creation-flow .creation-heading > div { flex-basis: auto; }
 .application .creation-heading > [data-slot='button'] { min-height: var(--control-height); }
+/* 创建教学方法页头：返回按钮进入正常流并与标题成组，保证不重叠、可触达；保存并退出用描边区分主次。 */
+.application .creation-flow .creation-heading > .back-link {
+  position: static;
+  top: auto;
+  left: auto;
+  flex: none;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink-2);
+  box-shadow: none;
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
+}
+.application .creation-flow .creation-heading > .back-link:hover {
+  color: var(--primary);
+  background: var(--blue-faint);
+  border-color: var(--line-strong);
+}
+.application .creation-flow .creation-heading > .back-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.application .creation-flow .creation-heading > .back-link:active {
+  transform: scale(.96);
+}
+.application .creation-flow .creation-heading > .page-heading-actions {
+  align-self: center;
+  flex: none;
+  margin: 0 0 0 auto;
+  border-color: var(--line-strong);
+  color: var(--primary);
+  font-weight: 600;
+}
+.application .creation-flow .creation-heading > .page-heading-actions:hover {
+  border-color: var(--primary);
+  color: var(--primary-hover);
+  background: var(--blue-faint);
+}
+.application .creation-flow .creation-heading > .page-heading-actions:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
 .application .companion-overview-heading > .companion-overview-image { flex: none; }
 .application .companion-overview-heading .companion-overview-meta { font-size: 14px; }
-@media (max-width: 1100px) { :root { --page-gutter: 24px; } }
+.application main.page-frame.companion-overview { padding-top: 12px; }
+.application .page-frame.companion-overview .companion-overview-heading.page-heading { padding-top: 0; margin-top: 0; }
+@media (max-width: 1100px) { :root { --page-gutter: 20px; } }
+@media (min-width: 761px) {
+  .application :is(.workshop-page, .companion-library) .page-heading > .page-heading-actions {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+@media (min-width: 761px) and (max-width: 1279px) {
+  .application :is(.workshop-page, .companion-library) .page-heading { min-height: 180px; }
+  .application :is(.workshop-page, .companion-library) .page-heading > .page-heading-actions {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
+}
 @media (max-width: 760px) {
   /* 手机资源页页头保留紧凑下限；标题或操作控件换行时按真实内容自然增高，不裁切。 */
   .home-page, .market-catalog, .workshop-page, .companion-library { --page-heading-height: 100px; --page-heading-padding: 12px; }
@@ -69,6 +137,7 @@ body, .application { background-color: var(--canvas); background-image: none; }
   .application .page-frame .page-heading { gap: 16px; flex-wrap: wrap; padding-bottom: 20px; }
   .application :is(.home-page, .market-catalog, .workshop-page, .companion-library) .page-heading { gap: 8px; padding-bottom: 12px; }
   .application .page-heading > img { display: none; }
+  .application .page-frame .page-heading:has(> img) { padding-right: 0; }
   .application .page-heading p { font-size: 14px; }
   .application .page-heading .page-heading-actions { align-self: flex-start; margin-left: 0; }
   .application .companion-library-heading .page-heading-actions { position: absolute; top: var(--page-heading-padding); right: 0; }
@@ -78,3 +147,60 @@ body, .application { background-color: var(--canvas); background-image: none; }
   .application .companion-overview-heading .page-heading-actions { grid-column: 2; }
   .application .testing-title { min-height: 37px; }
 }
+@media (max-width: 760px) {
+  /* 手机端创建页头：返回与标题同行，保存并退出换行并撑满，页头按内容自然增高。 */
+  .application .creation-flow .creation-heading.page-heading {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .application .creation-flow .creation-heading.page-heading > div:not(.page-heading-actions) {
+    flex: 1 1 auto;
+    flex-basis: auto;
+  }
+  .application .creation-flow .creation-heading.page-heading > .page-heading-actions {
+    flex: 1 1 100%;
+    align-self: stretch;
+    margin-left: 0;
+  }
+}
+
+/* 详情/预览公共页头：返回按钮独占一行，避免被标题 h1 覆盖命中区；创建页头 .creation-heading 保持原布局。 */
+.application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: 0;
+}
+.application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) > .back-link {
+  position: static;
+  top: auto;
+  left: auto;
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: 44px;
+}
+.application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) > div:not(.page-heading-actions) {
+  grid-column: 1;
+}
+.application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) > .page-heading-actions {
+  grid-column: 2;
+  grid-row: 2;
+  margin-left: 0;
+  justify-self: end;
+}
+@media (max-width: 760px) {
+  .application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .application .page-frame .page-heading:has(> .back-link):not(.creation-heading):not(.companion-overview-heading) > .page-heading-actions {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+}
+.application :is(.market-catalog, .workshop-page, .companion-library, .creation-flow) .page-heading > img { width: clamp(190px, 16vw, 260px); height: 124px; }
+@media(max-width: 760px) { .application :is(.market-catalog, .workshop-page, .companion-library, .creation-flow) .page-heading > img { width: 150px; height: 100px; } }
+@media(min-width: 761px) { .market-catalog, .workshop-page, .companion-library { --page-heading-height: 132px; } .application :is(.market-catalog, .workshop-page, .companion-library) .page-heading > img { height: calc(var(--page-heading-height) - 8px); } }
+
+.application main.page-frame.companion-practice-page { padding-top: 12px; }

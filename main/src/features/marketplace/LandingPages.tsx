@@ -25,7 +25,7 @@ export function DailyPage({ navigate }: { navigate: (route: AppRoute) => void })
           参考集市中的方法
         </Button>
         <Button variant="outline" onClick={() => navigate({ page: 'workshop' })}>
-          继续编辑我的 SKILL
+          继续编辑我的教学方法
         </Button>
       </div>
     </main>

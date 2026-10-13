@@ -21,10 +21,10 @@ import './workshop.css';
 
 const searchKey = 'teaching-method.workshop-filters.v1';
 const emptyCopy = {
-  skills: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
-  created: ['还没有创建教学 SKILL', '', '创建教学 SKILL'],
-  added: ['还没有从集市添加 SKILL', '', '前往教学 SKILL 集市'],
-  favorites: ['还没有收藏 SKILL', '', '前往教学 SKILL 集市'],
+  skills: ['还没有创建教学方法', '', '创建教学方法'],
+  created: ['还没有创建教学方法', '', '创建教学方法'],
+  added: ['还没有从集市添加教学方法', '', '前往教学方法集市'],
+  favorites: ['还没有收藏教学方法', '', '前往教学方法集市'],
 } as const;
 
 export function WorkshopPage(props: WorkshopProps) {
@@ -109,7 +109,7 @@ export function WorkshopPage(props: WorkshopProps) {
       if (entry) props.onMount(entry);
     },
     add: (item) => {
-      if (item.kind === 'skill' && props.onAddSkill(item.entry)) setMessage('已添加到我的 SKILL');
+      if (item.kind === 'skill' && props.onAddSkill(item.entry)) setMessage('已添加到我的教学方法');
     },
     remove: (item, trigger) => {
       dialogOrigin.current = trigger;
@@ -117,10 +117,10 @@ export function WorkshopPage(props: WorkshopProps) {
         name: item.title,
         removalOnly: item.kind === 'skill' && Boolean(item.entry.addedFrom),
         description: item.kind === 'skill' && item.entry.addedFrom
-          ? '只从我的 SKILL 中移除，集市原版保持不变。'
+          ? '只从我的教学方法中移除，集市原版保持不变。'
           : item.kind === 'method-draft'
           ? '这份未完成的教学方法草稿也会移除。'
-          : '仅移除这一项方法，保留其他 SKILL。',
+          : '仅移除这一项方法，保留其他教学方法。',
         action: () => {
           if (item.kind === 'skill') return props.onDeleteSkill(item.entry);
           return props.onDeleteAssistant(item.assistant.id);
@@ -152,11 +152,11 @@ export function WorkshopPage(props: WorkshopProps) {
     <main className="page-frame market-page workshop-page">
       <header className="workshop-heading page-heading">
         <div>
-          <h1>我的 SKILL</h1>
+          <h1>我的教学方法</h1>
         </div>
         <img src={`${import.meta.env.BASE_URL}workshop-folders.svg`} alt="" aria-hidden="true" />
         <div className="workshop-create-actions page-heading-actions">
-          <Button onClick={props.onCreate}>创建教学 SKILL</Button>
+          <Button onClick={props.onCreate}>创建教学方法</Button>
         </div>
       </header>
       <div className="workshop-layout">
@@ -165,14 +165,14 @@ export function WorkshopPage(props: WorkshopProps) {
           counts={counts}
           onTab={switchTab}
         />
-        <section className="workshop-content" aria-label="SKILL 管理">
+        <section className="workshop-content" aria-label="教学方法管理">
           <div className="workshop-tools">
             <h2>{label}</h2>
             <label className="workshop-search">
               <Search aria-hidden="true" />
               <input
-                aria-label="搜索我的 SKILL"
-                placeholder="搜索 SKILL 名称、内容或标签……"
+                aria-label="搜索我的教学方法"
+                placeholder="搜索教学方法名称、内容或标签……"
                 value={search.query}
                 onChange={(e) => setSearch((current) => ({ ...current, query: e.target.value }))}
               />
@@ -212,7 +212,7 @@ export function WorkshopPage(props: WorkshopProps) {
           </div>
           <div className="workshop-list-info">
             <span aria-live="polite">
-              {items.length} 项 SKILL
+              {items.length} 项教学方法
             </span>
             {hasFilters && (
               <Button variant="ghost" size="sm" onClick={clear}>
@@ -242,7 +242,7 @@ export function WorkshopPage(props: WorkshopProps) {
           </div>
           {!items.length && (
             <EmptyState
-              title={collections[tab].length ? '没有找到符合条件的 SKILL' : emptyCopy[tab][0]}
+              title={collections[tab].length ? '没有找到符合条件的教学方法' : emptyCopy[tab][0]}
               action={
                 <Button onClick={collections[tab].length ? clear : emptyAction}>
                   {collections[tab].length ? '清除筛选' : emptyCopy[tab][2]}

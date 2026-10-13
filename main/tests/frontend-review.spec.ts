@@ -36,8 +36,8 @@ test('手机作品页默认只保留一处搜索，筛选可展开并保留有�
   await seed(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/workshop');
-  await expect(page.getByLabel('搜索我的 SKILL')).toHaveCount(1);
-  await expect(page.getByLabel('搜索我的 SKILL')).toBeVisible();
+  await expect(page.getByLabel('搜索我的教学方法')).toHaveCount(1);
+  await expect(page.getByLabel('搜索我的教学方法')).toBeVisible();
   await expect(page.getByLabel('作品学段')).toBeHidden();
   await page.getByRole('button', { name: '筛选', exact: true }).click();
   await page.getByLabel('作品学段').selectOption('初中');
@@ -81,7 +81,7 @@ test('活动步骤切换定位新内容，手机保存反馈可见且底部留�
   await page.screenshot({ path: 'docs/assets/前端审查-活动手机可见区.png' });
 });
 
-test('手机活动支持方向键切换，方法检验与进度同时显示', async ({ page }) => {
+test('手机活动支持方向键切换，教学方法验证与进度同时显示', async ({ page }) => {
   await seed(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/space?draft=frontend-review-activity');
@@ -95,7 +95,7 @@ test('手机活动支持方向键切换，方法检验与进度同时显示', as
   await expect(configure).toBeFocused();
   await expect(page.locator('#activity-configure-panel')).toBeVisible();
   await page.goto('/#/assistant/assistant-demo-active/test');
-  await expect(page.getByRole('progressbar', { name: '方法检验进度' })).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: '教学方法验证进度' })).toBeVisible();
   await expect(page.locator('#testing-process')).toBeVisible();
   await expect(page.getByRole('tab', { name: '核对进度', exact: true })).toHaveCount(0);
 });
@@ -125,12 +125,12 @@ test('教学方法字段遵循各自限制，探究表单隐藏无意义的常�
   await page.goto('/#/create/frontend-field-limits');
   await page.getByRole('checkbox', { name: '标签 错因辅导', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  await page.getByRole('button', { name: '编辑SKILL 名称', exact: true }).click();
-  await expect(page.getByRole('textbox', { name: 'SKILL 名称', exact: true })).toHaveAttribute(
+  await page.getByRole('button', { name: '编辑教学方法名称', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: '教学方法名称', exact: true })).toHaveAttribute(
     'maxlength',
     '80',
   );
-  await page.getByRole('textbox', { name: 'SKILL 名称', exact: true }).fill('课堂反思');
+  await page.getByRole('textbox', { name: '教学方法名称', exact: true }).fill('课堂反思');
   await page.getByRole('button', { name: '编辑希望学生达到' }).click();
   await expect(page.getByRole('textbox', { name: '希望学生达到', exact: true })).toHaveAttribute(
     'maxlength',
@@ -152,14 +152,14 @@ test('离开长列表进入新页面回到顶部，键盘焦点到内容，返�
   await seed(page);
   await page.setViewportSize({ width: 1440, height: 700 });
   await page.goto('/#/workshop');
-  await page.getByLabel('搜索我的 SKILL').fill('反思');
+  await page.getByLabel('搜索我的教学方法').fill('反思');
   const last = page.locator('.workshop-item').last();
   await last.getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.locator('main')).toBeFocused();
   expect(await page.evaluate(() => scrollY)).toBe(0);
-  await expect(page).toHaveTitle(/反思.*教学工坊/);
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
-  await expect(page.getByLabel('搜索我的 SKILL')).toHaveValue('反思');
+  await expect(page).toHaveTitle(/反思.*师说/);
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
+  await expect(page.getByLabel('搜索我的教学方法')).toHaveValue('反思');
   await page.getByRole('link', { name: '跳到页面内容' }).focus();
   await page.getByRole('link', { name: '跳到页面内容' }).press('Enter');
   await expect(page.locator('main')).toBeFocused();

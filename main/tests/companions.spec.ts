@@ -27,9 +27,10 @@ async function basic(page: Page) {
   await page.getByRole('combobox', { name: '适用年级（可选）', exact: true }).selectOption('七年级');
 }
 async function create(page: Page) {
+  await verifyOwnerMethod(page);
   await page.goto('/#/companions/new-buddy/edit');
   await basic(page);
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('checkbox', { name: /错因追问/ }).check();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await tasks(page);
@@ -41,14 +42,50 @@ async function finish(page: Page) {
   await page.getByRole('button', { name: /^(创建学伴|保存学伴)$/ }).click();
 }
 
+// 2026-10-12 起未核对的方法不能挂载：进入四步选择前先在真实检测 UI 完成教师核对。
+async function verifyMethod(page: Page) {
+  await page.getByRole('button', { name: '开始验证', exact: true }).click();
+  await expect(page.locator('.execution-case').first()).toBeVisible();
+  const progress = page.getByRole('progressbar', { name: '教学方法验证进度' });
+  const max = Number(await progress.getAttribute('max'));
+  // 按已确认数量逐步等待，避免点击后旧按钮仍在 DOM 里造成误判。
+  for (let confirmed = 0; confirmed < max; confirmed += 1) {
+    await expect(progress).toHaveAttribute('value', String(confirmed));
+    if (confirmed === max - 1) {
+      await page.getByRole('button', { name: '确认并完成验证', exact: true }).click();
+    } else {
+      await page.getByRole('button', { name: '确认并继续', exact: true }).click();
+    }
+  }
+  await expect(progress).toHaveAttribute('value', String(max));
+  // 资格同步完成后才出现发布入口，据此确认核对已生效而非仅点了按钮。
+  await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toBeVisible();
+}
+
+async function verifyOwnerMethod(page: Page) {
+  await page.goto('/#/workshop');
+  await page.getByRole('button', { name: '发布到集市', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  const toTest = dialog.getByRole('button', { name: '前往教学方法验证' });
+  if (await toTest.count()) {
+    await toTest.click();
+    await verifyMethod(page);
+    return;
+  }
+  // 已核对时发布弹窗没有检验入口，直接关闭，不重复生成方法也不发布。
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+}
+
 test('草稿方法从详情检验，发布入口不会误入编辑；可发布和撤下', async ({ page }) => {
   await page.goto('/#/workshop');
   await page.getByRole('button', { name: '发布到集市', exact: true }).click();
-  await expect(page.getByRole('dialog')).toContainText('发布前请完成方法检验');
-  await page.getByRole('button', { name: '前往方法检验' }).click();
+  await expect(page.getByRole('dialog')).toContainText('发布前请完成教学方法验证');
+  await page.getByRole('button', { name: '前往教学方法验证' }).click();
   await expect(page.getByRole('progressbar')).toHaveAttribute('value', '0');
   await expect(page).toHaveURL(/buddy-owner\/test/);
-  await page.getByRole('button', { name: '确认并完成' }).click();
+  await verifyMethod(page);
   await page.goto('/#/workshop');
   await page.getByRole('button', { name: '发布到集市', exact: true }).click();
   await page.getByRole('button', { name: '确认发布', exact: true }).click();
@@ -73,7 +110,7 @@ test('命名、选方法、填写任务、上传材料，普通活动创建后�
   await expect(page.getByRole('textbox', { name: '学习任务与目标', exact: true })).toHaveValue('检查解题思路，说明每一步的理由');
   await finish(page);
   await expect(page).toHaveURL(/#\/companions\/new-buddy$/);
-  await expect(page.locator('.companion-task-summary')).toContainText('检查解题思路，说明每一步的理由');
+  await expect(page.locator('.companion-task-summary').first()).toContainText('检查解题思路，说明每一步的理由');
   await page.locator('summary').filter({ hasText: '学伴教学要求' }).click();
   await expect(page.locator('.companion-activity')).toContainText('学生把移项后的符号写错了。');
   const download = page.waitForEvent('download'); await page.getByRole('button', { name: '下载材料' }).click();
@@ -106,7 +143,7 @@ test('情景题与 PBL 可分别选用，取消后不进入活动；手机不溢
   await expect(page.getByRole('heading', { name: '情景题', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'PBL 学习活动', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '编辑学伴' }).click();
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await page.getByText('活动设计（选填）', { exact: true }).click();
   await page.getByRole('button', { name: '情景化出题' }).click();
@@ -115,22 +152,22 @@ test('情景题与 PBL 可分别选用，取消后不进入活动；手机不溢
   await expect(page.getByRole('heading', { name: 'PBL 学习活动', exact: true })).toBeVisible();
 });
 
-test('从我的 SKILL 挂载已有学伴可去重，挂载入口也可预选创建新学伴', async ({ page }) => {
+test('从我的教学方法 挂载已有学伴可去重，挂载入口也可预选创建新学伴', async ({ page }) => {
   await create(page); await finish(page);
   await page.goto('/#/workshop');
   const before = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
   await page.getByRole('button', { name: /更多操作：/ }).click();
-  await page.getByRole('menuitem', { name: '挂载到学伴' }).click();
-  await page.getByRole('button', { name: '已挂载，查看学伴' }).click();
+  await page.getByRole('menuitem', { name: '添加到学伴' }).click();
+  await page.getByRole('button', { name: '已添加，查看学伴' }).click();
   await expect(page.getByRole('heading', { name: '数学学伴', exact: true })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(before);
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!)[0].skillIds.length, companionsKey)).toBe(1);
   await page.goto(`/#/skill/${entryId}`);
-  await page.getByRole('button', { name: '挂载到学伴' }).click();
+  await page.getByRole('button', { name: '添加到学伴' }).click();
   await page.getByRole('button', { name: '创建新学伴' }).click();
   await expect(page.getByRole('textbox', { name: '学伴名称', exact: true })).toHaveValue('');
   await basic(page);
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await expect(page.getByRole('checkbox', { name: /错因追问/ })).toBeChecked();
 });
 
@@ -147,7 +184,7 @@ test('存储失败保留任务输入，恢复后可重试；损坏资料不被�
   await expect(page.locator('.companion-editor').getByRole('alert')).toContainText('保存失败');
   await page.evaluate(() => (window as unknown as { restoreStorage: () => void }).restoreStorage());
   await finish(page);
-  await expect(page.locator('.companion-task-summary')).toContainText('保留这项任务');
+  await expect(page.locator('.companion-task-summary').first()).toContainText('保留这项任务');
   await page.evaluate(key => localStorage.setItem(key, '{broken'), companionsKey);
   await page.reload();
   await expect(page.getByRole('alert')).toContainText('学伴资料读取失败');
@@ -168,8 +205,8 @@ test('从集市添加的只读 SKILL 可以挂载已有学伴，来源和个人�
   const originals = await page.evaluate(() => [localStorage.getItem('teaching-assistant.frontend-demo.v2'), localStorage.getItem('teaching-method.market-workspace.v1')]);
   await page.getByRole('button', { name: /更多操作：/ }).click();
   await expect(page.getByRole('menuitem', { name: '复制', exact: true })).toHaveCount(0);
-  await page.getByRole('menuitem', { name: '挂载到学伴' }).click();
-  await page.getByRole('button', { name: '确认挂载', exact: true }).click();
+  await page.getByRole('menuitem', { name: '添加到学伴' }).click();
+  await page.getByRole('button', { name: '确认添加', exact: true }).click();
   await expect(page.locator('summary').filter({ hasText: '证据追问' })).toBeVisible();
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!)[0].skillIds.length, companionsKey)).toBe(2);
   expect(await page.evaluate(() => [localStorage.getItem('teaching-assistant.frontend-demo.v2'), localStorage.getItem('teaching-method.market-workspace.v1')])).toEqual(originals);
@@ -197,6 +234,7 @@ test('发布保存失败不跳转、不假报成功，重试只发布一次', as
 });
 
 test('四步创建保留输入，预览仅在最后一步显示并排在保存区域上方', async ({ page }, info) => {
+  await verifyOwnerMethod(page);
   await page.setViewportSize({ width: 1540, height: 1000 });
   await page.goto('/#/companions/profile-buddy/edit');
   await expect(page.getByRole('list', { name: '创建进度' }).getByRole('listitem')).toHaveCount(4);
@@ -204,7 +242,7 @@ test('四步创建保留输入，预览仅在最后一步显示并排在保存�
   await expect(preview).toHaveCount(0);
   await expect(page.getByRole('heading', { name: '基本信息', exact: true })).toBeVisible();
   await expect.poll(() => page.locator('.companion-avatar-options img').evaluateAll(images => images.every(image => (image as HTMLImageElement).naturalWidth > 0))).toBe(true);
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('学伴名称');
   await basic(page);
   await page.getByRole('radio', { name: '简洁风格', exact: true }).check();
@@ -225,8 +263,8 @@ test('四步创建保留输入，预览仅在最后一步显示并排在保存�
   }
   await page.screenshot({ path: info.outputPath('companion-profile-mobile.png'), fullPage: true });
   await page.getByRole('radio', { name: '简洁风格', exact: true }).check();
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '选择 SKILL', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '选择教学方法', exact: true })).toBeVisible();
   await expect(preview).toHaveCount(0);
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await expect(preview).toHaveCount(0);
@@ -273,10 +311,11 @@ test('四步创建保留输入，预览仅在最后一步显示并排在保存�
   await page.goto('/#/companions');
   await expect(page.locator('.companion-card')).toHaveCount(1);
   await page.getByRole('button', { name: '查看学伴', exact: true }).click();
-  await expect(page.locator('.companion-task-summary')).toContainText('检查解题思路');
+  await expect(page.locator('.companion-task-summary').first()).toContainText('检查解题思路');
 });
 
 test('旧九项任务按授权清除，学伴名称、挂载与附件保留，新场景刷新仍保存', async ({ page }) => {
+  await verifyOwnerMethod(page);
   await page.goto('/#/home');
   const old = { id: 'legacy-buddy', name: '旧数学学伴', skillIds: [entryId], step: 2, status: 'ready', updatedAt: '2026-10-10',
     task: { title: '旧纠错任务', audience: '七年级学生', subject: '数学', duration: '两课时', goals: '解释错因', priorKnowledge: '掌握移项',
@@ -293,7 +332,7 @@ test('旧九项任务按授权清除，学伴名称、挂载与附件保留，�
   await page.getByRole('button', { name: '编辑学伴', exact: true }).click();
   await page.getByRole('textbox', { name: '学伴简介', exact: true }).fill('帮助学生说明解题理由');
   await page.getByRole('combobox', { name: '学段', exact: true }).selectOption('初中');
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await expect(page.getByRole('combobox', { name: '学习对象', exact: true })).toHaveValue('');
   await expect(page.getByRole('textbox', { name: '学习任务与目标', exact: true })).toHaveValue('');
@@ -304,7 +343,7 @@ test('旧九项任务按授权清除，学伴名称、挂载与附件保留，�
   await expect(page.locator('.companion-activity')).not.toContainText('掌握移项');
   await expect(page.locator('.companion-activity')).not.toContainText('旧学习目标');
   await page.reload();
-  await expect(page.locator('.companion-task-summary')).toContainText('检查解题思路');
+  await expect(page.locator('.companion-task-summary').first()).toContainText('检查解题思路');
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!)[0].legacyTask, companionsKey)).toBeUndefined();
 });
 
@@ -326,13 +365,13 @@ test('旧教学任务和活动草稿清空，来源 SKILL 与发布关系不受�
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!).tasks)).toHaveLength(1);
   await page.evaluate(() => { (window as unknown as { restoreWrite: () => void }).restoreWrite(); localStorage.setItem('allow-legacy-task-cleanup', 'yes'); });
   await page.getByRole('button', { name: '重新清理', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /让每一份教学智慧，\s*都被看见。/ })).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!).tasks)).toEqual([]);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-method.market-workspace.v1')!).activityDrafts)).toEqual([]);
   expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(before);
   await page.goto('/#/task/old-task');
   await expect(page.getByRole('heading', { name: '没有找到这项内容' })).toBeVisible();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(1);
 });
 
@@ -345,17 +384,17 @@ test('挂载弹窗关闭后，学伴详情和四个顶栏菜单均可继续点�
     await page.goto('/#/workshop');
     if (origin === 'card') {
       await page.getByRole('button', { name: /更多操作：/ }).click();
-      await page.getByRole('menuitem', { name: '挂载到学伴', exact: true }).click();
+      await page.getByRole('menuitem', { name: '添加到学伴', exact: true }).click();
     } else {
       await page.getByRole('button', { name: '查看', exact: true }).click();
-      await page.getByRole('button', { name: '挂载到学伴', exact: true }).click();
+      await page.getByRole('button', { name: '添加到学伴', exact: true }).click();
     }
-    await page.getByRole('button', { name: '已挂载，查看学伴', exact: true }).click();
+    await page.getByRole('button', { name: '已添加，查看学伴', exact: true }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page.locator('main')).toHaveCount(1);
     await expect(page.getByRole('heading', { name: '数学学伴', exact: true })).toBeVisible();
     await expect(page.locator('body')).not.toHaveCSS('pointer-events', 'none');
-    for (const [name, hash] of [['首页', 'home'], ['教学 SKILL 集市', 'market'], ['我的 SKILL', 'workshop'], ['我的学伴', 'companions']]) {
+    for (const [name, hash] of [['首页', 'home'], ['教学方法集市', 'market'], ['我的教学方法', 'workshop'], ['我的学伴', 'companions']]) {
       await page.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`#/${hash}$`));
       await expect(page.locator('main')).toHaveCount(1);

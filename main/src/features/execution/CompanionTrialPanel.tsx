@@ -68,7 +68,7 @@ export function ServerCompanionTrialPanel({ value, skills, onEdit, onCheck, onMe
   }
   return <section className="market-panel execution-trial-panel">
     <h2>学伴试发布</h2><p className="subtle">先试用，再邀请少量学生。结束后核对对话和方法执行情况。</p>
-    {!ready && <div className="execution-method-gate"><p>挂载的方法需要通过检测并由教师确认。</p>
+    {!ready && <div className="execution-method-gate"><p>已添加的教学方法需要完成验证并由教师确认。</p>
       {selected.filter(entry => !verification.verified(entry)).map(entry => <Button key={entry.id} variant="outline" onClick={() => onCheck(entry)}>检测：{entry.skill.name}</Button>)}
       {verification.error && verification.error !== error && <p role="alert">{verification.error}</p>}
     </div>}

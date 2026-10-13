@@ -1,0 +1,308 @@
+/* 师说公共主题：灰绿底色与光感书桌氛围，白面板、深绿控件。
+   仅在公共层统一品牌、字号、字体角色与动效；页面局部插画与构建保持原样。 */
+
+:root {
+  --page-title-size: 36px;
+  --header-height: 80px;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --page-title-size: 28px;
+  }
+}
+
+/* 四页共用同一氛围底，保证跨路由背景一致。照片只铺到具体页面容器。 */
+.application {
+  background-color: var(--canvas);
+  background-image:
+    radial-gradient(1200px 620px at 12% -8%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(900px 560px at 104% 6%, rgba(144, 155, 112, 0.16), rgba(144, 155, 112, 0) 66%),
+    radial-gradient(820px 560px at 88% 108%, rgba(44, 99, 58, 0.1), rgba(44, 99, 58, 0) 68%),
+    linear-gradient(180deg, #f2f7f4 0%, #eef4f1 46%, #eaf1ec 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* 首页保留书桌照片原位；登录页把照片铺到整块 .application 画布，登录容器本身不重复铺图。 */
+.application .home-surface {
+  background-image:
+    linear-gradient(180deg, rgba(244, 248, 245, 0.18) 0%, rgba(244, 248, 245, 0.12) 42%, rgba(244, 248, 245, 0.26) 100%),
+    url('../../public/study-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.application:has(.account-login) {
+  background-image:
+    linear-gradient(180deg, rgba(244, 248, 245, 0.24) 0%, rgba(244, 248, 245, 0.12) 42%, rgba(244, 248, 245, 0.28) 100%),
+    url('../../public/study-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 760px) {
+  .application .home-surface {
+    background-image:
+      linear-gradient(180deg, rgba(244, 248, 245, 0.42) 0%, rgba(244, 248, 245, 0.35) 44%, rgba(244, 248, 245, 0.45) 100%),
+      url('../../public/study-background.png');
+  }
+
+  .application:has(.account-login) {
+    background-image:
+      linear-gradient(180deg, rgba(244, 248, 245, 0.42) 0%, rgba(244, 248, 245, 0.35) 44%, rgba(244, 248, 245, 0.45) 100%),
+      url('../../public/study-background.png');
+  }
+}
+
+/* 登录内容层不再自带背景图，避免遮住画布照片。 */
+.account-login {
+  background-image: none;
+}
+.application .account-login { padding-inline: 0; }
+@media (min-width: 901px) {
+  .application .account-login { padding-right: 32px; }
+}
+
+/* 字体角色：品牌、页面主标题与条目名称用中文宋体，正文导航控件用黑体。 */
+.brand,
+.brand span {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.application .brand span {
+  display: inline;
+  font-size: 30px;
+  line-height: 1.1;
+}
+.application .brand .brand-logo {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 134px;
+  height: 60px;
+  overflow: hidden;
+}
+.application .brand-logo > img {
+  position: absolute;
+  width: 150px;
+  max-width: none;
+  height: auto;
+  left: -10px;
+  top: -46px;
+  filter: brightness(.88) saturate(1.05);
+}
+@media (max-width: 760px) {
+  .application .brand .brand-logo { width: 84px; height: 38px; }
+  .application .brand-logo > img { width: 94px; left: -6px; top: -29px; }
+}
+
+.application .header-inner { max-width: none; }
+.application .brand { flex: none; padding-inline: 12px 36px; }
+.application .teacher-avatar { min-width: 44px; min-height: 44px; }
+.application :is(.header-actions, .workshop-create-actions, .companion-library-heading, .home-hero-copy) [data-slot='button'][data-variant='default'] {
+  min-height: 44px;
+  padding-inline: 18px;
+  border: 1px solid var(--primary-hover);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  box-shadow: 0 4px 10px -6px var(--primary-active);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .application :is(.header-actions, .workshop-create-actions, .companion-library-heading, .home-hero-copy) [data-slot='button'][data-variant='default']:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -8px var(--primary-active);
+    filter: brightness(1.04);
+  }
+}
+.application :is(.header-actions, .workshop-create-actions, .companion-library-heading, .home-hero-copy) [data-slot='button'][data-variant='default']:active { transform: translateY(0) scale(.97); }
+@media (prefers-reduced-motion: reduce) {
+  .application :is(.header-actions, .workshop-create-actions, .companion-library-heading, .home-hero-copy) [data-slot='button'][data-variant='default'] { transition: none; transform: none; }
+}
+.application .header-nav { gap: 4px; }
+.application .header-nav button {
+  position: relative;
+  isolation: isolate;
+  border-bottom-color: transparent;
+  color: var(--ink-2);
+  font-size: 16px;
+}
+.application .header-nav button::before {
+  content: '';
+  position: absolute;
+  inset: 12px 4px;
+  border-radius: var(--radius-md);
+  background: var(--blue-soft);
+  opacity: 0;
+  transform: scale(.94);
+  transition: opacity 180ms ease, transform 180ms ease;
+  z-index: -1;
+}
+.application .header-nav button::after {
+  content: '';
+  position: absolute;
+  inset: auto 18px 0;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 200ms ease;
+}
+.application .header-nav button.active { color: var(--primary); }
+.application .header-nav button.active::before { opacity: .55; transform: scale(1); }
+.application .header-nav button.active::after { transform: scaleX(1); }
+.application .header-nav button:focus-visible { outline: 2px solid var(--ring); outline-offset: -4px; }
+@media (hover: hover) and (pointer: fine) {
+  .application .header-nav button:hover { color: var(--primary); }
+  .application .header-nav button:hover::before { opacity: 1; transform: scale(1); }
+}
+@media (max-width: 900px) {
+  .application .brand { padding-inline: 8px 20px; }
+  .application .header-nav { gap: 0; }
+}
+@media (max-width: 760px) {
+  .application .brand { padding-inline: 8px; }
+  .application .header-actions [data-slot='button'] { min-height: 44px; }
+  .application .header-nav button::before { inset: 4px 1px; }
+  .application .header-nav button::after { inset-inline: 6px; }
+}
+@media (max-width: 1000px) {
+  :root { --header-height: 120px; }
+  .application .app-header { height: var(--header-height); }
+  .application .header-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 72px minmax(0, 1fr); }
+  .application .brand { height: 72px; }
+  .application .header-actions { grid-column: 2; grid-row: 1; height: 72px; }
+  .application .header-nav { grid-column: 1 / -1; grid-row: 2; width: 100%; min-width: 0; height: 100%; justify-content: space-between; overflow-x: auto; }
+}
+@media (max-width: 760px) {
+  .application .header-nav button { font-size: 14px; padding-inline: 4px; min-width: 0; }
+  .application .header-actions [data-slot='button'][data-variant='default'] { font-size: 14px; padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .application .header-nav button::before,
+  .application .header-nav button::after { transition: none; }
+}
+
+@media (max-width: 760px) {
+  .application .brand span {
+    font-size: 26px;
+  }
+}
+
+.application main.page-frame h1,
+.application main .page-frame h1 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.application .home-hero-title,
+.application .home-shortcut-card h2,
+.application .home-featured-card h3,
+.application .companion-card-title h2,
+.application .catalog-resource-title h2,
+.application .workshop-item h3,
+.application .workshop-item h3 button {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.application .execution-case-heading h2,
+.application .execution-case h2,
+.application .execution-confirm h2,
+.application .companion-overview-panel h2 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.application .header-nav button,
+.application .header-actions,
+.application .account-login-intro p,
+.application .account-form {
+  font-family: var(--font-sans);
+}
+
+/* 统一 180ms 交互与按压反馈。 */
+.application .brand,
+.application .header-nav button,
+.application .home-shortcut-card,
+.application .home-featured-card,
+.application .home-primary-action,
+.application .account-form button,
+[data-slot='button'] {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.market-resource-card,
+.workshop-item,
+.companion-card {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.application .home-shortcut-card:not(:disabled):active,
+.application .home-featured-card:not(:disabled):active,
+.application .home-primary-action:active,
+.application .account-form button:active,
+.application .header-nav button:active,
+[data-slot='button']:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* 悬停反馈只在支持精细指针的设备启用，触屏不出现粘滞上浮。 */
+@media (hover: hover) and (pointer: fine) {
+  .application .home-shortcut-card:not(:disabled):hover,
+  .application .home-featured-card:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px -28px rgba(15, 70, 48, 0.45);
+  }
+
+  .market-resource-card:not(:disabled):hover,
+  .workshop-item:not(:disabled):hover,
+  .companion-card:not(:disabled):hover {
+    transform: translateY(-1px);
+    border-color: var(--line-strong, var(--line));
+    box-shadow: 0 16px 32px -26px rgba(15, 70, 48, 0.38);
+  }
+}
+
+/* 轻页面进入与弹窗时长 240ms；仅用透明度，避免影响吸顶与定位。 */
+@keyframes shishuo-page-enter {
+  from {
+    opacity: 0.001;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.application main.page-frame {
+  animation: shishuo-page-enter 240ms ease-out both;
+}
+
+[data-slot='dialog-overlay'],
+[data-slot='dialog-content'] {
+  animation-duration: 240ms;
+}
+
+/* 弹窗通过 portal 挂到 .application 之外，因此弹窗标题与动效用全局选择器命中。 */
+[data-slot='dialog-title'] {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}

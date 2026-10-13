@@ -1,4 +1,3 @@
-import { editMethodField } from './fixtures/method-form';
 import { test, expect } from './market-catalog-fixture';
 import { initialMine } from '../src/data/platform';
 
@@ -7,7 +6,8 @@ const fixture = {
   skills: [{ ...initialMine[0].skills[0], id: 'review-method', tags: ['一元一次方程'], steps: [
     { condition: '学生第一次答错', action: '先让学生回顾思路' },
     { condition: '回顾以后还是没有发现问题', action: '提醒他检查可能出错的那一步' },
-  ], behaviorSteps: ['先让学生回顾思路', '提醒他检查可能出错的那一步'] }],
+  ], behaviorSteps: ['先让学生回顾思路', '提醒他检查可能出错的那一步'],
+    constraints: [...initialMine[0].skills[0].constraints, '结束条件：学生能独立检查思路并解释错误原因后结束引导'] }],
 };
 
 test.beforeEach(async ({ page }) => {
@@ -27,25 +27,36 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   page.on('request', (request) => { if (request.url().includes('/api/')) requests.push(request.url()); });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/#/assistant/review-flow/test');
+  await page.getByRole('button', { name: '开始验证' }).click();
+  await expect(page.locator('.execution-case-heading').first()).toContainText('情况 1');
   await page.getByRole('button', { name: '确认并继续' }).click();
-  await expect(page.locator('.test-record')).toContainText('我已经回顾了自己的思路，但还是没有找到哪里出了问题。');
-  await expect(page.locator('.test-record')).toContainText('你已经回顾过思路');
-  await page.getByRole('button', { name: '修改当前方法' }).click();
-  const editor = page.getByRole('dialog');
-  await editor.getByRole('button', { name: '编辑做法 2' }).click();
-  await editor.getByRole('textbox', { name: '做法 2', exact: true }).fill('请学生标出不确定的一步，再提供一个针对性提示。');
-  await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
+  const secondCase = page.locator('.execution-case').filter({ hasText: '情况 2' });
+  await expect(secondCase.locator('.execution-transcript')).toContainText('我已经回顾了自己的思路，但还是没有找到哪里出了问题。');
+  await expect(secondCase.locator('.execution-transcript')).toContainText('你已经回顾过思路');
+  await page.getByRole('button', { name: '修改描述' }).click();
+  const editor = page.locator('.execution-case-editor');
+  await editor.getByLabel('教师做法', { exact: true }).fill('请学生标出不确定的一步，再提供一个针对性提示。');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
   await expect(editor).toBeHidden();
-  await expect(page.getByRole('heading', { name: /方法检验/, level: 1 })).toBeVisible();
-  await expect(page.getByRole('progressbar', { name: '方法检验进度' })).toHaveAttribute('value', '0');
+  await expect(page.getByRole('heading', { name: /教学方法验证/, level: 1 })).toBeVisible();
+  await expect(page.locator('.execution-progress progress')).toHaveAttribute('value', '1');
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
-  await expect(page.locator('.test-case-head')).toContainText('情况 1');
   await page.reload();
+  await expect(page.locator('.execution-progress progress')).toHaveAttribute('value', '1');
+  await expect(page.locator('.execution-case-heading').first()).toContainText('情况 2');
+  await expect(page.locator('.execution-case').filter({ hasText: '情况 2' })).toContainText('请学生标出不确定的一步');
   await page.getByRole('button', { name: '确认并继续' }).click();
-  await expect(page.locator('.check-list')).toContainText('请学生标出不确定的一步');
-  await page.getByRole('button', { name: '确认并完成' }).click();
-  await page.getByRole('button', { name: '学生视角预览', exact: true }).click();
+  await page.getByRole('button', { name: '修改描述' }).click();
+  const endingEditor = page.locator('.execution-case-editor');
+  await endingEditor.getByLabel('结束条件', { exact: true }).fill('学生能独立解释正确解题思路后结束');
+  await endingEditor.getByRole('button', { name: '保存并重新核对' }).click();
+  await expect(endingEditor).toBeHidden();
+  await expect(page.locator('.execution-progress progress')).toHaveAttribute('value', '0');
+  await page.getByRole('button', { name: '确认并继续' }).click();
+  await page.getByRole('button', { name: '确认并继续' }).click();
+  await page.getByRole('button', { name: '确认并完成验证' }).click();
+  await expect(page.locator('.execution-complete')).toBeVisible();
+  await page.goto('/#/assistant/review-flow/student-preview?from=test');
   await expect(page).toHaveURL(/student-preview\?from=test/);
   await page.getByRole('tab', { name: '方法步骤', exact: true }).click();
   await expect(page.getByText('回顾以后还是没有发现问题', { exact: true })).toBeVisible();
@@ -59,12 +70,17 @@ test('核对就地修改、重新核对、预览第二步、摘要与分享形�
   await page.getByRole('button', { name: '发送学生问题' }).click();
   await expect(page.locator('.student-message').last()).toContainText('先标出你不确定的一步');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('review-method:1');
-  await expect(page.getByRole('button', { name: '完成，返回我的 SKILL' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '完成，返回我的教学方法' })).toBeVisible();
   await page.getByText('核对记录', { exact: true }).click();
   await expect(page.locator('.preview-review-record')).toContainText('教师已核对方法内容');
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
   await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toBeVisible();
+  // 新版已取消检测完成区到学生视角预览的入口：预览改用直链兼容验证，发布从完成区弹窗确认。
+  await page.goto('/#/assistant/review-flow/test');
+  await expect(page.locator('.execution-complete')).toBeVisible();
   await page.getByRole('button', { name: '发布到集市', exact: true }).click();
+  const publishDialog = page.getByRole('dialog');
+  await publishDialog.getByRole('button', { name: /发布/ }).click();
   await expect(page).toHaveURL(/#\/market/);
   await expect(page.locator('.market-resource-card').filter({ hasText: '错误后反思引导' })).toHaveCount(2);
   await page.goto('/#/assistant/review-flow/logs');
@@ -115,12 +131,12 @@ test('多方法预览只分享当前方法，完成直接返回作品，未找�
   await page.screenshot({ path: 'docs/assets/简化后-方法详情-手机.png', fullPage: true, animations: 'disabled', scale: 'css' });
   await page.goto('/#/workshop?tab=created');
   await page.locator('.workshop-item').filter({ hasText: '第二项方法' }).getByRole('button', { name: '查看', exact: true }).click();
-  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '试用 教学方法', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '试用 教学方法', exact: true })).toHaveCount(0);
   await page.goto('/#/assistant/multi-review/student-preview?from=method&case=method-two:0');
   await expect(page.getByLabel('预览教学情况')).toHaveValue('method-two:0');
-  await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
-  await page.getByRole('button', { name: '完成，返回我的 SKILL' }).click();
+  await expect(page.getByRole('button', { name: '我的教学方法', exact: true })).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('button', { name: '完成，返回我的教学方法' }).click();
   await expect(page).toHaveURL(/workshop\?tab=skills$/);
   await page.goto('/#/assistant/multi-review/student-preview?from=method&case=missing:0');
   await expect(page.getByRole('heading', { name: '没有找到这项方法' })).toBeVisible();
@@ -150,28 +166,32 @@ test('未采用方法直接进入检验，加入失败时保留预览与原状�
   await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
   await page.getByRole('button', { name: '先核对教学方法', exact: true }).click();
   await expect(page).toHaveURL(/assistant\/review-flow\/test/);
-  await expect(page.locator('.test-case-head')).toContainText('情况 1');
+  await page.getByRole('button', { name: '开始验证' }).click();
+  await expect(page.locator('.execution-case-heading').first()).toContainText('情况 1');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.excluded-skills.v1')!)['review-flow'])).toEqual([]);
 });
 
 test('修改可以放弃，未核对版本不能分享，保存失败不替换原方法', async ({ page }) => {
   await page.goto('/#/assistant/review-flow/report');
   await expect(page.getByRole('button', { name: '发布到集市', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '方法检验' }).click();
-  await page.getByRole('button', { name: '修改当前方法' }).click();
-  const editor = page.getByRole('dialog');
-  await editor.getByRole('button', { name: '编辑做法 1' }).click();
-  await editor.getByLabel('做法 1', { exact: true }).fill('不保存的修改');
-  await editor.getByRole('button', { name: '取消', exact: true }).click();
-  await editor.getByRole('button', { name: '放弃修改' }).click();
-  await expect(page.locator('.check-list')).toContainText('先让学生回顾思路');
-  await page.getByRole('button', { name: '修改当前方法' }).click();
-  await editor.getByRole('button', { name: '编辑做法 1' }).click();
-  await editor.getByLabel('做法 1', { exact: true }).fill('存储失败时的修改');
+  await page.getByRole('button', { name: '教学方法验证' }).click();
+  await page.getByRole('button', { name: '开始验证' }).click();
+  await expect(page.locator('.execution-case-heading').first()).toContainText('情况 1');
+  await page.getByRole('button', { name: '修改描述' }).click();
+  const editor = page.locator('.execution-case-editor');
+  await editor.getByLabel('教师做法', { exact: true }).fill('不保存的修改');
+  await editor.getByRole('button', { name: '取消修改' }).click();
+  await expect(editor).toBeHidden();
+  await expect(page.locator('.execution-case')).toContainText('先让学生回顾思路');
+  await page.getByRole('button', { name: '修改描述' }).click();
+  await editor.getByLabel('教师做法', { exact: true }).fill('存储失败时的修改');
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new DOMException('quota', 'QuotaExceededError'); }; });
-  await editMethodField(editor, '结束条件', '学生能独立解释正确解题思路后结束');
   await editor.getByRole('button', { name: '保存并重新核对' }).click();
-  await expect(editor.getByRole('alert')).toContainText('修改未保存');
-  await expect(page.locator('.testing-progress progress')).toHaveAttribute('value', '0');
+  await expect(page.locator('.execution-error')).toContainText('保存');
+  await expect(editor.getByLabel('教师做法', { exact: true })).toHaveValue('存储失败时的修改');
+  await expect(page.locator('.execution-progress progress')).toHaveAttribute('value', '0');
+  const stored = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2') || '');
+  expect(stored).toContain('先让学生回顾思路');
+  expect(stored).not.toContain('存储失败时的修改');
   await expect(page.locator('main')).not.toContainText(/v\d+\.\d+/);
 });

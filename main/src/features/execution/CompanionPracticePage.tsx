@@ -18,16 +18,17 @@ type Detail = { trial: Trial; sessions: TrialSession[] };
 type PageProps = {
   value: LearningCompanion; skills: SkillEntry[]; onBack: () => void; onEdit: () => void;
   onCheck: (entry: SkillEntry) => void; onMethods: () => void;
+  backLabel?: string;
 };
 
 export function CompanionPracticePage(props: PageProps) {
   return serviceConfigured ? <ServerPracticePage {...props} /> : <PreviewPracticePage {...props} />;
 }
 
-function ServerPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods }: PageProps) {
+function ServerPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods, backLabel = '返回学伴' }: PageProps) {
   return <main className="page-frame market-page companion-page companion-practice-page">
     <header className="companion-practice-heading page-heading">
-      <button className="back-link" onClick={onBack}><ArrowLeft />返回学伴</button>
+      <button className="back-link" onClick={onBack}><ArrowLeft />{backLabel}</button>
       <PracticeIdentity value={value} />
     </header>
     <ServerCompanionTrialPanel value={value} skills={skills} onEdit={onEdit} onCheck={onCheck} onMethods={onMethods} />
@@ -43,7 +44,7 @@ function PracticeIdentity({ value, mode }: { value: LearningCompanion; mode?: st
   </div>;
 }
 
-function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods }: PageProps) {
+function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods, backLabel = '返回学伴' }: PageProps) {
   const verification = useVerification();
   const selected = skills.filter(entry => value.skillIds.includes(entry.id));
   const [trials, setTrials] = useState<Trial[]>([]);
@@ -63,7 +64,7 @@ function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods
   const suggestions = detail ? practiceInputs(detail.trial.companion, detail.trial.methods) : [];
 
   async function refresh(id?: string) {
-    const rows = await executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(value.id)}`);
+    const rows = await executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(value.id)}&purpose=practice`);
     setTrials(rows);
     const chosen = id || rows[0]?.id;
     setDetail(chosen ? await executionApi<Detail>(`/trials/${chosen}`) : null);
@@ -71,7 +72,7 @@ function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods
 
   useEffect(() => {
     let disposed = false;
-    void executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(value.id)}`).then(async rows => {
+    void executionApi<Trial[]>(`/trials?companionId=${encodeURIComponent(value.id)}&purpose=practice`).then(async rows => {
       if (disposed) return;
       const next = rows[0] ? await executionApi<Detail>(`/trials/${rows[0].id}`) : null;
       if (!disposed) { setTrials(rows); setDetail(next); }
@@ -89,10 +90,9 @@ function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods
   function start() {
     void act(async () => {
       setStarting(true);
-      const settled = await executionApi<{ trial: Trial }>('/trials', {
+      const settled = await executionApi<{ trial: Trial; session: TrialSession }>('/practice-trials', {
         companion: value, methods: selected.map(methodInput), hours: 168, capacity: 1,
       });
-      await executionApi(`/trials/${settled.trial.id}/teacher-session`, {});
       await refresh(settled.trial.id);
     }).finally(() => setStarting(false));
   }
@@ -104,11 +104,11 @@ function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods
 
   return <main className="page-frame market-page companion-page companion-practice-page">
     <header className="companion-practice-heading page-heading">
-      <button className="back-link" onClick={onBack}><ArrowLeft />返回学伴</button>
+      <button className="back-link" onClick={onBack}><ArrowLeft />{backLabel}</button>
       <PracticeIdentity value={value} mode="规则预览" />
       <div className="companion-practice-actions">
-        <Button variant="outline" disabled={busy || sending || loadingHistory || !ready} onClick={start}><MessageSquarePlus data-icon="inline-start" />{session ? '新对话' : '开始试运行'}</Button>
-        {isOpen && <Button variant="outline" disabled={busy || sending} onClick={end}><Square data-icon="inline-start" />结束试运行</Button>}
+        <Button className="practice-new-conversation" disabled={busy || sending || loadingHistory || !ready} onClick={start}><MessageSquarePlus data-icon="inline-start" />{session ? '新对话' : '开始试运行'}</Button>
+        {isOpen && <Button className="practice-end-conversation" variant="outline" disabled={busy || sending} onClick={end}><Square data-icon="inline-start" />结束试运行</Button>}
       </div>
     </header>
 
@@ -118,7 +118,7 @@ function PreviewPracticePage({ value, skills, onBack, onEdit, onCheck, onMethods
         try { return !isCompanionCaseMethod(value, methodInput(entry)); } catch { return true; }
       }).filter(entry => !verification.verified(entry)).map(entry =>
         <Button key={entry.id} variant="outline" onClick={() => onCheck(entry)}>核对：{entry.skill.name}</Button>)}
-      <Button variant="link" onClick={onMethods}>查看我的 SKILL</Button>
+      <Button variant="link" onClick={onMethods}>查看我的教学方法</Button>
       {verification.error && <p role="alert">{verification.error}</p>}
     </section>}
 

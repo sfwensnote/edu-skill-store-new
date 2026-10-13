@@ -1,0 +1,11 @@
+.companion-run-dialog[data-slot='dialog-content'] { width: min(560px, calc(100vw - 32px)); max-width: 560px; padding: 28px; gap: 22px; }
+.companion-run-dialog [data-slot='dialog-title'] { display: flex; align-items: center; gap: 10px; font-family: var(--font-serif); font-size: 25px; color: var(--primary); }
+.companion-run-dialog .run-summary { padding: 18px; background: var(--secondary); border-radius: 14px; overflow-wrap: anywhere; }
+.run-summary p { margin-top: 8px; color: var(--ink-2); line-height: 1.7; }
+.companion-run-dialog .form-field > span { display: flex; align-items: center; gap: 8px; }
+.companion-run-dialog .form-field svg { width: 18px; }
+.companion-run-dialog input { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; background: var(--card); }
+.companion-run-dialog small { line-height: 1.7; color: var(--ink-2); }
+.run-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.run-method-gate { display: grid; gap: 10px; }
+@media(max-width: 480px) { .companion-run-dialog[data-slot='dialog-content'] { padding: 20px; } }

@@ -179,8 +179,8 @@ export function methodFromSkill(skill: EducationalSkill): TeachingMethod {
 }
 
 export function methodError(method: TeachingMethod): string {
-  if (!method.name?.trim()) return '请填写 SKILL 名称。';
-  if (!method.description?.trim()) return '请填写 SKILL 简介。';
+  if (!method.name?.trim()) return '请填写教学方法名称。';
+  if (!method.description?.trim()) return '请填写教学方法简介。';
   if (!isTeachingCategory(method.category)) return '请选择教学分类。';
   if (!visibleTeachingTags(method.tags).length) return '请至少添加一个标签。';
   if (
@@ -192,13 +192,13 @@ export function methodError(method: TeachingMethod): string {
   ) {
     return '请补全教学方法中标记为“待补充”的内容。';
   }
-  if (method.teachingSteps.length > 8) return '一项 SKILL 最多包含 8 种情况，请合并相近情况后再确认。';
+  if (method.teachingSteps.length > 8) return '一项教学方法最多包含 8 种情况，请合并相近情况后再确认。';
   if (!method.principles.some((item) => item.startsWith(boundaryPrefix) && item.slice(boundaryPrefix.length).trim()))
     return '请填写结束条件。';
   const principles = method.principles.filter((item) => item.trim());
-  if (principles.length > 8) return '一项 SKILL 最多保留 8 条原则，请合并相近原则后再确认。';
-  if ((method.name?.trim().length || 0) > 80) return '请将 SKILL 名称缩短至 80 字以内。';
-  if ((method.description?.trim().length || 0) > 800) return '请将 SKILL 简介缩短至 800 字以内。';
+  if (principles.length > 8) return '一项教学方法最多保留 8 条原则，请合并相近原则后再确认。';
+  if ((method.name?.trim().length || 0) > 80) return '请将教学方法名称缩短至 80 字以内。';
+  if ((method.description?.trim().length || 0) > 800) return '请将教学方法简介缩短至 800 字以内。';
   if ([method.problem, method.expectedOutcome, method.trigger].some((item) => item.trim().length > 800))
     return '请将问题、学习目标和开始条件分别缩短至 800 字以内。';
   if (

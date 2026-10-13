@@ -26,7 +26,7 @@ test('集市添加不创建可编辑副本；分类、刷新、试用与移除�
   await page.goto('/#/market');
   const before = (await stored(page)).owners;
   const title = await firstRow(page).locator('h2').innerText();
-  await firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   await expect(page).toHaveURL(/#\/market$/);
   await expect(firstRow(page).getByRole('button', { name: '已添加', exact: true })).toBeDisabled();
   expect((await stored(page)).owners).toEqual(before);
@@ -42,36 +42,36 @@ test('集市添加不创建可编辑副本；分类、刷新、试用与移除�
   await expect(card).toHaveCount(1);
   await expect(card).toContainText(title);
   await expect(card.getByRole('button', { name: '编辑', exact: true })).toHaveCount(0);
-  await expect(card.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(card.getByRole('button', { name: '试用教学方法', exact: true })).toHaveCount(0);
   await card.getByRole('button', { name: '查看', exact: true }).click();
   await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '编辑我的方法' })).toHaveCount(0);
   await expect(page.getByText('方法示例', { exact: true })).toHaveCount(0);
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toHaveCount(0);
   expect((await stored(page)).owners).toEqual(before);
   await page.reload();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await expect(page.getByRole('heading', { name: '从集市添加', exact: true })).toBeVisible();
   await card.getByRole('button', { name: /更多操作/ }).click();
   await expect(page.getByRole('menuitem', { name: '改编 SKILL', exact: true })).toHaveCount(0);
   await expect(page.getByRole('menuitem', { name: /编辑|分享展示|加入助手配置/ })).toHaveCount(0);
-  await page.getByRole('menuitem', { name: '从我的 SKILL 移除', exact: true }).click();
+  await page.getByRole('menuitem', { name: '从我的教学方法 移除', exact: true }).click();
   await page.getByRole('button', { name: '确认移除', exact: true }).click();
   await expect(card).toHaveCount(0);
   await page.goto('/#/market');
   await expect(firstRow(page)).toContainText(title);
-  await expect(firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true })).toBeEnabled();
+  await expect(firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true })).toBeEnabled();
 });
 
 test('添加保存失败时不假报成功，恢复存储后只添加一次', async ({ page }) => {
   await page.goto('/#/market');
   await blockStorage(page, workspaceKey);
-  await firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('添加未保存');
-  await expect(firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true })).toBeEnabled();
+  await expect(firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true })).toBeEnabled();
   expect((await stored(page)).workspace.addedSkills || []).toHaveLength(0);
   await page.evaluate(() => (window as any).restoreSkillStorage());
-  await firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   expect((await stored(page)).workspace.addedSkills).toHaveLength(1);
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
@@ -84,7 +84,7 @@ test('集市及添加项没有改编或创建副本入口，试用不改变源�
   await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await expect(page.getByRole('log')).toContainText('模型回复');
   expect((await stored(page)).owners).toEqual(before.owners);
-  await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   await page.goto('/#/workshop?tab=added');
   await page.locator('.workshop-item').getByRole('button', { name: /更多操作/ }).click();
   await expect(page.getByRole('menuitem', { name: /改编|创建方法副本|编辑/ })).toHaveCount(0);
@@ -115,11 +115,11 @@ test('集市两个操作与我的分类在桌面、平板和手机可见且不�
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await expect(firstRow(page).getByRole('button', { name: '查看与试用', exact: true })).toBeVisible();
-    await expect(firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true })).toBeVisible();
+    await expect(firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await firstRow(page).getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await firstRow(page).getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   await page.goto('/#/workshop?tab=added');
   await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true })).toHaveValue('added');
   await expect(page.getByRole('combobox', { name: 'SKILL 分类', exact: true }).locator('option')).toHaveText([

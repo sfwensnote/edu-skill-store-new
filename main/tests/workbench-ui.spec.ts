@@ -15,11 +15,11 @@ import {
 } from '../shared/teaching-method';
 import { initialMine } from '../src/data/platform';
 
-test('工作区可预览、折叠并恢复手动修改与结束条件，形成 SKILL 前仍需完成梳理', async ({ page }) => {
+test('工作区可预览、折叠并恢复手动修改与结束条件，完成整理 前仍需完成梳理', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/#/create/workbench-review');
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  await expect(page.getByRole('button', { name: '形成 SKILL', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: '完成整理', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: '编辑希望学生达到' }).click();
   await page.getByRole('textbox', { name: '希望学生达到', exact: true }).fill('教师手动确认的学习目标');
   await page.getByRole('button', { name: '编辑结束条件', exact: true }).click();
@@ -30,9 +30,9 @@ test('工作区可预览、折叠并恢复手动修改与结束条件，形成 S
   );
   const group = page.getByRole('button', { name: '1 基础概况', exact: true });
   await group.click();
-  await expect(page.getByRole('button', { name: '编辑SKILL 名称' })).toBeHidden();
+  await expect(page.getByRole('button', { name: '编辑教学方法名称' })).toBeHidden();
   await group.click();
-  await page.getByRole('button', { name: '预览 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '预览教学方法', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('教师手动确认的学习目标');
   await expect(page.getByRole('dialog')).toContainText('两次提示后仍停滞时，转交教师。');
   await page.keyboard.press('Escape');
@@ -43,8 +43,8 @@ test('工作区可预览、折叠并恢复手动修改与结束条件，形成 S
   );
   for (let index = 1; index < mockQuestions.length; index++)
     await page.getByRole('button', { name: '提交', exact: true }).click();
-  await expect(page.getByRole('button', { name: '形成 SKILL', exact: true })).toBeEnabled();
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await expect(page.getByRole('button', { name: '完成整理', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page).toHaveURL(/assistant\/workbench-review\/test/);
   const skills = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2')!)[0].skills);
   expect(skills[0].constraints).toContain('结束条件：两次提示后仍停滞时，转交教师。');
@@ -109,7 +109,7 @@ test('主要页面在四种屏宽无横向溢出，工作区操作与学习内�
     ['inquiry/ui-inquiry/3', 'PBL项目工作区'],
     ['market', 'SKILL集市'],
     ['skill/sample-reflect', 'SKILL详情'],
-    ['workshop', '我的 SKILL'],
+    ['workshop', '我的教学方法'],
     ['assistant/assistant-demo-active/test', '检测与试用'],
     ['space', '教学任务'],
     ['task/ui-task', '学生学习预览'],

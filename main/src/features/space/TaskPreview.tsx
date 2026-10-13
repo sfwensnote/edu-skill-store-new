@@ -19,7 +19,7 @@ export function TaskPreview({
           {
             id: '方法体验',
             title: task.skill?.skill.name || '方法体验',
-            text: `请写下你的想法或一个需要帮助的问题。该 SKILL 会在“${task.skill?.skill.trigger}”时使用。`,
+            text: `请写下你的想法或一个需要帮助的问题。该教学方法会在“${task.skill?.skill.trigger}”时使用。`,
           },
         ]
       : task.level === 1
@@ -97,7 +97,7 @@ export function TaskPreview({
           {task.supportSkill && (
             <p>
               智能支持配置：{task.supportSkill.skill.name} · 本次预览不执行
-              SKILL。
+             教学方法。
             </p>
           )}
         </section>

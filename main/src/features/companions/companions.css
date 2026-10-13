@@ -1,5 +1,5 @@
 .companion-page { max-width: 1180px; padding-bottom: 48px; }
-.companion-page h2 { font-size: var(--text-section); font-weight: 600; margin-bottom: 18px; }
+.companion-page h2 { font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); font-size: var(--text-section); font-weight: 600; margin-bottom: 18px; }
 .companion-page h2 small { margin-left: 8px; color: var(--ink-2); font-size: 14px; font-weight: 400; }
 .companion-page .form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; font-weight: 500; }
 .companion-page :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), select) { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); min-height: var(--control-primary-height); padding: 10px 12px; width: 100%; font-weight: 400; }
@@ -27,6 +27,18 @@
 .companion-task-summary dt { color: var(--ink-2); }
 .companion-task-summary dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .companion-creation-heading > div { position: relative; max-width: calc(100% - 340px); }
+.application .companion-creation .companion-creation-heading.page-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding-block: 12px 24px;
+}
+.application .companion-creation-heading.page-heading > .back-link {
+  position: static;
+  justify-self: start;
+  min-height: 44px;
+}
 .companion-hero-art { position: absolute; right: 0; top: -4px; width: 540px; height: 180px; object-fit: contain; pointer-events: none; }
 .companion-stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 20px 24px; margin: 0 0 22px; gap: 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
 .companion-stepper li { display: flex; align-items: center; gap: 12px; min-width: 0; position: relative; color: var(--ink-2); }
@@ -83,7 +95,7 @@
 .companion-preview-window { border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
 .companion-preview-heading { display: flex; align-items: center; gap: 12px; padding: 18px; border-bottom: 1px solid var(--line); }
 .companion-preview-heading > div { min-width: 0; }
-.companion-preview-heading h3 { font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+.companion-preview-heading h3 { font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
 .companion-preview-heading p { color: var(--ink-2); font-size: 12px; margin-top: 4px; }
 .companion-preview-body { padding: 24px; display: grid; align-content: start; gap: 22px; }
 .companion-greeting { display: flex; align-items: flex-start; gap: 10px; }
@@ -98,7 +110,7 @@
 .companion-preview-composer { display: flex; align-items: center; gap: 12px; padding: 16px; border-top: 1px solid var(--line); color: var(--ink-3); }
 .companion-preview-composer span { flex: 1; font-size: 13px; border: 1px solid var(--line); border-radius: 5px; padding: 10px; }
 .companion-preview-composer svg { width: 18px; height: 18px; opacity: .6; }
-.companion-confirmation h3 { font-size: 16px; font-weight: 600; }
+.companion-confirmation h3 { font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); font-size: 16px; font-weight: 600; }
 .companion-confirmation p { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 8px; }
 .companion-confirmation > section { margin-top: 22px; }
 .companion-confirmation-profile { display: flex; align-items: flex-start; gap: 16px; }
@@ -135,7 +147,7 @@
 }
 
 .companion-case-picker { display: grid; gap: 12px; margin-bottom: 26px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--secondary); }
-.companion-case-picker h3 { font-size: 17px; font-weight: 600; }
+.companion-case-picker h3 { font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); font-size: 17px; font-weight: 600; }
 .companion-case-picker p { font-size: 13px; line-height: 1.7; color: var(--ink-2); }
 .companion-case-picker .form-field { max-width: 420px; }
 .companion-case-picker > button { justify-self: start; }

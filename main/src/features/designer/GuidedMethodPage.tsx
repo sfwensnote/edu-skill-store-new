@@ -1,5 +1,5 @@
 import { Textarea } from '@/components/ui/textarea';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Lightbulb, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -34,6 +34,7 @@ export function GuidedMethodPage({
   const [error, setError] = useState('');
   const [iconBusy, setIconBusy] = useState(false);
   const [preview, setPreview] = useState(false);
+  const previewButtonRef = useRef<HTMLButtonElement>(null);
   const [updated, setUpdated] = useState<{ section: number; at: number } | null>(null);
   const question = mockQuestions[draft.questionIndex];
   const answerLimit = question?.id === 'boundary' ? 500 - boundaryPrefix.length : 500;
@@ -308,24 +309,46 @@ export function GuidedMethodPage({
               >
                 继续梳理
               </Button>
-              <Button variant="outline" onClick={() => setPreview(true)}>
+              <Button ref={previewButtonRef} variant="outline" onClick={() => setPreview(true)}>
                 <Eye data-icon="inline-start" />
-                预览 SKILL
+                预览教学方法
               </Button>
               <Button disabled={iconBusy || Boolean(methodError(method))} onClick={confirm}>
-                形成 SKILL
+                完成整理
               </Button>
             </StickyActions>
           </section>
         </div>
       </div>
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="method-preview-dialog">
+        <DialogContent
+          className="method-preview-dialog"
+          onCloseAutoFocus={(event) => {
+            if (previewButtonRef.current?.isConnected) {
+              event.preventDefault();
+              previewButtonRef.current.focus();
+            }
+          }}
+        >
           <DialogHeader>
-            <DialogTitle>SKILL 预览</DialogTitle>
+            <DialogTitle>教学方法预览</DialogTitle>
             <DialogDescription className="sr-only">查看已填写的教学方法。</DialogDescription>
           </DialogHeader>
           <MethodPreview method={method} />
+          <div className="guided-preview-actions">
+            <Button variant="outline" onClick={() => setPreview(false)}>
+              返回编辑
+            </Button>
+            <Button
+              disabled={iconBusy || Boolean(methodError(method))}
+              onClick={() => {
+                setPreview(false);
+                confirm();
+              }}
+            >
+              确认完成整理
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

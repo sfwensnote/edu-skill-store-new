@@ -240,7 +240,7 @@ export function DesignerPage({
         </div>
         <Button
           className="page-heading-actions"
-          variant="ghost"
+          variant="outline"
           onClick={() => {
             if (retrySave()) onSaveExit();
           }}
@@ -278,8 +278,8 @@ export function DesignerPage({
           onInteractOutside={(event) => event.preventDefault()}>
           <LoaderCircle className="spin" aria-hidden="true" />
           <DialogHeader>
-            <DialogTitle>SKILL 已创建</DialogTitle>
-            <DialogDescription role="status">正在打开方法检验…</DialogDescription>
+            <DialogTitle>教学方法已创建</DialogTitle>
+            <DialogDescription role="status">正在打开教学方法验证…</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>

@@ -70,7 +70,7 @@ export function useMarketWorkspace(storage: WorkspaceStorage) {
   function saveDesign(id: string, level: DesignLevel) {
     const current = stateRef.current;
     const design = current.designs.find((d) => d.id === id);
-    const issue = design ? outcomeIssue(design, level) : '没有找到这份作品，请返回我的 SKILL 检查。';
+    const issue = design ? outcomeIssue(design, level) : '没有找到这份作品，请返回我的教学方法检查。';
     if (issue) {
       setStorageError(issue);
       return false;

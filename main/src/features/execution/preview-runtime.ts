@@ -28,6 +28,7 @@ const stateSchema = z.object({
   trials: z.array(trialInputSchema.pick({ companion: true, methods: true }).extend({
     id: z.string(), ownerId: z.string(), verifications: z.array(z.string()), model: z.literal(previewModel),
     status: z.enum(['open', 'closed', 'revoked']), createdAt: z.string(), expiresAt: z.string(), capacity: z.number(),
+    purpose: z.enum(['run', 'practice']).optional(),
   })),
   sessions: z.array(z.object({ id: z.string(), trialId: z.string(), audience: z.literal('teacher'), name: z.string(), messages: messagesSchema,
     pending: z.boolean(), error: z.string(), createdAt: z.string(), requestId: z.string().optional() })),
@@ -72,6 +73,27 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
   }
   function requireOpen(trial: Trial) {
     if (trial.status !== 'open' || Date.parse(trial.expiresAt) <= clock()) throw new Error('本次试运行已结束，请开始新的试运行。');
+  }
+  // 校验挂载方法并构造试运行记录；原 trials 接口与 preview 原子接口共用同一套门槛。
+  function purposeOf(data: State, trial: Trial) {
+    return trial.purpose || (data.sessions.some(session => session.trialId === trial.id && session.audience === 'teacher') ? 'practice' : 'run');
+  }
+  function prepareTrial(data: State, body: unknown, purpose: 'run' | 'practice' = 'run'): Trial {
+    const input = trialInputSchema.parse(body), proofs = proofList(data);
+    // 内置案例方法走案例专用途径，其余方法仍必须由教师核对确认。
+    const confirmed = (method: MethodInput) => proofs.some(proof => proof.entryId === method.entryId &&
+      compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill));
+    if (new Set(input.methods.map(method => method.entryId)).size !== input.methods.length ||
+      input.companion.skillIds.length !== input.methods.length || input.methods.some(method => !input.companion.skillIds.includes(method.entryId) ||
+      (!confirmed(method) && !isCompanionCaseMethod(input.companion, method))))
+      throw new Error('已添加的教学方法需要先核对并由教师确认。');
+    const issue = companionIssue(input.companion, input.methods.map(method => ({ id: method.entryId })));
+    if (issue) throw new Error(issue);
+    return { id: crypto.randomUUID(), ownerId, companion: { ...input.companion,
+      materials: input.companion.materials.map(item => ({ ...item, data: '' })) }, methods: input.methods,
+      verifications: input.methods.flatMap(method => confirmed(method)
+        ? [proofs.find(proof => proof.entryId === method.entryId && compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill))!.detectionId] : []),
+      model: previewModel, purpose, status: 'open', createdAt: new Date(clock()).toISOString(), expiresAt: new Date(clock() + input.hours * 3600000).toISOString(), capacity: 1 };
   }
   return async function request<T>(path: string, body?: unknown, commitMethod?: (method: TeachingMethod) => boolean): Promise<T> {
     const url = new URL(path, 'https://browser.invalid'), parts = url.pathname.split('/').filter(Boolean);
@@ -119,26 +141,19 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       }
       result = item.value;
     } else if (parts[0] === 'trials' && parts.length === 1) {
-      if (body === undefined) result = data.trials.filter(item => !url.searchParams.get('companionId') || item.companion.id === url.searchParams.get('companionId'));
+      if (body === undefined) result = data.trials.filter(item => (!url.searchParams.get('companionId') || item.companion.id === url.searchParams.get('companionId')) && (!url.searchParams.get('purpose') || purposeOf(data, item) === url.searchParams.get('purpose')));
       else {
-        const input = trialInputSchema.parse(body), proofs = proofList(data);
-        // 内置案例方法走案例专用途径，其余方法仍必须由教师核对确认。
-        const confirmed = (method: MethodInput) => proofs.some(proof => proof.entryId === method.entryId &&
-          compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill));
-        if (new Set(input.methods.map(method => method.entryId)).size !== input.methods.length ||
-          input.companion.skillIds.length !== input.methods.length || input.methods.some(method => !input.companion.skillIds.includes(method.entryId) ||
-          (!confirmed(method) && !isCompanionCaseMethod(input.companion, method))))
-          throw new Error('挂载的方法需要先核对并由教师确认。');
-        const issue = companionIssue(input.companion, input.methods.map(method => ({ id: method.entryId })));
-        if (issue) throw new Error(issue);
-        const trial: Trial = { id: crypto.randomUUID(), ownerId, companion: { ...input.companion,
-          materials: input.companion.materials.map(item => ({ ...item, data: '' })) }, methods: input.methods,
-          verifications: input.methods.flatMap(method => confirmed(method)
-            ? [proofs.find(proof => proof.entryId === method.entryId && compileSkillInstructions(proof.skill) === compileSkillInstructions(method.skill))!.detectionId] : []),
-          model: previewModel, status: 'open', createdAt: new Date(clock()).toISOString(), expiresAt: new Date(clock() + input.hours * 3600000).toISOString(), capacity: 1 };
-        for (const previous of data.trials) if (previous.companion.id === trial.companion.id && previous.status === 'open') previous.status = 'closed';
+        const trial = prepareTrial(data, body);
+        for (const previous of data.trials) if (previous.companion.id === trial.companion.id && previous.status === 'open' && purposeOf(data, previous) === 'run') previous.status = 'closed';
         data.trials.unshift(trial); save(data); result = { trial };
       }
+    } else if (parts[0] === 'practice-trials' && parts.length === 1 && body !== undefined) {
+      // preview 学伴试运行：试运行与教师会话在同一次 save 内落盘，避免两段保存中途失败留下不一致状态。
+      const trial = prepareTrial(data, body, 'practice');
+      for (const previous of data.trials) if (previous.companion.id === trial.companion.id && previous.status === 'open' && purposeOf(data, previous) === 'practice') previous.status = 'closed';
+      const session: TrialSession = { id: crypto.randomUUID(), trialId: trial.id, audience: 'teacher', name: '教师试运行', messages: [],
+        pending: false, error: '', createdAt: new Date(clock()).toISOString() };
+      data.trials.unshift(trial); data.sessions.push(session); save(data); result = { trial, session };
     } else if (parts[0] === 'trials' && parts[1]) {
       const trial = trialOf(data, parts[1]);
       if (parts[2] === 'teacher-session' && body !== undefined) {
@@ -157,7 +172,7 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
       const session = data.sessions.find(item => item.id === parts[1]); if (!session) throw new Error('没有找到本次对话。');
       requireOpen(trialOf(data, session.trialId));
       const method = trialOf(data, session.trialId).methods.find(item => item.entryId === input.entryId);
-      if (!practice && !method) throw new Error('请选择本次挂载的教学方法。');
+      if (!practice && !method) throw new Error('请选择本次使用的教学方法。');
       const chosen = method && previewCases(method).find(item => item.id === input.caseId);
       if (!practice && !chosen) throw new Error('教学情境已变化，请重新选择。');
       const receipt = data.requests.find(item => item.sessionId === session.id && item.requestId === input.requestId);
@@ -179,7 +194,7 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
         data.requests.push({ sessionId: session.id, requestId: input.requestId, userId: message.id, replyId: reply.id, entryId: input.entryId, caseId: input.caseId });
         save(data); result = session;
       }
-    } else throw new Error('该入口暂不可用，请返回教学工坊。');
+    } else throw new Error('该入口暂不可用，请返回师说。');
     return structuredClone(result) as T;
   };
 }

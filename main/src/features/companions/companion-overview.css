@@ -8,7 +8,7 @@
 .companion-overview .companion-activity { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 22px; }
 .companion-overview-main, .companion-overview-side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .companion-overview-panel.market-panel { margin: 0; padding: 26px; }
-.companion-overview-panel h2 { display: flex; align-items: center; gap: 10px; font-size: var(--text-section); font-weight: 600; margin-bottom: 20px; }
+.companion-overview-panel h2 { display: flex; align-items: center; gap: 10px; font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); font-size: var(--text-section); font-weight: 600; margin-bottom: 20px; }
 .companion-overview-panel h2 > svg { width: 20px; height: 20px; color: var(--primary); flex-shrink: 0; }
 .companion-overview-panel h2 small { margin-left: auto; }
 .companion-overview-panel h3 { font-size: 14px; font-weight: 600; margin-top: 18px; color: var(--ink-2); }
@@ -23,7 +23,7 @@
 .companion-overview-skill p { font-size: 14px; color: var(--ink-2); }
 .requirements-content { display: grid; gap: 24px; margin-top: 20px; }
 .requirements-content > section + section { border-top: 1px solid var(--line); padding-top: 20px; }
-.requirements-content h3 { color: var(--ink); font-size: 17px; margin: 0 0 16px; }
+.requirements-content h3 { font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif); color: var(--ink); font-size: 17px; margin: 0 0 16px; }
 .method-requirements { margin-top: 16px; font-size: 14px; line-height: 1.75; }
 .requirements-fields { margin: 0; }
 .requirements-fields > div { display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 16px; padding: 8px 0; }
@@ -51,4 +51,25 @@
     .companion-overview-heading > button { grid-column: 2; justify-self: start; }
   .companion-overview-panel.market-panel { padding: 20px 16px; }
   .companion-overview-panel .companion-task-summary > div { grid-template-columns: 1fr; gap: 6px; }
+}
+.companion-overview-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; margin-top: 0; border-bottom: 0; position: relative; isolation: isolate; }
+.companion-overview-heading::before { content: ''; position: absolute; inset: -12px -24px 0; z-index: -1; background: linear-gradient(90deg, var(--background) 20%, transparent 80%), url('/study-background.png') right 65% / cover no-repeat; opacity: .45; pointer-events: none; }
+.companion-overview-heading > .back-link { grid-column: 1 / -1; justify-self: start; }
+.companion-overview-identity { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.companion-overview-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+@media(max-width: 900px) { .companion-overview-heading { grid-template-columns: minmax(0, 1fr); } .companion-overview-actions { justify-self: end; } }
+@media(max-width: 600px) { .companion-overview-identity { gap: 14px; align-items: start; } .companion-overview-heading::before { inset-inline: -12px; } .companion-overview-actions { justify-self: start; } }
+.application .page-frame .companion-overview-heading.page-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding-right: 0; min-height: 210px; }
+.application .companion-overview-heading.page-heading > .back-link { position: static; grid-column: 1 / -1; min-height: 44px; }
+.companion-overview-heading::before { display: none; }
+.application .companion-overview-heading.page-heading > .companion-overview-art { width: 250px; height: 140px; top: 54px; left: 76%; opacity: .9; }
+.application .companion-overview-heading > .companion-overview-identity { max-width: 66%; }
+.application .companion-overview-heading > .companion-overview-actions { flex: none; position: relative; align-self: end; margin-bottom: 12px; }
+@media(max-width: 1100px) { .application .companion-overview-heading.page-heading > .companion-overview-art { display: none; } .application .companion-overview-heading > .companion-overview-identity { max-width: 100%; } }
+@media(max-width: 900px) { .application .page-frame .companion-overview-heading.page-heading { grid-template-columns: minmax(0, 1fr); min-height: 0; } }
+@media(min-width: 1101px) {
+  .application .page-frame .companion-overview-heading.page-heading { grid-template-columns: minmax(0, 1fr) 200px auto; min-height: 0; gap: 12px 20px; }
+  .application .companion-overview-heading.page-heading > .companion-overview-art { position: static; grid-column: 2; grid-row: 2; width: 200px; height: 124px; transform: none; align-self: center; }
+  .application .companion-overview-heading > .companion-overview-identity { max-width: 100%; grid-column: 1; grid-row: 2; align-self: center; }
+  .application .companion-overview-heading > .companion-overview-actions { grid-column: 3; grid-row: 2; align-self: center; margin-bottom: 0; }
 }

@@ -18,9 +18,9 @@ test('助手库支持搜索、筛选和详情跳转', async ({ page }) => {
   await page.screenshot({ path: 'test-results/library-1440.png', fullPage: true });
 });
 
-test('旧我的助手地址进入我的 SKILL；删除单项须确认并保留其他方法', async ({ page }) => {
+test('旧我的助手地址进入我的教学方法；删除单项须确认并保留其他方法', async ({ page }) => {
   await page.goto('/#/mine');
-  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的教学方法', exact: true })).toBeVisible();
   const first = page.locator('.workshop-item').first();
   const title = await first.locator('h3').innerText();
   await first.getByRole('button', { name: /更多操作/ }).click();

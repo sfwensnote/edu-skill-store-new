@@ -112,7 +112,7 @@ export function workshopCollections({
       subject: assistant.subject,
       createdAt: assistant.createdAt,
       updatedAt: assistant.updatedAt,
-      status: '尚未形成 SKILL',
+      status: '尚未形成教学方法',
       detail: '梳理中',
     }));
   return {

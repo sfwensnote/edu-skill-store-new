@@ -1,6 +1,11 @@
-.account-login { min-height: calc(100dvh - var(--header-height)); display: grid; place-items: center; padding-block: 40px; }
-.account-login-panel { width: 100%; max-width: 390px; padding: 32px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); }
-.account-login-panel h1 { font-size: 24px; font-weight: 600; margin-bottom: 28px; }
+.account-login { min-height: calc(100dvh - var(--header-height)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 48px; padding: 56px var(--page-gutter); }
+.account-login { background-image: none; }
+.account-login.page-frame .account-login-intro h1 { font-size: clamp(40px, 4vw, 60px); }
+.account-login-panel h2 { font-family: var(--font-serif); font-size: 28px; font-weight: 600; letter-spacing: 0; margin: 0 0 24px; }
+.account-login-intro { max-width: 640px; display: flex; flex-direction: column; gap: 14px; }
+.account-login-intro h1 span { display: block; }
+.account-login-intro p { margin: 0; color: var(--ink-2); font-size: var(--text-body); line-height: 1.7; }
+.account-login-panel { width: 100%; max-width: 420px; justify-self: end; padding: 32px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: 0 24px 56px -34px rgba(15, 70, 48, .4); }
 .account-form { display: flex; flex-direction: column; gap: 16px; }
 .account-field { display: flex; flex-direction: column; gap: 8px; }
 .account-field input { width: 100%; min-height: 44px; border: 1px solid var(--input); border-radius: var(--radius-md); padding: 10px 12px; background: var(--card); color: var(--ink); }
@@ -16,4 +21,8 @@
 .account-list li + li { border-top: 1px solid var(--line); }
 .account-list li > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
 .account-list span, .account-list small { color: var(--ink-2); }
+@media (max-width: 900px) { .account-login { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 40px; } .account-login-panel { max-width: 420px; justify-self: start; } }
 @media (max-width: 480px) { .account-login { padding-block: 24px; align-items: start; } .account-login-panel { padding: 24px; } }
+.application .account-login-intro { max-width: none; container-type: inline-size; }
+.application .account-login.page-frame .account-login-intro h1 { font-size: clamp(22px, 7.6cqw, 60px); }
+.application .account-login-intro h1 > span { white-space: nowrap; }

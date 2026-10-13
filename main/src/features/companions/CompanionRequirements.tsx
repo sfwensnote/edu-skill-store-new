@@ -23,7 +23,7 @@ export function CompanionRequirements({ value, skills }: { value: LearningCompan
     <div className="requirements-content">
       <section><h3>学习场景</h3><TaskSummary task={value.task} /></section>
       {selected.map(entry => <section key={entry.id}><h3>{entry.skill.name}</h3><MethodRequirements entry={entry} /></section>)}
-      {!selected.length && <p className="subtle">尚未挂载教学方法</p>}
+      {!selected.length && <p className="subtle">尚未添加教学方法</p>}
     </div>
   </details>;
 }

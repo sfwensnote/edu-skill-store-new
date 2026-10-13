@@ -33,7 +33,7 @@ export function CompanionConfirmation({ value, skills }: { value: LearningCompan
   return <div className="companion-confirmation">
     <div className="companion-confirmation-profile"><CompanionAvatar value={value} /><div><h3>{value.name}</h3><p>{value.introduction}</p></div></div>
     <p className="subtle">{[value.grade, value.subject, value.year].filter(Boolean).join(' · ')}</p>
-    <section><h3>挂载的 SKILL</h3><ul>{value.skillIds.map(id => <li key={id}>{skills.find(entry => entry.id === id)?.skill.name || 'SKILL 已移除'}</li>)}</ul></section>
+    <section><h3>已添加的教学方法</h3><ul>{value.skillIds.map(id => <li key={id}>{skills.find(entry => entry.id === id)?.skill.name || '教学方法已移除'}</li>)}</ul></section>
     <TaskSummary task={value.task} />
     {!!value.materials.length && <section><h3>教学材料</h3><ul>{value.materials.map(item => <li key={item.id}>{item.name}</li>)}</ul></section>}
     {value.design.contextual && <section><h3>情景题</h3><p>{value.design.context}</p><p>{value.design.question}</p></section>}

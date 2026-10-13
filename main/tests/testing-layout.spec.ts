@@ -20,9 +20,9 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
     await editMethodField(page, `情况 ${index}`, condition);
     await editMethodField(page, `做法 ${index}`, action);
   }
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'SKILL 已创建' })).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: '正在打开方法检验' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '正在打开教学方法验证' })).toBeVisible();
   await expect(page).toHaveURL(/check-layout\/test/);
   await expect(page.getByRole('dialog')).toHaveCount(0);
   const previous = page.getByRole('button', { name: '返回上一步', exact: true });
@@ -31,12 +31,12 @@ test('任意学科创建、过渡显示与标题下进度条，手机与桌面�
   await previous.click();
   await expect(page).toHaveURL(/#\/create\/check-layout/);
   await expect(page.getByRole('heading', { name: '创建教学方法', level: 1 })).toBeVisible();
-  await expect(page.getByRole('button', { name: '编辑SKILL 名称', exact: true })).toContainText('思路追问');
+  await expect(page.getByRole('button', { name: '编辑教学方法名称', exact: true })).toContainText('思路追问');
   await page.getByRole('button', { name: '这就是我的教学方法', exact: true }).click();
   await expect(page).toHaveURL(/check-layout\/test/);
-  const heading = page.getByRole('heading', { name: '思路追问 方法检验', level: 1 });
+  const heading = page.getByRole('heading', { name: '思路追问 教学方法验证', level: 1 });
   await expect(heading).toBeVisible();
-  const progress = page.getByRole('progressbar', { name: '方法检验进度' });
+  const progress = page.getByRole('progressbar', { name: '教学方法验证进度' });
   await expect(progress).toHaveAttribute('value', '0');
   await expect(progress).toHaveAttribute('max', '2');
   const titleBounds = await heading.boundingBox();

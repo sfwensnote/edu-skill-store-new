@@ -4,12 +4,16 @@
 .execution-heading h1 span { font-size: .7em; font-weight: 600; }
 .execution-heading .back-link { margin-bottom: 18px; }
 .execution-heading p { margin-top: 8px; color: var(--muted-foreground); }
-.execution-progress { display: flex; align-items: center; gap: 12px; max-width: 680px; margin-top: 20px; }
+.execution-progress { display: grid; gap: 8px; width: 100%; margin-top: 20px; }
+.execution-progress-track { position: relative; width: 100%; min-width: 0; }
+.execution-progress-track progress { display: block; }
+.execution-progress-dividers { display: grid; position: absolute; inset: 0; pointer-events: none; }
+.execution-progress-dividers > span:not(:last-child) { border-right: 2px solid var(--card); }
 .execution-progress progress { appearance: none; width: 100%; height: 8px; border: 0; border-radius: 4px; overflow: hidden; accent-color: var(--primary); background: var(--muted); }
 .execution-progress progress::-webkit-progress-bar { background: var(--border); }
 .execution-progress progress::-webkit-progress-value { background: var(--primary); }
 .execution-progress progress::-moz-progress-bar { background: var(--primary); }
-.execution-progress span { white-space: nowrap; }
+.execution-progress > span { white-space: nowrap; justify-self: end; }
 .execution-error { color: var(--destructive); margin: 16px 0; }
 .execution-cases { display: grid; gap: 20px; margin-top: 24px; }
 .execution-case, .execution-confirm, .execution-trial-panel, .execution-join { padding: 26px; }
@@ -19,7 +23,20 @@
 .execution-case-editor { display: grid; gap: 20px; margin-top: 24px; }
 .execution-case-actions { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 24px; }
 .execution-case-actions .inline-actions { flex-wrap: wrap; }
-.execution-complete { margin-top: 24px; color: var(--primary); }
+.execution-method-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+.execution-method-summary > div { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--muted); }
+.execution-method-summary dt { font-weight: 600; margin-bottom: 8px; color: var(--primary); }
+.execution-method-summary dd { margin: 0; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .execution-method-summary { grid-template-columns: minmax(0, 1fr); } }
+.execution-complete { display: grid; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+.execution-complete > p { margin: 0; color: var(--primary); font-weight: 600; }
+.execution-complete-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.execution-complete:focus { outline: none; }
+.execution-complete:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.execution-complete-pending { display: grid; gap: 6px; margin: 0; color: var(--foreground); font-weight: 400; }
+.execution-complete-pending p { margin: 0; }
+.execution-complete-pending ul { margin: 0; padding-left: 18px; }
+.execution-complete > p.execution-complete-error { margin: 0; color: var(--destructive); font-weight: 400; }
 .practice-setup { margin: 24px 0; }
 .practice-setup summary, .practice-suggestions summary { cursor: pointer; font-weight: 600; }
 .practice-setup > p { margin-top: 12px; }
@@ -83,6 +100,14 @@
 .companion-practice-name { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .companion-practice-mode { flex: none; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--secondary); color: var(--ink-2); font-size: 12px; font-weight: 500; line-height: 1.7; }
 .companion-practice-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.companion-practice-actions [data-slot='button'] { min-height: 44px; padding-inline: 18px; font-size: 16px; font-weight: 600; border-radius: 12px; }
+.companion-practice-actions .practice-new-conversation { background: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary-hover); box-shadow: 0 3px 8px rgba(20, 83, 57, .16); }
+.application .companion-practice-actions [data-slot='button'].practice-end-conversation { background: #fff5f3; color: #a13d36; border: 1px solid #d8a19c; box-shadow: 0 2px 6px rgba(135, 54, 47, .08); }
+.application .companion-practice-actions [data-slot='button'].practice-end-conversation:focus-visible { outline-color: #a13d36; }
+@media (hover: hover) {
+  .companion-practice-actions .practice-new-conversation:hover:not(:disabled) { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(20, 83, 57, .22); }
+  .application .companion-practice-actions [data-slot='button'].practice-end-conversation:hover:not(:disabled) { background: #fbe5e2; border-color: #ba6860; color: #8c302a; }
+}
 .companion-practice-context.market-panel { margin: 0 0 18px; padding: 18px 22px; }
 .companion-practice-context summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
 .companion-practice-context-body { display: grid; gap: 10px; margin-top: 16px; }
@@ -104,10 +129,11 @@
 .companion-chat-hint { color: var(--ink-3); }
 .companion-chat-status { padding: 0 22px 8px; font-size: 13px; color: var(--ink-2); }
 .companion-chat .execution-error { margin: 0; padding: 0 22px 8px; }
-.companion-chat-composer { display: grid; gap: 12px; padding: 18px 22px 22px; border-top: 1px solid var(--line); background: var(--card); }
+.companion-chat-composer { display: grid; gap: 12px; padding: 22px; border-top: 3px solid color-mix(in srgb, var(--primary) 28%, var(--secondary)); background: color-mix(in srgb, var(--secondary) 84%, var(--card)); box-shadow: 0 -6px 18px rgba(20, 83, 57, .05); }
 .companion-chat-composer .form-field { width: 100%; }
+.application .companion-chat-composer [data-slot='textarea'] { background: var(--card); border-color: color-mix(in srgb, var(--primary) 22%, var(--line)); box-shadow: 0 2px 7px rgba(20, 83, 57, .04); }
 .companion-chat-actions { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.application .page-frame .companion-practice-heading.page-heading { padding-top: calc(var(--page-heading-padding, 20px) + 34px); }
+.application .page-frame .companion-practice-heading.page-heading { padding-top: 0; }
 @media (max-width: 600px) {
   .application .page-frame .companion-practice-heading.page-heading { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .application .page-frame .companion-practice-heading > .companion-practice-identity,

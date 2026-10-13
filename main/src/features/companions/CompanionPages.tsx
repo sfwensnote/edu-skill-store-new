@@ -44,7 +44,7 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onPractice, on
     <header className="companion-library-heading page-heading">
       <div><h1 ref={headingRef} tabIndex={-1}>我的学伴</h1><p>管理学伴、教学方法与学习材料。</p></div>
       <img src={`${import.meta.env.BASE_URL}companion-hero.png`} alt="" aria-hidden="true" />
-      <Button className="page-heading-actions" onClick={onCreate}><Plus data-icon="inline-start" />创建学伴</Button>
+      <div className="page-heading-actions"><Button onClick={onCreate}><Plus data-icon="inline-start" />创建学伴</Button></div>
     </header>
     <div className="market-panel companion-library-filters" role="search" aria-label="学伴搜索与筛选">
       <label className="companion-library-search"><Search aria-hidden="true" /><input type="search" aria-label="搜索学伴" placeholder="搜索学伴名称、简介或材料…" value={query} onChange={event => setQuery(event.target.value)} /></label>
@@ -61,7 +61,7 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onPractice, on
         }} onRemove={trigger => { originRef.current = trigger; setError(''); setPending(item); }} />)}</div>}
     <Dialog open={!!pending} onOpenChange={open => { if (!open && !removing) { setPending(null); setError(''); } }}>
       <DialogContent onCloseAutoFocus={event => { event.preventDefault(); (originRef.current?.isConnected ? originRef.current : headingRef.current)?.focus(); }}>
-        <DialogHeader><DialogTitle>删除这个学伴？</DialogTitle><DialogDescription>“{pending?.name || '未命名学伴'}”及其学习任务、材料将从我的学伴中删除。挂载的 SKILL 仍保留。</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>删除这个学伴？</DialogTitle><DialogDescription>“{pending?.name || '未命名学伴'}”及其学习任务、材料将从我的学伴中删除。已添加的教学方法仍保留。</DialogDescription></DialogHeader>
         {error && <p role="alert">{error}</p>}
         <div className="inline-actions"><Button variant="outline" disabled={removing} onClick={() => setPending(null)}>取消</Button><Button variant="destructive" disabled={removing} onClick={() => {
           if (!pending || removing) return; setRemoving(true);
@@ -74,22 +74,24 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onPractice, on
     </Dialog>
   </main>;
 }
-export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMethods, onPractice }: {
+export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMethods, onPractice, onRun, onReport }: {
   value: LearningCompanion; skills: SkillEntry[]; onBack: () => void; onEdit: () => void;
   onCheck: (entry: SkillEntry) => void; onMethods: () => void; onPractice: () => void;
+  onRun?: () => void; onReport?: () => void;
 }) {
   const selected = value.skillIds.map(id => skills.find(entry => entry.id === id));
   return <main className="page-frame market-page companion-page companion-overview">
     <header className="companion-overview-heading page-heading">
       <button className="back-link" onClick={onBack}><ArrowLeft />返回我的学伴</button>
-      <div className="companion-overview-image"><CompanionAvatar value={value} /></div>
+      <img className="companion-overview-art" src={`${import.meta.env.BASE_URL}companion-hero.png`} alt="" aria-hidden="true" />
+      <div className="companion-overview-identity"><div className="companion-overview-image"><CompanionAvatar value={value} /></div>
       <div className="companion-overview-profile"><div className="companion-card-title"><h1>{value.name || '未命名学伴'}</h1><span className="companion-card-status" data-status={value.status}>{value.status === 'draft' ? '草稿' : '已创建'}</span></div>
         {value.introduction && <p>{value.introduction}</p>}
         <p className="companion-overview-meta">{[value.grade, value.subject, value.year].filter(Boolean).join(' · ')}</p>
       </div>
-      <Button className="page-heading-actions" variant="outline" onClick={onEdit}>编辑学伴</Button>
+      </div><div className="companion-overview-actions"><Button variant="outline" onClick={onPractice}>试运行</Button>{onRun && <Button onClick={onRun}>运行</Button>}<Button variant="outline" onClick={onEdit}>编辑学伴</Button></div>
     </header>
-    {selected.some(entry => !entry) && <p role="alert">关联的 SKILL 已移除，请编辑学伴重新选择。教学任务与材料仍保留。</p>}
+    {selected.some(entry => !entry) && <p role="alert">关联的教学方法已移除，请编辑学伴重新选择。教学任务与材料仍保留。</p>}
     <div className="companion-activity">
       <div className="companion-overview-main">
         <section className="market-panel companion-overview-panel"><h2><BookOpen aria-hidden="true" />学习场景</h2><TaskSummary task={value.task} />
@@ -99,18 +101,18 @@ export function CompanionDetail({ value, skills, onBack, onEdit, onCheck, onMeth
         {value.design.pbl && <section className="market-panel companion-overview-panel"><h2>PBL 学习活动</h2><h3>驱动问题</h3><p>{value.design.drivingQuestion}</p><h3>项目成果</h3><p>{value.design.product}</p><h3>活动阶段</h3><p>{value.design.stages}</p></section>}
         <CompanionRequirements value={value} skills={skills} />
       </div>
-      <aside className="companion-overview-side" aria-label="学伴的 SKILL 与材料">
-        <section className="market-panel companion-overview-panel"><h2><Link aria-hidden="true" />挂载的 SKILL <small>{selected.filter(Boolean).length} 个</small></h2>
+      <aside className="companion-overview-side" aria-label="学伴的教学方法与材料">
+        <section className="market-panel companion-overview-panel"><h2><Link aria-hidden="true" />已添加的教学方法<small>{selected.filter(Boolean).length} 个</small></h2>
           {selected.filter((entry): entry is SkillEntry => !!entry).map(entry => <details className="companion-overview-skill" key={entry.id}><summary>{entry.skill.name}</summary><p>{entry.skill.summary}</p><MethodRequirements entry={entry} /></details>)}
-          {!selected.some(Boolean) && <p className="subtle">尚未挂载可用 SKILL</p>}
+          {!selected.some(Boolean) && <p className="subtle">尚未添加教学方法</p>}
         </section>
         <section className="market-panel companion-overview-panel"><h2><FileText aria-hidden="true" />教学材料 <small>{value.materials.length} 份</small></h2>{value.materials.length ? <ul className="companion-files">{value.materials.map(item => <li key={item.id}><span>{item.name}</span><Button variant="link" onClick={() => downloadMaterial(item)}>下载材料</Button></li>)}</ul> : <p className="subtle">未添加材料</p>}</section>
       </aside>
     </div>
     {serviceConfigured ? <CompanionTrialPanel value={value} skills={skills} onEdit={onEdit} onCheck={onCheck} onMethods={onMethods} /> :
       <section className="market-panel execution-trial-panel companion-practice-entry">
-        <h2>学伴试运行</h2><p className="subtle">进入独立对话页，以学生身份连续体验挂载方法。</p>
-        <Button onClick={onPractice}>开始试运行</Button>
+        <h2>学伴试运行</h2><p className="subtle">进入独立对话页，以学生身份连续体验已添加的教学方法。</p>
+        <div className="inline-actions"><Button variant="outline" onClick={onPractice}>开始试运行</Button>{onRun && <Button onClick={onRun}>运行</Button>}{onReport && <Button variant="link" onClick={onReport}>查看运行报告</Button>}</div>
       </section>}
   </main>;
 }

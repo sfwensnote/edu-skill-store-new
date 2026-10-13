@@ -98,7 +98,7 @@ export function MarketPage({
     <main className="page-frame market-catalog market-page">
       <header className="catalog-heading page-heading">
         <div>
-          <h1>教学 SKILL 集市</h1>
+          <h1>教学方法集市</h1>
         </div>
         <img src={`${import.meta.env.BASE_URL}market-learning.svg`} alt="" aria-hidden="true" />
       </header>
@@ -106,7 +106,7 @@ export function MarketPage({
         <label className="catalog-search">
           <Search aria-hidden="true" />
           <input
-            aria-label="搜索 SKILL"
+            aria-label="搜索教学方法"
             placeholder="搜索方法、标签或作者"
             value={filters.query}
             onChange={(event) => update({ query: event.target.value })}
@@ -137,6 +137,21 @@ export function MarketPage({
               ))}
             </select>
           </label>
+
+          <span role="status" className="catalog-result-count">
+            {items.length} 项方法
+          </span>
+          <label className="catalog-sort">
+            排序
+            <select
+              aria-label="排序方式"
+              value={filters.sort}
+              onChange={(event) => update({ sort: event.target.value })}
+            >
+              <option value="default">默认排序</option>
+              <option value="name">名称排序</option>
+            </select>
+          </label>
         </div>
       </div>
       <div className="catalog-layout">
@@ -151,20 +166,6 @@ export function MarketPage({
               <Filter data-icon="inline-start" />
               筛选分类
             </Button>
-            <span role="status" className="catalog-result-count">
-              {items.length} 项方法
-            </span>
-            <label className="catalog-sort">
-              排序
-              <select
-                aria-label="排序方式"
-                value={filters.sort}
-                onChange={(event) => update({ sort: event.target.value })}
-              >
-                <option value="default">默认排序</option>
-                <option value="name">名称排序</option>
-              </select>
-            </label>
           </div>
           {hasFilters && items.length > 0 && (
             <div className="catalog-active-filters">
@@ -173,8 +174,7 @@ export function MarketPage({
               <Button size="sm" variant="ghost" onClick={() => setFilters({ ...defaultCatalogFilters })}>
                 <X data-icon="inline-start" />
                 清除筛选
-              </Button>
-            </div>
+              </Button></div>
           )}
           <div className="market-resource-list">
             {items.map((entry) => {
@@ -197,8 +197,7 @@ export function MarketPage({
                         onClick={() => onFavorite(entry.id)}
                       >
                         <Heart fill={favorite ? 'currentColor' : 'none'} />
-                      </Button>
-                    </div>
+                      </Button></div>
                     {entry.skill.summary && <p className="catalog-resource-summary">{entry.skill.summary}</p>}
                     <p className="skill-practice">{entry.example}</p>
                     <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example).filter((tag) => tag !== category)} />
@@ -222,25 +221,21 @@ export function MarketPage({
                       <span>
                         <CircleCheck />
                         {skillValidationLabel(entry)}
-                      </span>
-                    </div>
-                  </div>
+                      </span></div></div>
                   <div className="catalog-resource-actions">
                     <Button onClick={() => onOpen(entry.id)}>
                       查看与试用
                       <ArrowRight data-icon="inline-end" />
                     </Button>
                     <Button variant="outline" disabled={addedIds.includes(entry.id)} onClick={() => onAdd(entry)}>
-                      {addedIds.includes(entry.id) ? '已添加' : '添加到我的 SKILL'}
-                    </Button>
-                  </div>
+                      {addedIds.includes(entry.id) ? '已添加' : '添加到我的教学方法'}
+                    </Button></div>
                 </article>
               );
-            })}
-          </div>
+            })}</div>
           {!items.length && (
             <EmptyState
-              title={!entries.length ? '集市暂无 SKILL' : favoriteEmpty ? '还没有收藏的教学方法' : '没有找到符合条件的教学方法'}
+              title={!entries.length ? '集市暂无教学方法' : favoriteEmpty ? '还没有收藏的教学方法' : '没有找到符合条件的教学方法'}
               action={entries.length > 0 &&
                 <Button variant="outline" onClick={() => setFilters({ ...defaultCatalogFilters })}>
                   {favoriteEmpty ? '浏览全部方法' : '清除筛选'}
@@ -250,8 +245,7 @@ export function MarketPage({
               {entries.length > 0 && !favoriteEmpty && '尝试调整关键词或筛选条件。'}
             </EmptyState>
           )}
-        </section>
-      </div>
+        </section></div>
       <Dialog open={categoryPanel} onOpenChange={setCategoryPanel}>
         <DialogContent className="market-filter-dialog">
           <DialogHeader>

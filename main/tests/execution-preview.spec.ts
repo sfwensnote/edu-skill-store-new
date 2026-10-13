@@ -17,19 +17,19 @@ async function createMethod(page: Page) {
     const index = await page.locator('.outline-step').count();
     await editMethodField(page, `情况 ${index}`, condition); await editMethodField(page, `做法 ${index}`, action);
   }
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page).toHaveURL(/preview-reflect\/test/);
 }
 async function confirm(page: Page) {
-  await page.getByRole('button', { name: '开始检测', exact: true }).click();
+  await page.getByRole('button', { name: '开始验证', exact: true }).click();
   await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
   await expect(page.locator('.execution-case')).toHaveCount(1);
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
   await expect(page.getByRole('heading', { name: '情况 2', exact: true })).toBeVisible();
   await expect(page.locator('.execution-case')).toContainText('已经回顾过思路');
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
-  await page.getByRole('button', { name: '确认并完成检测', exact: true }).click();
-  await expect(page.getByRole('status').filter({ hasText: '可将这项方法挂载到学伴' })).toBeVisible();
+  await page.getByRole('button', { name: '确认并完成验证', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: '可将这项教学方法添加到学伴' })).toBeVisible();
 }
 test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行，刷新与手机显示可用', async ({ page }, info) => {
   test.setTimeout(90000);
@@ -37,7 +37,7 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
   page.on('pageerror', error => errors.push(error.message));
   page.on('request', request => { if (request.url().includes('/api/')) requests.push(request.url()); });
   await createMethod(page);
-  await expect(page.getByRole('button', { name: '开始检测', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: '开始验证', exact: true })).toBeEnabled();
   await confirm(page);
   await expect(page.locator('.execution-case')).toHaveCount(1);
   await expect(page.locator('main')).not.toContainText(/服务尚未连接|Demo|演示|调用模型/);
@@ -48,7 +48,7 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
   await page.goto('/#/companions/practice-buddy/edit');
   await page.getByRole('textbox', { name: '学伴名称', exact: true }).fill('反思学伴');
   await page.getByRole('textbox', { name: '学伴简介', exact: true }).fill('一起检查解题思路');
-  await page.getByRole('button', { name: '下一步：选择 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '下一步：选择教学方法', exact: true }).click();
   await page.getByRole('checkbox', { name: /错因反思/ }).check();
   await page.getByRole('button', { name: '下一步：教学场景', exact: true }).click();
   await page.getByRole('combobox', { name: '学习对象', exact: true }).selectOption('个别学生');
@@ -101,13 +101,13 @@ test('纯前端创建 → 检测核对 → 发布 → 创建学伴 → 试运行
   await expect(page.locator('.companion-chat-message')).toHaveCount(0);
   await page.getByRole('combobox', { name: '历史记录', exact: true }).selectOption({ index: 1 });
   await expect(page.locator('.companion-chat-log')).toContainText('你已经回顾过思路');
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '我的教学方法', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(1);
   expect(requests).toEqual([]); expect(errors).toEqual([]);
 });
 test('核对保存失败保留原记录和确认操作，恢复存储后可以重试', async ({ page }) => {
   await createMethod(page);
-  await page.getByRole('button', { name: '开始检测', exact: true }).click();
+  await page.getByRole('button', { name: '开始验证', exact: true }).click();
   await expect(page.getByRole('heading', { name: '情况 1', exact: true })).toBeVisible();
   const key = previewStorageKey(primaryTeacherId);
   await page.evaluate(key => {
@@ -121,12 +121,12 @@ test('核对保存失败保留原记录和确认操作，恢复存储后可以�
   await page.evaluate(() => (window as unknown as { restoreWrite: () => void }).restoreWrite());
   await page.getByRole('button', { name: '确认并继续' }).click();
   await page.getByRole('button', { name: '确认并继续' }).click();
-  await page.getByRole('button', { name: '确认并完成检测' }).click();
-  await expect(page.getByRole('status').filter({ hasText: '可将这项方法挂载到学伴' })).toBeVisible();
+  await page.getByRole('button', { name: '确认并完成验证' }).click();
+  await expect(page.getByRole('status').filter({ hasText: '可将这项教学方法添加到学伴' })).toBeVisible();
 });
 test('情况 2 现场修改同步原方法；刷新、回看、保存失败和重新核对均保留进度', async ({ page }, info) => {
   await createMethod(page);
-  await page.getByRole('button', { name: '开始检测', exact: true }).click();
+  await page.getByRole('button', { name: '开始验证', exact: true }).click();
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
   await expect(page.getByRole('heading', { name: '情况 2', exact: true })).toBeVisible();
   await page.reload();
@@ -159,8 +159,8 @@ test('情况 2 现场修改同步原方法；刷新、回看、保存失败和�
   }
   await page.screenshot({ path: info.outputPath('case-review-mobile.png'), fullPage: true });
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
-  await page.getByRole('button', { name: '确认并完成检测', exact: true }).click();
-  await page.getByRole('button', { name: '我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '确认并完成验证', exact: true }).click();
+  await page.getByRole('button', { name: '我的教学方法', exact: true }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(1);
   await expect(page.locator('.workshop-item').getByRole('button', { name: '发布到集市', exact: true })).toBeEnabled();
 });

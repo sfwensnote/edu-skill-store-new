@@ -10,7 +10,7 @@ export function usePageFocus(route: AppRoute) {
     main.id = 'main-content';
     main.tabIndex = -1;
     const heading = main.querySelector('h1')?.textContent?.trim();
-    document.title = heading ? `${heading} · 教学工坊` : '教学工坊 · 教师工作台';
+    document.title = heading ? `${heading} · 师说` : '师说 · 教师工作台';
     if (previous.current !== key) {
       // 列表页自行恢复浏览位置，其余页面从新的内容开始。
       if (!['market', 'workshop', 'mine'].includes(route.page)) window.scrollTo(0, 0);

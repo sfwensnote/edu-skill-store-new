@@ -13,7 +13,7 @@ export const learningAudiences = ['全班学生', '学习小组', '个别学生'
 export const learningScenarios = ['课堂学习', '课后练习', '自主学习', '复习巩固'] as const;
 export const companionSteps = [
   { step: 1, label: '基本信息', caption: '学伴的身份与定位' },
-  { step: 2, label: '选择 SKILL', caption: '挂载教学方法' },
+  { step: 2, label: '选择教学方法', caption: '添加教学方法' },
   { step: 3, label: '教学场景', caption: '设置学习对象与任务' },
   { step: 4, label: '预览与保存', caption: '确认并完成创建' },
 ] as const;
@@ -54,8 +54,8 @@ export function companionIssue(value: LearningCompanion, skills: Pick<SkillEntry
   if (!value.introduction.trim()) return '请填写学伴简介。';
   if (!value.grade.trim() || !value.subject.trim()) return '请选择学段和学科。';
   if (throughStep === 1) return '';
-  if (!value.skillIds.length) return '请从我的 SKILL 中选择至少一项方法。';
-  if (value.skillIds.some(id => !skills.some(entry => entry.id === id))) return '所选 SKILL 已移除，请重新选择。';
+  if (!value.skillIds.length) return '请从我的教学方法中选择至少一项方法。';
+  if (value.skillIds.some(id => !skills.some(entry => entry.id === id))) return '所选教学方法已移除，请重新选择。';
   if (throughStep === 2) return '';
   for (const [key, label] of taskFields) if (!value.task[key].trim()) return key === 'taskAndGoals' ? `请填写${label}。` : `请选择${label}。`;
   if (value.design.contextual && (!value.design.context.trim() || !value.design.question.trim())) return '请填写教学情景和情景题目。';

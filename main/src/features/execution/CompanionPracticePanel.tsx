@@ -76,7 +76,7 @@ export function CompanionPracticePanel({ value, skills, onCheck, onEdit }: {
       const id = event.target.value; void act(() => refresh(id));
     }}>{trials.map(trial => <option key={trial.id} value={trial.id}>{new Date(trial.createdAt).toLocaleString('zh-CN')} · {trial.status === 'open' && Date.parse(trial.expiresAt) > Date.now() ? '运行中' : '已结束'}</option>)}</select></label>}
     {session && detail && <section className="execution-self-test">
-      <div className="practice-context"><h3>本次学习场景</h3><TaskSummary task={detail.trial.companion.task} /><p className="subtle">挂载的 SKILL：{detail.trial.methods.map(method => method.skill.name).join('、')}</p>
+      <div className="practice-context"><h3>本次学习场景</h3><TaskSummary task={detail.trial.companion.task} /><p className="subtle">已添加的教学方法：{detail.trial.methods.map(method => method.skill.name).join('、')}</p>
         {!!detail.trial.companion.materials.length && <p className="subtle">教学材料：{detail.trial.companion.materials.map(material => material.name).join('、')}</p>}
       </div>
       <TrialChat key={session.id} session={session} disabled={!isOpen} traceLabel="教学方法使用记录" inputLabel="以学生身份输入" initialInput={session.messages.length ? '' : suggestions[0]} suggestions={suggestions}

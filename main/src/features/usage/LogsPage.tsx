@@ -61,7 +61,7 @@ export function LogsPage({
                   <ChevronRight />
                 </button>
               ))}
-              {!assistant.skills.length && <p>尚未形成教学 SKILL，请先整理教学方法。</p>}
+              {!assistant.skills.length && <p>尚未形成教学方法，请先整理教学方法。</p>}
             </div>
           </section>
         </div>

@@ -19,8 +19,8 @@ export function WorkshopNavigation({
   return (
     <aside className="workshop-sidebar">
       <label className="workshop-mobile-category">
-        SKILL 分类
-        <select aria-label="SKILL 分类" value={tab} onChange={(e) => onTab(e.target.value as WorkshopTab)}>
+       教学方法分类
+        <select aria-label="教学方法分类" value={tab} onChange={(e) => onTab(e.target.value as WorkshopTab)}>
           {workshopTabs.map(([key, label]) => (
             <option key={key} value={key}>
               {label}（{counts[key]}）
@@ -28,7 +28,7 @@ export function WorkshopNavigation({
           ))}
         </select>
       </label>
-      <nav aria-label="SKILL 分类">
+      <nav aria-label="教学方法分类">
         {[workshopTabs.slice(0, 1), workshopTabs.slice(1)].map((group, index) => (
           <div className="workshop-nav-group" key={index}>
             {group.map(([key, label]) => {

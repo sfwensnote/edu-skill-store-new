@@ -35,7 +35,7 @@ test('分类图案固定，颜色和自定义图片随创建、编辑、发布�
     await page.getByRole('button', { name: '提交', exact: true }).click();
   }
   await fillMethodDetails(page, '图标同步检查', '引导学生回顾步骤', '学生能说明正确思路时结束');
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page).toHaveURL(/icon-flow\/test/);
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
   await page.getByRole('button', { name: '确认并完成', exact: true }).click();
@@ -55,7 +55,7 @@ test('分类图案固定，颜色和自定义图片随创建、编辑、发布�
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('skill-icon-mobile.png'), fullPage: true });
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
   await page.getByRole('button', { name: '确认并完成', exact: true }).click();
   await page.goto('/#/workshop');
@@ -81,9 +81,9 @@ test('分类图案固定，颜色和自定义图片随创建、编辑、发布�
     await other.getByLabel('账号', { exact: true }).fill('icon_receiver');
     await other.getByLabel('密码', { exact: true }).fill('icon123456');
     await other.getByRole('button', { name: '注册并登录', exact: true }).click();
-    await other.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '教学 SKILL 集市', exact: true }).click();
-    await other.locator('.market-resource-card').getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
-    await other.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '我的 SKILL', exact: true }).click();
+    await other.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '教学方法 集市', exact: true }).click();
+    await other.locator('.market-resource-card').getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
+    await other.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '我的教学方法', exact: true }).click();
     await other.getByRole('navigation', { name: 'SKILL 分类', exact: true }).getByRole('button', { name: '从集市添加', exact: true }).click();
     const added = other.locator('.workshop-item .skill-icon');
     await expect(added.locator('img')).toHaveAttribute('src', /^data:image\/png;base64,/);

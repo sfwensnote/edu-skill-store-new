@@ -63,14 +63,14 @@ export function WorkshopResourceCard({
       <div className="workshop-resource-body">
         <div className="workshop-resource-labels">
           <span>
-            {item.kind === 'method-draft' ? '创建草稿' : item.entry.addedFrom ? '从集市添加' : '教学 SKILL'}
+            {item.kind === 'method-draft' ? '创建草稿' : item.entry.addedFrom ? '从集市添加' : '教学方法'}
           </span>
           {shared && <span>已发布</span>}
         </div>
         <h3>
           <button onClick={() => actions.view(item)}>{item.title}</button>
         </h3>
-        <p className="workshop-summary">{item.summary || '继续编辑，补充 SKILL 内容。'}</p>
+        <p className="workshop-summary">{item.summary || '继续编辑，补充教学方法内容。'}</p>
         <TeachingTagList tags={item.tags} />
         <div className="workshop-resource-meta">
           <span>
@@ -104,7 +104,7 @@ export function WorkshopResourceCard({
           </Button>
         )}
         {own && item.kind === 'skill' && <Button variant="outline" onClick={() => actions.share(item)}>{shared ? '管理发布' : '发布到集市'}</Button>}
-        {item.kind === 'skill' && !canMount && <Button variant="outline" onClick={() => actions.add(item)}>添加到我的 SKILL</Button>}
+        {item.kind === 'skill' && !canMount && <Button variant="outline" onClick={() => actions.add(item)}>添加到我的教学方法</Button>}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -131,7 +131,7 @@ export function WorkshopResourceCard({
                 {item.kind === 'skill' && canMount && (
                   <DropdownMenuItem onSelect={() => actions.mount(item, moreRef.current)}>
                     <Link />
-                    挂载到学伴
+                    添加教学方法
                   </DropdownMenuItem>
                 )}
               </DropdownMenuGroup>
@@ -142,11 +142,11 @@ export function WorkshopResourceCard({
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     variant="destructive"
-                    aria-label={own ? `删除${item.title}` : '从我的 SKILL 移除'}
+                    aria-label={own ? `删除${item.title}` : '从我的教学方法移除'}
                     onSelect={() => actions.remove(item, moreRef.current)}
                   >
                     <Trash2 />
-                    {own ? '删除' : '从我的 SKILL 移除'}
+                    {own ? '删除' : '从我的教学方法移除'}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </>

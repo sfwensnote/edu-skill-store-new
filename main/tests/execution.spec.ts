@@ -42,7 +42,7 @@ test('教师真实身份 → 检测确认 → 挂载 → 学生受控试用 → 
   await page.getByRole('textbox', { name: '账号', exact: true }).fill('teacher-browser');
   await page.getByLabel('密码', { exact: true }).fill('browser-test-password');
   await page.getByRole('button', { name: '注册并登录', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /让每一份教学智慧，\s*都被看见。/ })).toBeVisible();
   await expect(page).toHaveURL(/#\/home/);
   const accountId = await page.evaluate(async () => {
     const token = sessionStorage.getItem('teaching-workshop.server-session');
@@ -61,13 +61,13 @@ test('教师真实身份 → 检测确认 → 挂载 → 学生受控试用 → 
   await page.goto('/#/assistant/browser-method/test');
   await page.reload();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('方法检测');
-  await page.getByRole('button', { name: '开始检测', exact: true }).click();
+  await page.getByRole('button', { name: '开始验证', exact: true }).click();
   await expect(page.getByRole('heading', { name: '教师确认', exact: true })).toBeVisible();
   await expect(page.locator('.execution-case')).toHaveCount(6);
   await expect(page.getByRole('button', { name: '确认检测结果' })).toBeDisabled();
   await page.getByRole('checkbox', { name: '我已查看实际回复，执行符合我的教学方法。' }).check();
   await page.getByRole('button', { name: '确认检测结果' }).click();
-  await expect(page.getByRole('status').filter({ hasText: '可将这项方法挂载到学伴' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '可将这项教学方法添加到学伴' })).toBeVisible();
   await page.screenshot({ path: info.outputPath('real-detection.png'), fullPage: true });
   await page.goto('/#/workshop');
   await page.locator('.workshop-item').getByRole('button', { name: /更多操作/ }).click();

@@ -9,10 +9,10 @@ export function SkillChatPreview({ skill }: { skill: EducationalSkill }) {
   const [caseId, setCaseId] = useState(cases[0]?.id || '');
   const selected = cases.find((item) => item.id === caseId) || cases[0];
   return (
-    <section className="market-panel skill-experience skill-case-trial" aria-label="试用 SKILL">
-      <h2>试用 SKILL</h2>
+    <section className="market-panel skill-experience skill-case-trial" aria-label="试用教学方法">
+      <h2>试用教学方法</h2>
       {selected ? <>
-        <p className="subtle">选择学生的回答，看模型采用这项 SKILL 后如何引导。</p>
+        <p className="subtle">选择学生的回答，看模型采用这项教学方法后如何引导。</p>
         {cases.length > 1 ? <label className="form-field">
           试用案例
           <select aria-label="试用案例" value={selected.id} onChange={(event) => setCaseId(event.target.value)}>

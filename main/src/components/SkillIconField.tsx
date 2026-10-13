@@ -36,11 +36,11 @@ export function SkillIconField({ category, value, onChange, onBusy }: {
     finally { if (request.current === current) { setBusy(false); latest.current.onBusy?.(false); } }
   }
   return <fieldset className="skill-icon-field">
-    <legend>SKILL 图标</legend>
+    <legend>教学方法图标</legend>
     <div className="skill-icon-controls">
       <SkillIcon category={isTeachingCategory(category) ? category : '未分类'} icon={appearance} />
       <div>
-        <div className="skill-icon-colors" role="group" aria-label="SKILL 图标颜色">
+        <div className="skill-icon-colors" role="group" aria-label="教学方法图标颜色">
           {skillIconColors.map((color, index) => <button type="button" key={color} aria-label={['绿色', '蓝色', '紫色', '棕色', '粉色'][index]}
             aria-pressed={(appearance.color || skillIconColors[0]).toLowerCase() === color} disabled={busy} style={{ backgroundColor: color }}
             onClick={() => onChange({ ...appearance, color })} />)}
@@ -48,7 +48,7 @@ export function SkillIconField({ category, value, onChange, onBusy }: {
             value={appearance.color || skillIconColors[0]} onChange={event => onChange({ ...appearance, color: event.target.value })} /></label>
         </div>
         <div className="skill-icon-upload-actions">
-          <input ref={input} type="file" className="sr-only" tabIndex={-1} aria-label="上传 SKILL 图标" accept="image/png,image/jpeg,image/webp" disabled={busy}
+          <input ref={input} type="file" className="sr-only" tabIndex={-1} aria-label="上传教学方法图标" accept="image/png,image/jpeg,image/webp" disabled={busy}
             onChange={event => { void upload(event.target.files?.[0]); event.target.value = ''; }} />
           <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => input.current?.click()}>{busy ? '正在读取…' : '上传图标'}</Button>
           {appearance.image && <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={() => onChange({ color: appearance.color })}>使用分类图标</Button>}

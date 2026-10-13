@@ -134,8 +134,13 @@
 .catalog-results {
   min-width: 0;
 }
+.catalog-result-count {
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--ink-2);
+}
 .catalog-list-toolbar {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 12px;
   min-height: 34px;
@@ -216,7 +221,8 @@
   min-width: 0;
 }
 .market-catalog .catalog-resource-title h2 {
-  font-size: 17px;
+  font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif);
+  font-size: 22px;
   font-weight: 600;
   line-height: 1.45;
 }
@@ -336,6 +342,9 @@
   }
 }
 @media (max-width: 900px) {
+  .catalog-list-toolbar {
+    display: flex;
+  }
   .catalog-layout {
     grid-template-columns: 1fr;
   }
@@ -395,7 +404,8 @@
     gap: 4px;
   }
   .market-catalog .catalog-resource-title h2 {
-    font-size: 17px;
+    font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif);
+    font-size: 20px;
   }
   .catalog-resource-summary {
     font-size: 15px;
@@ -419,5 +429,16 @@
   .catalog-resource-icon {
     width: 40px;
     height: 40px;
+  }
+}
+@media (min-width: 1101px) {
+  .catalog-filters {
+    flex-wrap: nowrap;
+  }
+  .catalog-selects {
+    flex-wrap: nowrap;
+  }
+  .catalog-search {
+    min-width: 120px;
   }
 }

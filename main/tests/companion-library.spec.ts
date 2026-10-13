@@ -64,8 +64,8 @@ test('列表使用所选头像与真实资料，搜索筛选和排序可用，�
   await expect(page.locator('[data-companion-id="math"] .companion-avatar')).toHaveAttribute('data-style', 'simple');
   await expect(page.locator('[data-companion-id="reading"] .companion-avatar')).toHaveAttribute('data-style', 'lively');
   await expect(page.locator('[data-companion-id="custom"] .companion-avatar img')).toHaveAttribute('src', customImage);
-  await expect(page.locator('[data-companion-id="custom"]')).toContainText('SKILL 已移除');
-  await expect(page.locator('[data-companion-id="math"]')).toContainText('已挂载 1 个 SKILL');
+  await expect(page.locator('[data-companion-id="custom"]')).toContainText('教学方法已移除');
+  await expect(page.locator('[data-companion-id="math"]')).toContainText('已添加 1 项教学方法');
   await expect(page.locator('[data-companion-id="math"]')).toContainText('材料 1 份');
   await expect(page.getByRole('button', { name: /上传材料/ })).toHaveCount(0);
   await expect.poll(() => page.locator('.companion-library img').evaluateAll(images => images.every(image => (image as HTMLImageElement).naturalWidth > 0))).toBe(true);
@@ -99,7 +99,7 @@ test('草稿可查看或继续创建，详情保留头像、场景、方法与�
   await page.locator('[data-companion-id="custom"]').getByRole('button', { name: '查看学伴', exact: true }).click();
   await expect(page).toHaveURL(/#\/companions\/custom(?:\?|$)/);
   await expect(page.locator('.companion-overview-image img')).toHaveAttribute('src', customImage);
-  await expect(page.getByRole('alert').filter({ hasText: '关联的 SKILL 已移除' })).toBeVisible();
+  await expect(page.getByRole('alert').filter({ hasText: '关联的 教学方法已移除' })).toBeVisible();
   await page.getByRole('button', { name: '返回我的学伴', exact: true }).click();
   await page.locator('[data-companion-id="custom"]').getByRole('button', { name: '继续创建', exact: true }).click();
   await expect(page).toHaveURL(/#\/companions\/custom\/edit(?:\?|$)/);
@@ -122,7 +122,7 @@ test('草稿可查看或继续创建，详情保留头像、场景、方法与�
   await expect(page.getByRole('textbox', { name: '学伴简介', exact: true })).toHaveValue('帮助学生检查解题思路');
 });
 
-test('复制只创建独立学伴草稿，原学伴与我的 SKILL 保持，复制失败可重试', async ({ page }) => {
+test('复制只创建独立学伴草稿，原学伴与我的教学方法 保持，复制失败可重试', async ({ page }) => {
   await seed(page);
   const before = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!)[0], companionsKey);
   const skillsBefore = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));

@@ -17,6 +17,7 @@ import './styles/workbench-resources.css';
 import './styles/workbench-spaces.css';
 import './styles/interaction.css';
 import './styles/page-layout.css';
+import './styles/shishuo-theme.css';
 const root = createRoot(document.getElementById('root')!);
 function startApp() {
   try {
@@ -29,7 +30,7 @@ function startApp() {
   } catch {
     root.render(<main className="page-frame market-page">
       <section className="market-panel" role="alert">
-        <p>SKILL 未清空，请检查浏览器存储权限后重试。</p>
+        <p>教学方法未清空，请检查浏览器存储权限后重试。</p>
         <Button onClick={startApp}>重新清空</Button>
       </section>
     </main>);

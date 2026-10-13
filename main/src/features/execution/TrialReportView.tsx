@@ -5,8 +5,8 @@ import { reviewSchema, type TrialReport, type TrialSession } from '../../../shar
 import { executionApi, failureMessage } from './api';
 import { Transcript } from './Transcript';
 
-const aspectLabels = { learning: '学生学习表现', skill: 'SKILL 执行情况', runtime: '学伴运行问题' };
-const decisions = { 'meets-expectations': '符合预期', 'adjust-scene': '调整学习场景', 'modify-skill': '修改 SKILL', 'expand-trial': '扩大试用范围' };
+const aspectLabels = { learning: '学生学习表现', skill: '教学方法执行情况', runtime: '学伴运行问题' };
+const decisions = { 'meets-expectations': '符合预期', 'adjust-scene': '调整学习场景', 'modify-skill': '修改教学方法', 'expand-trial': '扩大试用范围' };
 export function TrialReportView({ initial, sessions, onEdit, onMethods }: {
   initial: TrialReport; sessions: TrialSession[]; onEdit: () => void; onMethods: () => void;
 }) {
@@ -43,7 +43,7 @@ export function TrialReportView({ initial, sessions, onEdit, onMethods }: {
       {error && <p role="alert">{error}</p>}
       <div className="inline-actions"><Button disabled={busy} type="submit">保存核对意见</Button>
         <Button type="button" variant="outline" onClick={onEdit}>调整学习场景</Button>
-        <Button type="button" variant="outline" onClick={onMethods}>查看与修改 SKILL</Button></div>
+        <Button type="button" variant="outline" onClick={onMethods}>查看与修改教学方法</Button></div>
       {report.review && <p role="status">已记录：{decisions[report.review.decision]}</p>}
     </form>
     <Dialog open={!!evidence} onOpenChange={open => { if (!open) setEvidence(null); }}><DialogContent className="execution-evidence-dialog">

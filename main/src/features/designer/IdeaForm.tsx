@@ -27,9 +27,12 @@ export function IdeaForm({
         if (complete && !iconBusy) onContinue();
       }}
     >
+      <section className="idea-thought">
       <header>
         <h2>说说你的教学想法</h2>
       </header>
+      <p className="idea-tip" id="idea-tip">写下你在课堂上会怎么做，接下来一起整理成可复用的教学方法。</p>
+      <div className="idea-composer">
       {!draft.originalIdea && (
         <Button
           variant="link"
@@ -50,10 +53,12 @@ export function IdeaForm({
         </Button>
       )}
       <label className="idea-input">
-        <span className="sr-only">教学想法</span>
+        <span className="idea-input-label">教学想法</span>
         <MethodTextField
           id="original-idea"
           aria-label="教学想法"
+          aria-describedby="idea-tip"
+          minRows={5}
           required
           maxLength={500}
           value={draft.originalIdea}
@@ -64,10 +69,12 @@ export function IdeaForm({
           onChange={(event) => onChange({ ...draft, originalIdea: event.target.value, exampleIdea: false })}
           placeholder="例如：学生做错题以后总是等答案。我希望第一次做错的时候不要马上告诉他答案，而是先让他回顾自己的思路。"
         />
-        {draft.originalIdea.length >= 450 && (
-          <span className="idea-count">还可输入 {500 - draft.originalIdea.length} 字</span>
-        )}
+        <span className="idea-count">{draft.originalIdea.length >= 450 ? `还可输入 ${500 - draft.originalIdea.length} 字` : `${draft.originalIdea.length} / 500`}</span>
       </label>
+      </div>
+      </section>
+      <section className="idea-settings">
+      <header><h2>基本信息</h2><p>选择适用范围，方便分享与复用。</p></header>
       <div className="idea-context">
         <label>
           <span>学段<span className="required-mark" aria-hidden="true"> *</span></span>
@@ -118,6 +125,7 @@ export function IdeaForm({
           <ArrowRight data-icon="inline-end" />
         </Button>
       </footer>
+      </section>
     </form>
   );
 }

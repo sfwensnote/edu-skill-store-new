@@ -18,8 +18,8 @@ test('首页与集市可试用收藏添加；编辑自己的单项不覆盖其�
   const api: string[] = [];
   page.on('request', (r) => { if (r.url().includes('/api/')) api.push(r.url()); });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '浏览集市' }).click();
+  await expect(page.getByRole('heading', { name: /让每一份教学智慧，\s*都被看见。/ })).toBeVisible();
+  await page.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: '教学方法 集市', exact: true }).click();
   await page.getByRole('button', { name: '错误后反思引导', exact: true }).click();
   const ownersBefore = await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'));
   await page.getByLabel('学生输入', { exact: true }).fill('我算错了，不知道检查哪里');
@@ -27,12 +27,12 @@ test('首页与集市可试用收藏添加；编辑自己的单项不覆盖其�
   await expect(page.getByRole('log')).toContainText('请把你目前的做法和理由写出来');
   await expect(page.getByRole('button', { name: /改编/ })).toHaveCount(0);
   await page.getByRole('button', { name: '收藏', exact: true }).click();
-  await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   expect(await page.evaluate(() => localStorage.getItem('teaching-assistant.frontend-demo.v2'))).toBe(ownersBefore);
   await page.goto('/#/create/assistant-demo-active?skill=reflect');
-  await page.getByRole('button', { name: '编辑SKILL 名称' }).click();
-  await page.getByRole('textbox', { name: 'SKILL 名称', exact: true }).fill('编辑原有第一项');
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '编辑教学方法名称' }).click();
+  await page.getByRole('textbox', { name: '教学方法名称', exact: true }).fill('编辑原有第一项');
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   const old = await page.evaluate(() => JSON.parse(localStorage.getItem('teaching-assistant.frontend-demo.v2') || '[]')
     .find((a: { id: string }) => a.id === 'assistant-demo-active'));
   expect(old.skills).toHaveLength(3);
@@ -153,7 +153,7 @@ test('工坊复制、收藏、分享、助手配置和确认删除可交互', as
   await page.getByRole('button', { name: '确认删除' }).click();
   await expect(page.locator('.workshop-item')).toHaveCount(6);
   await page.goto('/#/market');
-  await expect(page.getByRole('heading', { name: '教学 SKILL 集市', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '教学方法 集市', exact: true })).toBeVisible();
 });
 
 test('390px 手机布局支持入口、三个编辑层级与使用空间，无横向溢出', async ({ page }) => {

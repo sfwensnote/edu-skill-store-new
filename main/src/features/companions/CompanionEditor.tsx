@@ -15,7 +15,7 @@ import { useVerification } from '../execution/useVerification';
 import { methodInput, serviceConfigured } from '../execution/api';
 
 const stepIcons = [UserRound, FileText, BookOpen, Save];
-const stepHints = ['设置学伴的名称、简介和适用范围。', '从我的 SKILL 中选择教学方法。', '选择学习对象与情境，写明任务和目标。', '确认学伴信息、教学方法与学习任务。'];
+const stepHints = ['设置学伴的名称、简介和适用范围。', '从我的教学方法中选择教学方法。', '选择学习对象与情境，写明任务和目标。', '确认学伴信息、教学方法与学习任务。'];
 
 export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSkills }: {
   initial: LearningCompanion; skills: SkillEntry[]; onSave: (value: LearningCompanion) => boolean;
@@ -73,7 +73,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
       const issue = issueFor(valueRef.current, (step - 1) as CompanionStep);
       if (issue) { setError(issue); return; }
       if (step > 2 && unverified(valueRef.current)) {
-        setError('请先检测所选 SKILL 并确认结果，再挂载到学伴。'); return;
+        setError('请先验证所选教学方法并确认结果，再添加到学伴。'); return;
       }
     }
     const next = { ...valueRef.current, step };
@@ -86,7 +86,7 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
     const issue = issueFor(valueRef.current);
     if (issue) { setError(issue); return; }
     if (unverified(valueRef.current)) {
-      setError('所选方法尚未验证，请先完成 SKILL 检测。'); return;
+      setError('所选方法尚未验证，请先完成教学方法验证。'); return;
     }
     const next = { ...valueRef.current, status: 'ready' as const };
     if (persist(next)) onDone();
@@ -140,8 +140,8 @@ export function CompanionEditor({ initial, skills, onSave, onDone, onBack, onSki
             <input type="checkbox" disabled={!verification.verified(entry) && !value.skillIds.includes(entry.id)} checked={value.skillIds.includes(entry.id)} onChange={event => change({ skillIds: event.target.checked ? [...value.skillIds, entry.id] : value.skillIds.filter(id => id !== entry.id) })} />
             <span><strong>{entry.skill.name}</strong><small>{entry.grade} · {entry.subject} · {verification.verified(entry) ? serviceConfigured ? '已验证' : '教师已核对' : '待检测'}</small><span>{entry.skill.summary}</span></span>
           </label>)}</div>
-          {!!missing.length && <p role="alert">有 {missing.length} 项 SKILL 已移除。<Button variant="link" onClick={() => change({ skillIds: value.skillIds.filter(id => !missing.includes(id)) })}>清除失效选择</Button></p>}
-          {!skills.length && <EmptyState title="还没有可选择的 SKILL" action={<Button variant="outline" onClick={() => leave(onSkills)}>前往我的 SKILL</Button>} />}
+          {!!missing.length && <p role="alert">有 {missing.length} 项教学方法已移除。<Button variant="link" onClick={() => change({ skillIds: value.skillIds.filter(id => !missing.includes(id)) })}>清除失效选择</Button></p>}
+          {!skills.length && <EmptyState title="还没有可选择的教学方法" action={<Button variant="outline" onClick={() => leave(onSkills)}>前往我的教学方法</Button>} />}
         </>}
         {value.step === 3 && <>
           <TaskElements task={value.task} design={value.design} onTask={task => change({ task })} onDesign={design => change({ design })} />

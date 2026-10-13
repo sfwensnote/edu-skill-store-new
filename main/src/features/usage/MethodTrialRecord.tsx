@@ -4,7 +4,7 @@ import { MethodSteps } from './MethodSteps';
 
 export function MethodTrialRecord({ task, onBack }: { task: LocalTeachingTask; onBack: () => void }) {
   return <main className="page-frame detail-page method-detail-page">
-    <button className="back-link" onClick={onBack}><ArrowLeft />返回我的 SKILL</button>
+    <button className="back-link" onClick={onBack}><ArrowLeft />返回我的教学方法</button>
     <header className="method-detail-heading"><div>
       <p>历史方法试用</p>
       <h1>{task.skill?.skill.name || task.title}</h1>

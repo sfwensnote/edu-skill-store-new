@@ -92,7 +92,7 @@ export function StudentPreviewPage({
     setValue('');
   }
   const backText = backLabel;
-  if (!activeSkill) return <main className="page-frame not-found"><h1>还没有可试用的 SKILL</h1>
+  if (!activeSkill) return <main className="page-frame not-found"><h1>还没有可试用的教学方法</h1>
     <Button onClick={onContinue}>返回方法编辑</Button></main>;
   return (
     <main className="student-preview-page page-frame">
@@ -176,7 +176,7 @@ export function StudentPreviewPage({
         {!checked ? <Button onClick={onContinue}>先核对教学方法</Button> : <>
           {!shared && activeSkill && <Button variant="outline" onClick={() => onShare(activeSkill.id)}>发布到集市</Button>}
           {shared && <span className="preview-shared-status">已发布到集市</span>}
-          <Button onClick={onDone}>完成，返回我的 SKILL</Button>
+          <Button onClick={onDone}>完成，返回我的教学方法</Button>
         </>}
       </footer>
     </main>

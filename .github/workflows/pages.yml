@@ -1,4 +1,4 @@
-name: 部署教学工坊到 GitHub Pages
+name: 部署师说到 GitHub Pages
 
 on:
   push:

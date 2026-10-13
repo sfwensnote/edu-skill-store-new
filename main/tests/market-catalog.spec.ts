@@ -22,7 +22,7 @@ test('集市组合筛选、分类计数、收藏持久化及详情返回可用',
   await expect(page.getByRole('heading', { name: '还没有收藏的教学方法' })).toBeVisible();
   await page.getByRole('button', { name: '浏览全部方法' }).click();
 
-  await page.getByLabel('搜索 SKILL').fill('周老师');
+  await page.getByLabel('搜索教学方法').fill('周老师');
   await expect(rows).toHaveCount(1);
   await expect(rows).toContainText('费用比较中的信息提取与论证');
   await page.getByRole('button', { name: '清除筛选', exact: true }).click();
@@ -50,7 +50,7 @@ test('集市组合筛选、分类计数、收藏持久化及详情返回可用',
   await personal.getByRole('button', { name: /^我收藏的/ }).click();
   await expect(personal.getByRole('button', { name: /^我收藏的/ })).toContainText('1');
   await rows.getByRole('button', { name: '查看与试用', exact: true }).click();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toContainText('预计使用 3 小时');
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toContainText('预计使用 3 小时');
   await page.reload();
   await page.getByRole('button', { name: '返回集市', exact: true }).click();
   await expect(rows).toHaveCount(1);
@@ -92,18 +92,18 @@ test('手机集市使用白色分类面板，分类与标签共同生效并可�
   await page.screenshot({ path: 'docs/assets/SKILL集市手机.png', fullPage: true });
 });
 
-test('我的 SKILL 不提供试用，方法检验与原版集市导航可用', async ({ page }) => {
+test('我的教学方法 不提供试用，教学方法验证与原版集市导航可用', async ({ page }) => {
   await page.goto('/#/daily');
   await page.setViewportSize({ width: 1440, height: 1000 });
   const card = await page.locator('.daily-entry').boundingBox();
   expect(Math.abs(card!.x + card!.width / 2 - 720)).toBeLessThan(2);
   await page.goto('/#/workshop?tab=skills');
-  await expect(page.getByRole('button', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '试用教学方法', exact: true })).toHaveCount(0);
   await page.locator('.workshop-item').first().getByRole('button', { name: '查看', exact: true }).click();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: '方法检验', exact: true }).click();
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '教学方法验证', exact: true }).click();
   await expect(page).toHaveURL(/#\/assistant\/[^/]+\/test/);
-  await expect(page.getByRole('button', { name: '我的 SKILL', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('button', { name: '我的教学方法', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByRole('button', { name: '布置任务', exact: true })).toHaveCount(0);
   await page.goto('/#/market');
   await expect(page.getByRole('button', { name: /助手库/ })).toHaveCount(0);

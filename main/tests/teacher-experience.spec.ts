@@ -46,7 +46,7 @@ test('教师初学者：空的个人工作区，具体案例试用与添加各�
   await page.getByRole('button', { name: '查看模型回复', exact: true }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: info.outputPath('market-preview-mobile.png'), fullPage: true });
-  await page.getByRole('button', { name: '添加到我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '添加到我的教学方法', exact: true }).click();
   await page.goto('/#/workshop?tab=created');
   await expect(page.locator('.workshop-item')).toHaveCount(0);
   await page.goto('/#/workshop?tab=added');
@@ -65,14 +65,14 @@ test('资深教师：直接编辑语文方法，不回答六问也能检测、�
   await page.getByLabel('教学分类', { exact: true }).selectOption('课堂提问');
   await page.getByRole('checkbox', { name: '标签 课堂提问', exact: true }).check();
   await page.getByRole('button', { name: '继续', exact: true }).click();
-  for (const [label, value] of [['SKILL 名称', '阅读证据追问'], ['SKILL 简介', '引导学生用原文支持阅读判断'], ['结束条件', '学生能独立解释原文依据时结束'], ['希望学生达到', '用原文支持自己的判断'],
+  for (const [label, value] of [['教学方法名称', '阅读证据追问'], ['教学方法简介', '引导学生用原文支持阅读判断'], ['结束条件', '学生能独立解释原文依据时结束'], ['希望学生达到', '用原文支持自己的判断'],
     ['什么时候开始', '学生只表达观点没有依据']]) await edit(page, label, value);
   await page.getByRole('button', { name: '补充一种情况和做法', exact: true }).click();
   await edit(page, '情况 1', '学生只表达观点'); await edit(page, '做法 1', '追问原文依据');
   await page.getByRole('button', { name: '补充一条原则', exact: true }).click();
   await edit(page, '原则 1', '不替学生寻找原文证据');
   await expect(page.locator('.question-top small')).toHaveText('1 / 6');
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page.locator('.simulation-line.assistant')).toContainText('判断依据');
   await expect(page.locator('.simulation-line.assistant')).not.toContainText('教师会');
   await noDemoLabels(page);
@@ -108,7 +108,7 @@ test('职前教师：按自己的备课想法完成六问，不混入数学答�
     await page.getByRole('button', { name: '提交', exact: true }).click();
   }
   await fillMethodDetails(page, '朗读停顿比较', '让学生理解不同停顿对句意的影响', '学生能比较两种停顿并解释句意时结束');
-  await page.getByRole('button', { name: '形成 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '完成整理', exact: true }).click();
   await expect(page.locator('.simulation-line.assistant')).toContainText('停顿');
   await expect(page.locator('main')).not.toContainText(/3x|方程|100%|触发率|全部通过/);
   await page.getByRole('button', { name: '确认并继续', exact: true }).click();
@@ -151,7 +151,7 @@ test('失效的步骤与编辑链接不会冒用另一项方法；列表偏好�
   for (const path of ['/#/create/assistant-demo-active?skill=missing',
     '/#/assistant/assistant-demo-active/student-preview?case=reflect:99&from=method']) {
     await page.goto(path);
-    await expect(page.getByRole('button', { name: '返回我的 SKILL', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '返回我的教学方法', exact: true })).toBeVisible();
     await expect(page.locator('.creation-flow,.student-chat')).toHaveCount(0);
   }
   await page.addInitScript(() => {

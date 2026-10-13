@@ -53,17 +53,17 @@ test('方法详情返回原分类，集市返回保留搜索，失效链接有�
   await page.goto('/#/workshop?tab=skills');
   await page.locator('.workshop-item').first().getByRole('button', { name: '查看', exact: true }).click();
   await page.reload();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
   await expect(page).toHaveURL(/workshop\?tab=skills$/);
-  await page.getByRole('button', { name: '教学 SKILL 集市', exact: true }).click();
+  await page.getByRole('button', { name: '教学方法 集市', exact: true }).click();
   await page.getByLabel('搜索 SKILL').fill('反思');
   await page.getByRole('button', { name: '错误后反思引导', exact: true }).click();
   await page.getByRole('button', { name: '返回集市', exact: true }).click();
   await expect(page.getByLabel('搜索 SKILL')).toHaveValue('反思');
   await page.goto('/#/inquiry/deleted-design/3');
   await expect(page.getByRole('heading', { name: '没有找到这项内容' })).toBeVisible();
-  await page.getByRole('button', { name: '返回我的 SKILL', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '我的 SKILL', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '返回我的教学方法', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '我的教学方法', exact: true })).toBeVisible();
 });
 
 test('客户展示页面使用统一配色，没有开发说明，桌面与手机导航均可用', async ({ page }) => {
@@ -71,7 +71,7 @@ test('客户展示页面使用统一配色，没有开发说明，桌面与手�
   page.on('pageerror', (error) => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/#/home');
-  await expect(page.getByRole('heading', { name: '教学工坊', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /让每一份教学智慧，\s*都被看见。/ })).toBeVisible();
   const color = await page.evaluate(
     () => getComputedStyle(document.querySelector('.app-header')!).backgroundColor,
   );
@@ -107,14 +107,14 @@ test('客户展示页面使用统一配色，没有开发说明，桌面与手�
 
 test('检测返回保留正在编辑的单项 SKILL，记录不存在时不会显示别人的对话', async ({ page }) => {
   await page.goto('/#/create/assistant-demo-active?skill=progressive-hint');
-  await expect(page.getByRole('button', { name: '编辑SKILL 名称' })).toContainText('渐进式提示');
+  await expect(page.getByRole('button', { name: '编辑教学方法名称' })).toContainText('渐进式提示');
   await editMethodField(page, '结束条件', '学生能独立完成下一步后结束');
   await page.getByRole('button', { name: '这就是我的教学方法' }).click();
   await expect(page).toHaveURL(/assistant-demo-active\/test/);
   await page.reload();
   await page.getByRole('button', { name: '返回上一步', exact: true }).click();
   await expect(page).toHaveURL(/skill=progressive-hint/);
-  await expect(page.getByRole('button', { name: '编辑SKILL 名称' })).toContainText('渐进式提示');
+  await expect(page.getByRole('button', { name: '编辑教学方法名称' })).toContainText('渐进式提示');
   await page.goto('/#/assistant/assistant-demo-active/logs/missing-record');
   await expect(page.getByRole('heading', { name: '没有找到这项方法' })).toBeVisible();
   await page.getByRole('button', { name: '返回教学预览', exact: true }).click();

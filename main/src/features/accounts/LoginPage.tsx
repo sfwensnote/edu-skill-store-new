@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import { GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function LoginPage({ onLogin, onRegister, initialError }: {
@@ -22,10 +21,18 @@ export function LoginPage({ onLogin, onRegister, initialError }: {
     finally { setBusy(false); }
   }
   return <div className="application">
-    <header className="app-header"><div className="header-inner"><span className="brand"><GraduationCap aria-hidden="true" /><span>教学工坊</span></span></div></header>
+    <header className="app-header"><div className="header-inner"><span className="brand"><span className="brand-logo"><img src={`${import.meta.env.BASE_URL}shishuo-logo.png`} alt="" aria-hidden="true" /><span className="sr-only">师说</span></span></span></div></header>
     <main className="account-login page-frame">
-      <section className="account-login-panel" aria-labelledby="account-heading">
-        <h1 id="account-heading">{register ? '注册教师账号' : '登录教学工坊'}</h1>
+      <section className="account-login-intro">
+        <h1 id="account-heading">
+          <span>让教学智慧，</span>
+          <span>形成可复用的教学方法。</span>
+        </h1>
+        <p>把日常教学中的方法与经验，整理成清晰、可复用的教学方法。</p>
+        <p>登录后可以在一个工作区里创建、检验并发布你的教学方法。</p>
+      </section>
+      <section className="account-login-panel" aria-labelledby="login-form-heading">
+        <h2 id="login-form-heading">{register ? '注册教师账号' : '欢迎登录'}</h2>
         <form className="account-form" onSubmit={submit}>
           {register && <label className="account-field"><span>姓名</span><input autoComplete="name" value={name} onChange={e => setName(e.target.value)} required maxLength={30} disabled={busy} /></label>}
           <label className="account-field"><span>账号</span><input autoComplete="username" value={login} onChange={e => setLogin(e.target.value)} required minLength={3} maxLength={40} autoCapitalize="none" spellCheck={false} disabled={busy} aria-describedby={register ? 'account-format' : undefined} /></label>

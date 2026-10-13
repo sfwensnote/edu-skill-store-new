@@ -7,7 +7,7 @@ import { companionsKey, newCompanion } from '../shared/learning-companion';
 const skill = packageTeachingMethod(completeTeachingMethod(), 'audit-method');
 const owner = { ...initialMine[0], id: 'audit-owner', name: skill.name, skills: [skill], status: 'TESTED', isPublic: false, revision: 1 };
 const entryId = 'personal:audit-owner:audit-method';
-const menus = [['首页', 'home'], ['教学 SKILL 集市', 'market'], ['我的 SKILL', 'workshop'], ['我的学伴', 'companions']] as const;
+const menus = [['首页', 'home'], ['教学方法 集市', 'market'], ['我的教学方法', 'workshop'], ['我的学伴', 'companions']] as const;
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(({ owner, draft, ready }) => {
@@ -40,7 +40,7 @@ async function topMenus(page: Page) {
 async function ownDetail(page: Page) {
   await page.goto('/#/workshop?tab=created');
   await page.getByRole('button', { name: '查看', exact: true }).click();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toHaveCount(0);
 }
 
 test('详情挂载草稿与正式学伴都打开所选详情，关闭、返回和刷新不残留旧页面', async ({ page }) => {
@@ -49,7 +49,7 @@ test('详情挂载草稿与正式学伴都打开所选详情，关闭、返回�
     await ownDetail(page);
     await page.getByRole('button', { name: '挂载到学伴', exact: true }).click();
     await page.getByRole('combobox', { name: '选择学伴', exact: true }).selectOption(id);
-    await page.getByRole('button', { name: '已挂载，查看学伴', exact: true }).click();
+    await page.getByRole('button', { name: '已添加，查看学伴', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`#/${'companions'}/${id}(\\?|$)`));
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
     await expect(page.locator('main')).toHaveCount(1);
@@ -102,7 +102,7 @@ test('同一详情反复打开发布与挂载弹窗、取消和 Escape，随后�
   await expect(page).toHaveURL(/#\/market$/);
   await expect(page.locator('main')).toHaveCount(1);
   await page.getByRole('button', { name: '查看与试用', exact: true }).click();
-  await expect(page.getByRole('region', { name: '试用 SKILL', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: '试用教学方法', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '管理发布', exact: true }).click();
   await page.getByRole('button', { name: '查看集市', exact: true }).click();
   await expect(page).toHaveURL(/#\/market$/);

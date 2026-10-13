@@ -10,11 +10,12 @@
 .creation-panel {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius);
 }
 .creation-panel h2 {
-  font-size: 28px;
-  font-weight: 650;
+  font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif);
+  font-size: 24px;
+  font-weight: 600;
 }
 .creation-panel header > p {
   color: var(--ink-2);
@@ -22,9 +23,29 @@
   line-height: 1.75;
 }
 .idea-form {
-  max-width: 1040px;
-  margin: 0 auto 32px;
-  padding: 32px 36px;
+  max-width: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: 24px;
+  padding: 24px;
+}
+.idea-thought { min-width: 0; min-height: 430px; display: flex; flex-direction: column; gap: 16px; background: var(--muted); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
+.idea-settings { min-width: 0; padding: 8px; }
+.idea-settings > header { margin-bottom: 24px; }
+.idea-tip { margin: 0; color: var(--ink-2); line-height: 1.75; }
+.idea-composer { margin-top: auto; min-width: 0; }
+.idea-thought .idea-input { margin-top: 8px; padding: 16px; background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); }
+.idea-thought .idea-input:focus-within { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent); }
+.idea-input-label { display: block; font-size: 14px; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+.idea-thought .idea-input .method-text-field textarea { min-height: 180px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; line-height: 1.8; }
+.idea-thought .idea-count { display: block; position: static; text-align: right; font-size: 13px; margin-top: 4px; }
+.idea-form .creation-footer { position: static; margin-top: 24px; }
+@media (max-width: 900px) {
+  .idea-form.creation-panel { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 20px; }
+  .idea-thought { padding: 16px; min-height: 320px; }
+  .idea-thought .idea-input .method-text-field textarea { min-height: 140px; }
+  .idea-settings { padding: 0; }
 }
 .idea-input {
   display: block;
@@ -103,7 +124,7 @@
   min-width: 0;
 }
 .guided-conversation {
-  background: var(--card);
+  background: var(--accent);
   padding: 24px 28px 32px;
   border-right: 1px solid var(--line);
   overflow-y: auto;
@@ -113,8 +134,9 @@
 }
 .guided-heading h2,
 .method-outline > header h3 {
-  font-size: 27px;
-  font-weight: 650;
+  font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif);
+  font-size: 22px;
+  font-weight: 600;
   line-height: 1.4;
 }
 .guided-heading p {
@@ -201,8 +223,9 @@
   font-size: 12px;
 }
 .current-question h4 {
-  font-size: 21px;
-  font-weight: 650;
+  font-family: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'SimSun', serif);
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.55;
   margin: 14px 0 18px;
 }
@@ -319,7 +342,7 @@
   padding: 24px 28px 0;
   background: var(--card);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -524,7 +547,7 @@
   }
   .guided-heading h2,
   .method-outline > header h3 {
-    font-size: 25px;
+    font-size: 20px;
   }
   .method-workarea {
     padding: 18px 0 0;
@@ -550,5 +573,25 @@
   }
   .creation-footer {
     flex-wrap: wrap;
+  }
+}
+
+/* 教学方法预览弹窗底部操作：窄屏换行，随内容滚动，不覆盖预览正文 */
+.guided-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .guided-preview-actions {
+    flex-wrap: wrap;
+  }
+  .guided-preview-actions > button {
+    flex: 1 1 auto;
   }
 }
