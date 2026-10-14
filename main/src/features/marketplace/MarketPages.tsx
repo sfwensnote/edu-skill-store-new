@@ -7,6 +7,8 @@ import { skillCreatorLabel, skillSourceText, skillValidationLabel } from '../../
 import { SkillChatPreview } from './SkillChatPreview';
 import { MethodSteps } from '@/features/usage/MethodSteps';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { methodMarkdown } from '../../../shared/method-chat';
+import './market-chat.css';
 export function SkillDetailPage({
   entry,
   favorite,
@@ -49,13 +51,13 @@ export function SkillDetailPage({
           {backLabel}
         </button>
         <div>
-          <h1>{entry.skill.name}</h1>
-          <p>{entry.skill.summary}</p>
+          <h1>{showTrial ? '试用教学方法' : entry.skill.name}</h1>
+          {!showTrial && <><p>{entry.skill.summary}</p>
           <p className="subtle">
             {skillCreatorLabel(entry)} · {entry.grade} · {entry.subject} · {teachingCategoryOf(entry.skill, entry.scene, entry.area)}
           </p>
           <TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example)} />
-          <small>{skillValidationLabel(entry)}</small>
+          <small>{skillValidationLabel(entry)}</small></>}
         </div>
         <div className="inline-actions page-heading-actions">
           {onCheck && <Button onClick={onCheck}>教学方法验证</Button>}
@@ -76,9 +78,11 @@ export function SkillDetailPage({
           </Button>}
         </div>
       </header>
-      <div className={showTrial ? 'detail-grid' : 'detail-grid method-only-detail'}>
+      <div className={showTrial ? 'detail-grid market-chat-stack' : 'detail-grid method-only-detail'}>
+        {showTrial && <SkillChatPreview key={`${entry.id}:${methodMarkdown(entry.skill)}`} entry={entry} />}
         <section className="market-panel method-detail">
-          <MethodSteps skill={entry.skill} />
+          {showTrial && <header className="market-method-information"><h2>{entry.skill.name}</h2><p>{entry.skill.summary}</p><p className="subtle">{skillCreatorLabel(entry)} · {entry.grade} · {entry.subject} · {teachingCategoryOf(entry.skill, entry.scene, entry.area)}</p><TeachingTagList tags={teachingTagsOf(entry.skill, entry.scene, entry.area, entry.example)} /><small>{skillValidationLabel(entry)}</small></header>}
+          <MethodSteps skill={entry.skill} actionsOnly />
           <h3>课堂使用</h3>
           <p>{entry.example}</p>
           {source && <details>
@@ -86,7 +90,6 @@ export function SkillDetailPage({
             <p>{source}</p>
           </details>}
         </section>
-        {showTrial && <SkillChatPreview key={`${entry.id}:${entry.version}`} skill={entry.skill} />}
       </div>
     </main>
   );

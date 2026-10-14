@@ -10,7 +10,7 @@ export function PublishSkillDialog({ entry, shared, checked, onClose, onCheck, o
   const [error, setError] = useState('');
   return <Dialog open onOpenChange={open => { if (!open) onClose(); }}><DialogContent>
     <DialogHeader><DialogTitle>{shared ? '管理发布' : '发布到教学方法集市'}</DialogTitle>
-      <DialogDescription>{shared ? `“${entry.skill.name}”已发布，其他教师可以查看、试用和添加。` : checked ? `发布“${entry.skill.name}”，供其他教师查看、试用和添加。` : '发布前请完成教学方法验证，逐项确认学生输入、模型回复与教学做法。'}</DialogDescription>
+      <DialogDescription>{shared ? `“${entry.skill.name}”已发布，其他教师可以查看、试用和添加。` : checked ? `发布“${entry.skill.name}”，供其他教师查看、试用和添加。` : '发布前请与搭载教学方法的模型对话，并确认这项方法通过测验。'}</DialogDescription>
     </DialogHeader>
     {error && <p role="alert">{error}</p>}
     <div className="inline-actions">

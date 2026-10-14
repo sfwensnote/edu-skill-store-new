@@ -2,9 +2,10 @@ import type { EducationalSkill } from '../../../shared/assistant';
 import { Button } from '@/components/ui/button';
 import './method-steps.css';
 
-export function MethodSteps({ skill, onPreview }: {
+export function MethodSteps({ skill, onPreview, actionsOnly = false }: {
   skill: EducationalSkill;
   onPreview?: (index: number) => void;
+  actionsOnly?: boolean;
 }) {
   const steps = skill.steps?.length
     ? skill.steps
@@ -25,10 +26,10 @@ export function MethodSteps({ skill, onPreview }: {
               <h3>步骤 {index + 1}</h3>
               {onPreview && <Button variant="outline" size="sm" onClick={() => onPreview(index)}>预览这一步</Button>}
             </header>
-            <dl>
+            {actionsOnly ? <p className="method-step-text">{step.action}</p> : <dl>
               <div><dt>学生表现</dt><dd>{step.condition}</dd></div>
               <div className="method-step-action"><dt>教师做法</dt><dd>{step.action}</dd></div>
-            </dl>
+            </dl>}
           </li>
         ))}
       </ol>

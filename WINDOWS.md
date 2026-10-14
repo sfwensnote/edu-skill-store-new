@@ -145,3 +145,5 @@ main/data/workspace.sqlite 包含账户、密码哈希、会话和项目记录�
 首次建库已获用户批准。后续每次换机器前，在当前机器检查 `git status`，按已授权范围提交并推送；切换到另一台时先确认工作区干净，再 `git pull --ff-only`。有未提交内容时先保留，不用 reset、clean 或强制推送覆盖。
 
 package-lock.json 变化后在该机器重新 npm ci。保持相同 Node 版本；编辑器使用 UTF-8。源码经 Git 同步，浏览器作品和私有配置单独管理，不承诺自动跨设备同步。当前已检查源码文件名和导入大小写无冲突；唯一目录命名问题是 Mac 外层目录末尾空格。
+
+2026-10-14 已将本机网页与公网隧道改为 Windows 计划任务 Shishuo-AlwaysOn 托管。任务由系统服务拉起独立 Node supervisor，不依赖 Codex；当前父进程已确认为 svchost.exe。登录 Windows 后自动启动，执行时限为 PT0S，任务异常按1分钟重启，网页或隧道子进程异常按5秒重启。主控脚本为 main/scripts/keep-workbench-running.mjs；运行状态与日志保存在忽略目录 backups/windows-hosting。当前公网地址自动写入根目录师说公网地址.txt，隧道重建后地址可能变化。手动启动使用启动师说后台.cmd。关闭 Codex 不停止后台；电脑关机、休眠、断网或注销 Windows 会影响访问。本轮由主 Agent 直接完成，不使用技能，按用户要求停止只读子代理，未运行测试或模型请求。

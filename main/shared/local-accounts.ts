@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { publicTeacherAccount } from './public-teacher';
 
 export const accountsKey = 'teaching-method.local-accounts.v1';
 export const accountSessionKey = 'teaching-method.account-session.v1';
@@ -25,12 +26,17 @@ const initialAccounts: LocalAccount[] = [
 ];
 export function readAccounts(storage: AccountStorage): LocalAccount[] {
   const raw = storage.getItem(accountsKey);
-  if (raw === null) return structuredClone(initialAccounts);
+  if (raw === null) return [...structuredClone(initialAccounts), { ...publicTeacherAccount }];
   try {
     const parsed = z.object({ version: z.literal(1), accounts: z.array(accountSchema).min(1) }).parse(JSON.parse(raw));
     if (new Set(parsed.accounts.map(a => a.id)).size !== parsed.accounts.length ||
       new Set(parsed.accounts.map(a => a.login)).size !== parsed.accounts.length) throw new Error();
-    return parsed.accounts;
+    const existing = parsed.accounts.find(account => account.login === publicTeacherAccount.login);
+    if (!existing) return [...parsed.accounts, { ...publicTeacherAccount }];
+    // 保留同名账号的资料归属，只统一用户明确指定的共用登录信息。
+    return parsed.accounts.map(account => account.id === existing.id
+      ? { ...publicTeacherAccount, id: existing.id }
+      : account);
   } catch { throw new Error('账号资料无法读取，请检查浏览器存储后重试。'); }
 }
 export function identity(account: LocalAccount): AccountIdentity {
@@ -55,8 +61,8 @@ async function passwordHash(password: string, salt: string) {
 function saveSession(storage: AccountStorage, sessions: AccountStorage, account: LocalAccount) {
   const current = readAccounts(storage).find(a => a.id === account.id && !a.disabled);
   if (!current) throw new Error('此账号已停用，请联系管理员。');
-  if (storage.getItem(accountsKey) === null)
-    storage.setItem(accountsKey, JSON.stringify({ version: 1, accounts: readAccounts(storage) }));
+  const accounts = JSON.stringify({ version: 1, accounts: readAccounts(storage) });
+  if (storage.getItem(accountsKey) !== accounts) storage.setItem(accountsKey, accounts);
   sessions.setItem(accountSessionKey, JSON.stringify({ accountId: current.id, expires: Date.now() + 8 * 3600000 }));
   return identity(current);
 }

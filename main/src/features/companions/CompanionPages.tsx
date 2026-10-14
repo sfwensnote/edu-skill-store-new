@@ -42,7 +42,7 @@ export function CompanionsPage({ items, skills, onCreate, onOpen, onPractice, on
   function clearFilters() { setQuery(''); setStatus('all'); setSubject('all'); setSort('updated'); }
   return <main className="page-frame market-page companion-page companion-library">
     <header className="companion-library-heading page-heading">
-      <div><h1 ref={headingRef} tabIndex={-1}>我的学伴</h1><p>管理学伴、教学方法与学习材料。</p></div>
+      <div><h1 ref={headingRef} tabIndex={-1}>我的学伴</h1></div>
       <img src={`${import.meta.env.BASE_URL}companion-hero.png`} alt="" aria-hidden="true" />
       <div className="page-heading-actions"><Button onClick={onCreate}><Plus data-icon="inline-start" />创建学伴</Button></div>
     </header>

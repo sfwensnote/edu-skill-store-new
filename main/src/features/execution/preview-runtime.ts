@@ -9,17 +9,19 @@ import { reviewProgress, reviewSchema, updateCaseReview, type ReviewedDetection 
 import type { TeachingMethod } from '../../../shared/teaching-method';
 import { practiceReply } from '../../../shared/companion-practice';
 import { isCompanionCaseMethod } from '../../../shared/companion-cases';
+import { completeChat, methodChatRecordSchema, methodMarkdown, type MethodChatRecord } from '../../../shared/method-chat';
 
 type Prepared = { value: ReviewedDetection; prepared: DetectionCase[] };
 type Receipt = { sessionId: string; requestId: string; userId: string; replyId: string; entryId: string; caseId: string };
-type State = { version: 1; detections: Prepared[]; trials: Trial[]; sessions: TrialSession[]; requests: Receipt[] };
+type State = { version: 1; detections: Prepared[]; trials: Trial[]; sessions: TrialSession[]; requests: Receipt[]; methodChats: MethodChatRecord[] };
 type StoragePort = Pick<Storage, 'getItem' | 'setItem'>;
 export const previewStorageKey = (owner: string) => `teaching-method.execution-preview.v1:${owner}`;
-const initial = (): State => ({ version: 1, detections: [], trials: [], sessions: [], requests: [] });
+const initial = (): State => ({ version: 1, detections: [], trials: [], sessions: [], requests: [], methodChats: [] });
 const messagesSchema = z.array(z.object({ id: z.string(), role: z.enum(['user', 'assistant']), content: z.string(), at: z.string(), activations: z.array(activationSchema) }));
 const caseSchema = testSituationSchema.extend({ id: z.string(), messages: messagesSchema, verdicts: z.array(verdictSchema) });
 const stateSchema = z.object({
   version: z.literal(1),
+  methodChats: z.array(methodChatRecordSchema).default([]),
   detections: z.array(z.object({ prepared: z.array(caseSchema), value: z.object({
     id: z.string(), ownerId: z.string(), method: methodInputSchema, fingerprint: z.string(), model: z.literal(previewModel),
     status: z.enum(['running', 'review', 'failed', 'verified']), cases: z.array(caseSchema), error: z.string(),
@@ -66,8 +68,10 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
     }
     if (changed) save(data);
   }
-  const proofList = (data: State): Verification[] => data.detections.filter(item => item.value.status === 'verified')
-    .map(({ value }) => ({ entryId: value.method.entryId, detectionId: value.id, fingerprint: value.fingerprint, skill: value.method.skill }));
+  const proofList = (data: State): Verification[] => [...data.detections.filter(item => item.value.status === 'verified')
+    .map(({ value }) => ({ entryId: value.method.entryId, detectionId: value.id, fingerprint: value.fingerprint, skill: value.method.skill })),
+    ...data.methodChats.filter(chat => chat.confirmedAt && chat.fingerprint === methodMarkdown(chat.method.skill) && completeChat(chat.messages))
+      .map(chat => ({ entryId: chat.method.entryId, detectionId: `teacher-chat:${chat.id}`, fingerprint: compileSkillInstructions(chat.method.skill), skill: chat.method.skill }))];
   function trialOf(data: State, id: string) {
     const trial = data.trials.find(item => item.id === id); if (!trial) throw new Error('没有找到本次试运行记录。'); return trial;
   }
@@ -100,6 +104,22 @@ export function createPreviewRuntime(storage: StoragePort, ownerId: string, cloc
     const data = read(); advance(data);
     let result: unknown;
     if (parts[0] === 'verified' && body === undefined) result = proofList(data);
+    else if (parts[0] === 'method-chats' && parts.length === 1) {
+      if (body === undefined) result = data.methodChats.filter(chat => !url.searchParams.get('entryId') || chat.method.entryId === url.searchParams.get('entryId'));
+      else {
+        const input = methodChatRecordSchema.parse(body);
+        if (input.fingerprint !== methodMarkdown(input.method.skill) || !completeChat(input.messages)) throw new Error('对话与当前方法不匹配，请重新开始。');
+        const previous = data.methodChats.find(chat => chat.id === input.id);
+        if (previous && (previous.method.entryId !== input.method.entryId || previous.fingerprint !== input.fingerprint)) throw new Error('方法已修改，请开始新的对话。');
+        const saved = { ...input, confirmedAt: undefined, updatedAt: new Date(clock()).toISOString() };
+        data.methodChats = [saved, ...data.methodChats.filter(chat => chat.id !== saved.id)]; save(data); result = saved;
+      }
+    } else if (parts[0] === 'method-chats' && parts[2] === 'confirm') {
+      const input = z.object({ fingerprint: z.string(), teacherConfirmed: z.literal(true) }).parse(body);
+      const chat = data.methodChats.find(chat => chat.id === parts[1]);
+      if (!chat || chat.fingerprint !== input.fingerprint || chat.fingerprint !== methodMarkdown(chat.method.skill) || !completeChat(chat.messages)) throw new Error('没有可确认的当前方法对话，请先发送消息。');
+      chat.confirmedAt = new Date(clock()).toISOString(); save(data); result = chat;
+    }
     else if (parts[0] === 'detections' && parts.length === 1) {
       if (body === undefined) result = data.detections.map(item => item.value).filter(item => !url.searchParams.get('entryId') || item.method.entryId === url.searchParams.get('entryId'));
       else {

@@ -1,0 +1,8 @@
+.market-page .detail-grid.market-chat-stack { display: flex; flex-direction: column; gap: 24px; }
+.market-model-trial { width: 100%; min-width: 0; }
+.market-model-trial h2 { font-family: var(--font-serif); font-size: 23px; }
+.market-method-information { display: flex; flex-direction: column; gap: 10px; padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.market-method-information h2 { font-family: var(--font-serif); font-size: 28px; color: var(--primary); line-height: 1.5; }
+.market-method-information p { line-height: 1.8; }
+.market-method-information small { color: var(--ink-2); }
+@media(max-width: 640px) { .method-step-text { padding: 18px 16px; } .market-method-information h2 { font-size: 24px; } }

@@ -20,6 +20,8 @@ playwright-report/
 /main/data/
 migration-private/
 /backups/
+/.local-deploy/
+/师说公网地址.txt
 *.sqlite
 *.sqlite-*
 *.sqlite3

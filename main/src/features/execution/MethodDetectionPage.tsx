@@ -1,8 +1,6 @@
 import type { SkillEntry } from '../../../shared/marketplace';
 import type { TeachingMethod } from '../../../shared/teaching-method';
-import { serviceConfigured } from './api';
-import { RemoteMethodDetectionPage } from './RemoteMethodDetectionPage';
-import { MethodReviewPage } from './MethodReviewPage';
+import { MethodModelChatPage } from './MethodModelChatPage';
 
 export type MethodDetectionProps = {
   entries: SkillEntry[];
@@ -15,5 +13,5 @@ export type MethodDetectionProps = {
   canPublish?: (entry: SkillEntry) => boolean;
 };
 export function MethodDetectionPage(props: MethodDetectionProps) {
-  return serviceConfigured ? <RemoteMethodDetectionPage {...props} /> : <MethodReviewPage {...props} />;
+  return <MethodModelChatPage {...props} />;
 }
